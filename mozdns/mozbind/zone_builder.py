@@ -128,16 +128,6 @@ def build_zone_data(view, root_domain, soa, logf=None):
 
     :param root_domain: The root domain of this zone.
     :type root_domain: str
-
-    :returns public_file_path: The path to the zone file in the STAGEING dir
-    :type public_file_path: str
-    :returns public_data: The data that should be written to public_file_path
-    :type public_data: str
-
-    :returns view_zone_file: The path to the zone file in the STAGEING dir
-    :type view_zone_file: str
-    :param view_data: The data that should be written to view_zone_file
-    :type view_data: str
     """
     ztype = 'reverse' if root_domain.is_reverse else 'forward'
     if (soa.has_record_set(view=view, exclude_ns=True) and

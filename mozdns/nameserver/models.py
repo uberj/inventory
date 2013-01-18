@@ -22,14 +22,14 @@ class Nameserver(MozdnsRecord):
 
         Sometimes a name server needs a glue record. A glue record can either
         be an AddressRecord or a StaticInterface. These two types are
-        represented but the attributes `addr_glue` and `intr_glue`, which are
+        represented by the attributes `addr_glue` and `intr_glue`, which are
         both FK's enforced by the DB.
 
-        If there are two A or two Interfaces, or one A and one Interface that
-        fit the criterion of being a NS's glue record, the user should have the
-        choice to choose between records. Because of this, a glue record will
-        only be automatically assigned to a NS if a) The NS doesn't have a glue
-        record or b) the glue record the NS has isn't valid.
+        If there are multiple A or Interfaces that fit the criterion of being
+        an NS's glue record, the user should have the choice to choose between
+        records. Because of this, a glue record will only be automatically
+        assigned to a NS if a) The NS doesn't have a glue record or b) the glue
+        record the NS has isn't valid.
     """
     id = models.AutoField(primary_key=True)
     domain = models.ForeignKey(Domain, null=False, help_text="The domain this "
