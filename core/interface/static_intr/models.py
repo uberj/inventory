@@ -210,8 +210,9 @@ class StaticInterface(BaseAddressRecord):
                     "Cannot delete the record {0}. It is a "
                     "glue record.".format(self.record_type()))
         check_cname = kwargs.pop("check_cname", True)
-        super(StaticInterface, self).delete(validate_glue=False,
-                                            check_cname=check_cname)
+        super(StaticInterface, self).delete(
+            validate_glue=False, check_cname=check_cname, **kwargs
+        )
 
     def __repr__(self):
         return "<StaticInterface: {0}>".format(str(self))

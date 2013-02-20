@@ -36,6 +36,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'south',
     'systems',
     'migrate_dns',
+    'migrate_dhcp',
     'user_systems',
     'build',
     'dhcp',
@@ -74,7 +75,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'mozdns.mozbind',
     'mozdns.record',
     'mozdns.create_zone',
-    #'debug_toolbar',
+    'debug_toolbar',
     'tastypie',
     'tastytools',
     'reversion',
@@ -85,7 +86,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
 # Because Jinja2 is the default template loader, add any non-Jinja templated
 # apps here:
 JINGO_EXCLUDE_APPS = [
-    #'debug_toolbar',
+    'debug_toolbar',
     'build',
     'admin',
     'user_systems',
@@ -144,7 +145,7 @@ DEBUG_TOOLBAR_PANELS = (
 )
 TMP_MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     'reversion.middleware.RevisionMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 MIDDLEWARE_CLASSES = []
 for mc in TMP_MIDDLEWARE_CLASSES:

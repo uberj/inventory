@@ -19,7 +19,7 @@ def log(msg, level=0):
     do_info = True
     do_warning = True
     do_error = True
-    do_debug = True
+    do_debug = False
     do_build = True
     if do_info and level == 0:
         print "[INFO] {0}\n".format(msg),

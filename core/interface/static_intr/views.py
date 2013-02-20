@@ -11,8 +11,8 @@ from core.interface.static_intr.models import StaticInterface
 from core.interface.static_intr.models import StaticIntrKeyValue
 from core.interface.static_intr.forms import StaticInterfaceForm
 from core.interface.static_intr.forms import FullStaticInterfaceForm
-from core.interface.static_intr.forms import StaticInterfaceQuickForm
-from core.interface.static_intr.forms import CombineForm
+#from core.interface.static_intr.forms import StaticInterfaceQuickForm
+#from core.interface.static_intr.forms import CombineForm
 from core.keyvalue.utils import get_attrs, update_attrs, get_aa, get_docstrings
 from core.keyvalue.utils import dict_to_kv
 from core.range.models import Range

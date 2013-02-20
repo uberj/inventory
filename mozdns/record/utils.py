@@ -32,6 +32,10 @@ from mozdns.nameserver.models import Nameserver
 from mozdns.nameserver.forms import NameserverForm
 from mozdns.utils import ensure_label_domain, prune_tree
 
+from core.interface.static_intr.models import StaticInterface
+from core.interface.static_intr.forms import StaticInterfaceFQDNForm
+from core.interface.static_intr.forms import StaticInterfaceForm
+
 
 class RecordView(object):
     form_template = 'record/ajax_form.html'
@@ -50,7 +54,12 @@ class RecordView(object):
         return self._display_object(request, object_, record_type, record_pk)
 
     def _display_object(self, request, object_, record_type, record_pk):
-        domains = Domain.objects.filter(is_reverse=False)
+        if object_:
+            domains = []
+        else:
+            domains = [domain.name for
+                       domain in
+                       Domain.objects.filter(is_reverse=False)]
         if not object_:
             form = self.DisplayForm()
         else:
@@ -61,7 +70,7 @@ class RecordView(object):
             'object_': object_,
             'record_type': record_type if record_type else '',
             'record_pk': record_pk if record_pk else '',
-            'domains': json.dumps([domain.name for domain in domains]),
+            'domains': json.dumps(domains),
         })
 
     def post(self, request, record_type, record_pk):
@@ -185,6 +194,13 @@ class A_(RecordView):
 @tag_rdtype
 class AAAA_(A_):
     pass
+
+
+@tag_rdtype
+class INTR_(RecordView):
+    Klass = StaticInterface
+    form = StaticInterfaceForm
+    DisplayForm = StaticInterfaceFQDNForm
 
 
 @tag_rdtype
