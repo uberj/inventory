@@ -114,7 +114,7 @@ class RecordView(object):
 
         return render(request, self.form_template, context)
 
-    def modify_qd(self, qd):
+    def modify_qd(self, qd, object_=None):
         fqdn = qd.pop('fqdn', [''])[0]
         domain = None
         # if record_type not in ('PTR', 'NS', 'DOMAIN', 'SOA'):
@@ -139,7 +139,7 @@ class RecordView(object):
         # This little chunk of code could be factored out, but I think it's
         # more clear when you see which objects don't need to call this in one
         # spot.
-        qd, errors = self.modify_qd(qd)
+        qd, errors = self.modify_qd(qd, object_=object_)
         if errors:
             return None, errors
 
@@ -201,6 +201,12 @@ class INTR_(RecordView):
     Klass = StaticInterface
     form = StaticInterfaceForm
     DisplayForm = StaticInterfaceFQDNForm
+    def modify_qd(self, qd, object_=None):
+        # We hide the system attribute in the update form so we must
+        # reintroduce it into the qd when saving the object.
+        if object_:
+            qd['system'] = object_.system.pk
+        return super(INTR_, self).modify_qd(qd, object_=object_)
 
 
 @tag_rdtype
@@ -230,7 +236,7 @@ class NS_(RecordView):
     form = NameserverForm
     DisplayForm = NameserverForm
 
-    def modify_qd(self, qd):
+    def modify_qd(self, qd, **kwargs):
         domain_pk = qd.pop('domain', '')[0]
         try:
             domain = Domain.objects.get(pk=domain_pk)
@@ -250,7 +256,7 @@ class PTR_(RecordView):
     form = PTRForm
     DisplayForm = PTRForm
 
-    def modify_qd(self, qd):
+    def modify_qd(self, qd, **kwargs):
         return qd, None
 
 
@@ -274,7 +280,7 @@ class SOA_(RecordView):
     form = SOAForm
     DisplayForm = SOAForm
 
-    def modify_qd(self, qd):
+    def modify_qd(self, qd, **kwargs):
         return qd, None
 
 

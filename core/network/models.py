@@ -30,9 +30,9 @@ class Network(models.Model, ObjectUrlMixin):
     network_str = models.CharField(max_length=49, editable=True,
                                    help_text="The network address of this "
                                    "network.")
-    prefixlen = models.PositiveIntegerField(null=False,
-                                            help_text="The number of binary "
-                                            "1's in the netmask.")
+    prefixlen = models.PositiveIntegerField(null=False, blank=True,
+        help_text="The number of binary 1's in the netmask."
+    )
 
     dhcpd_raw_include = models.TextField(
         null=True, blank=True, help_text="The config options in this box "
@@ -141,7 +141,7 @@ class Network(models.Model, ObjectUrlMixin):
         self.prefixlen = self.network.prefixlen
 
     def __str__(self):
-        return self.network_str
+        return "{0}".format(self.network_str)
 
     def __repr__(self):
         return "<Network {0}>".format(str(self))

@@ -49,7 +49,7 @@ class KeyValue(models.Model):
     def __str__(self):
         return "Key: {0} Value {1}".format(self.key, self.value)
 
-    def clean(self, require_validation=True):
+    def clean(self, require_validation=True, check_unique=True):
         key_attr = self.key.replace('-', '_')
         # aa stands for auxilarary attribute.
         if (not hasattr(self, key_attr) and
@@ -73,7 +73,9 @@ class KeyValue(models.Model):
             # We want to catch when the validator didn't accept the correct
             # number of arguements.
             raise ValidationError("%s" % str(e))
-        self.validate_unique()
+
+        if check_unique:
+            self.validate_unique()
 
     def validate_unique(self):
         if (self.__class__.objects.filter(
