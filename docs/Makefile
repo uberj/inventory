@@ -36,7 +36,11 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html:
+api-man:
+	wget https://raw.github.com/uberj/inv-tool/master/docs/invtool.man.rst -O api.man.rst
+	sed -i "s/==/--/g" api.man.rst && sed -i "s/=$$/-/"  api.man.rst
+
+html: api-man
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -128,3 +132,6 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+people:
+	scp -r _build/html people.mozilla.com:~/public_html/docs

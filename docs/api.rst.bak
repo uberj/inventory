@@ -1,0 +1,167 @@
+Inventory API
+=============
+An Interface to Mozilla's Inventory
+-----------------------------------
+This MAN page serves as the formal documentation for Inventory's command line API
+
+StaticInterface
+>>>>>>>>>>>>>>>
+
+The general form of any operation on a ``StaticInterface`` is as follows::
+
+    ./api.py interface <action> <system-spec> <modifier>
+
+    <action>        -> create | update | delete
+    <system-spec>   -> 'system id' | 'system name'
+
+The ``system-spec`` is the system that the interface is tied to.
+
+Creation
+++++++++
+The general form of creating an interface is as follows::
+
+    ./api.py interface create <system-spec> [options]
+
+
+When creating an interface it is a user's responsiblity to ensure that the information passed to the
+API is specific enough to determine which ``Range`` an interface is *or* provide a specific IP
+address to use when creating the interface.
+
+    -s, --site
+        The site to search for a free IP in. When using -s the -v option must also be used to specify which site
+        (DC/BU) the vlan is in. The value assocated with this option is the name of the site.
+
+    -v, --vlan
+        The vlan to search for a free IP in. When using -v the -s option must also be used to specify which site
+        (DC/BU) the vlan is in. The value assocated with this option is the name of the vlan.
+
+    -b, --base-domain
+        The base domain to use when creating an interface. By default this is set to 'mozilla.com'
+
+    -n, --network
+        The network to search for a free IP in. This option requres that there only exist one
+        declared range within the network. If there is more than one range, use the -r option.
+
+    -r, --range
+        When using -r, it is explicityly specififed which range of IP's the interface is allowed to
+        have. The first IP in the range that has no A, PTR, or Interface associated with it is used
+        for the new interface. The value associated with this option is either two IP addresses in
+        either dotted quad format or IPv6 colon format.
+
+    -i, --ip
+        When using -i the interface will be made with this ip. The value associated with this option
+        is an IP address in either dotted quad format or IPv6 colon format.
+
+    -m, --mac
+        The mac address of the new interface
+
+    -l, --label
+        If the the -s and -v options are used in creating an interface the -l option will be used to
+        derive the fqdn of the interface.
+
+    -n, --fqdn
+        If the -n option is used, the value of the option will be used as the fqdn of the interface.
+        The correct DNS domain's must exist and creation will fail if an appropriate domain for the
+        interface's name is not found.
+
+    -t, --type
+        The type of the interface. For example, ``eth2.0`` has a type of ``eth``. If no type is
+        specified ``eth`` is used.
+
+    -p, --primary
+        The primary number of the interface. For example, ``eth2.0`` has a primary number of 2. If
+        no primary number is specified the system's interfaces are searched and the highest non-used
+        primary number is used.
+
+    -a, --alias
+        The alias number of the interface. For example, ``eth2.0`` has an alias number of 0. If the
+        -a option is used you must also use the -p option.
+
+
+Creation Examples
+`````````````````
+
+Example 0. This is the most useful command::
+
+    ./api.py interface create system1 -m <mac> -l <label> -d <domain> -r <start-ip>,<end-ip>
+
+For example::
+
+    ./api.py interface create system1 -m f0:de:f1:db:b9:25 -l system1 -d db.scl3.mozilla.com -r 10.22.3.230,10.22.3.240
+
+This command will attempt to create an interface with the mac ``f0:de:f1:db:b9:25``, the name
+``system1.db.scl3.mozilla.com`` and an IP in the range ``10.22.3.230,10.22.3.240``. The first IP in
+the range ``10.22.3.230,10.22.3.240`` that has no A, PTR, or Interface associated with it will be
+used as the interface's IP.
+
+While other commands may be syntactically simpler, the command here is non-ambigouse to the
+underlying system and will only fail if there are no unused IP addresses in the specified range.
+
+
+
+Creation Return Values
+++++++++++++++++++++++
+
+Successful creation:
+    1) Return value is 0
+    2) A JSON is printed to STDOUT
+
+Unsuccessful creation:
+    1) Return value is 1
+    2) A JSON is printed to STDOUT
+
+The Return JSON
+```````````````
+The keys and values in the JSON will depend on whether an interface was created or not. Here is an
+example of the JSON that will be printed to STDOUT during a successful creation::
+
+    {
+        "created": "True",
+        "id": "5"
+        "ip_str": "10.22.3.234",
+        "label": "system1",
+        "domain": "db.scl3.mozilla.com",
+        "interface": "eth0",
+        "mac": "f0:de:f1:db:b9:25"
+    }
+
+Here is an example of the JSON that will be printed to STDOUT during an unsuccessful creation::
+
+    {
+        "created": "false",
+        "error": "No free IP addresses in the range 10.22.3.230,10.22.3.240"
+    }
+
+.. warning::
+    You can be sure that all of the values shown above will be present but you should not assume
+    that more values won't be added to the JSON at a later time. Write your code accordingly.
+
+Other Examples
+--------------
+
+.. note::
+    These are commands that we want to write, but don't have time to right now.
+
+Example 1::
+
+    ./api.py interface create system1 -m f0:de:f1:db:b9:25 -l system1 -v db -s scl3
+
+This command will attempt to create an interface associated with the system ``system1``, with a mac
+address ``f0:de:f1:db:b9:25``, with the name ``system1.db.scl3.mozilla.com`` and will look for a
+free IP in the db vlan in scl3. If no free IP address is found the command will return FAIL. When
+there is more than one network is associated with the db vlan in scl3 the command will return FAIL.
+If there is one network associated with the db vlan in scl3 but there is more than one range
+associated with the network the command will return FAIL. Upon successly creating an interface the
+command will return 0 and a JSON containing information about the interface.
+
+Example 2::
+
+    ./api.py interface create system1 -m f0:de:f1:db:b9:25 -l system1 -b mozilla.net -v db -s scl3
+
+This command is exactly the same as Example1 except instead of inferring the interface's name as
+``system1.db.scl3.mozilla.com`` the -b flag causes the name to be ``system1.db.scl3.mozilla.net``
+
+
+
+
+
