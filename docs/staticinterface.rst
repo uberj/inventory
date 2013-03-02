@@ -149,24 +149,23 @@ Start over by deleting all BI objects and then delete the SI object.
 
 Free IP Addresses
 =================
-Just by looking at an Interfaces requested hostname we can determine which site
-(datacenter and possible business unit) and vlan an Interface is in. Using the
+Just by looking at an Interface's requested hostname we can determine which site
+(datacenter or business unit) and vlan an Interface is in. Using the
 names of the site and vlan we can use information stored in the :ref:`core`
-core of inventory to determine which IP address to choose for the interface.
+of inventory to determine which IP address to choose for the interface.
 For example::
 
 
         webnode1.webops.scl3.mozilla.com
 
 
-This Interface is in scl3 in the webops vlan. Since Inventory tracks both sites
-and vlans getting these objects is just a matter of querying the database.::
+This Interface is in the webops vlan in scl3. Since Inventory tracks both sites
+and vlans, getting these objects is just a matter of querying the database.::
 
     site_scl3 = Site.objects.get(name='scl3')
     vlan_webops = Vlan.objects.get(name='webops')
 
-Networks are associated to vlan's so retreving which networks are in the webops
-vlan is one query away.::
+Networks are associated to vlan's::
 
     webops_networks = vlan_webops.network_set.all()
 
@@ -178,14 +177,14 @@ at networks that are in the webops vlan *and* are in scl3.::
         if network.site == site_scl3:
             scl3_webops_networks.append(network)
 
-We now look for a free IP in a range in one of the networks in ``scl3_webops_networks``.
+We now look for a free IP in one of the networks in ``scl3_webops_networks``.
 
 .. note::
     In most cases there is only one network associated with a vlan in a particular datacenter.
 
 Getting a free ip is easy.::
 
-    network = scl3_webops_networks[0]  # Let's just choose the first one for the sake of example.
+    network = scl3_webops_networks[0]  # Let's just choose the first network for the sake of example.
     ip = None
     for range in network.range_set.all():
         ip = range.get_next_ip()
