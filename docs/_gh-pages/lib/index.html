@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usefull functions &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Inventory DNS API" href="../api/" />
+    <link rel="prev" title="Coding Ideas (Standards)" href="../coding_standard/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../api/" title="Inventory DNS API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../coding_standard/" title="Coding Ideas (Standards)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-core.lib.utils">
+<span id="usefull-functions"></span><span id="lib"></span><h1>Usefull functions<a class="headerlink" href="#module-core.lib.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="core.lib.utils.calc_free_ips_int">
+<tt class="descclassname">core.lib.utils.</tt><tt class="descname">calc_free_ips_int</tt><big>(</big><em>range_start</em>, <em>range_end</em><big>)</big><a class="headerlink" href="#core.lib.utils.calc_free_ips_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is like calc_free_ips_str except it&#8217;s arguements are
+integers.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.lib.utils.calc_free_ips_str">
+<tt class="descclassname">core.lib.utils.</tt><tt class="descname">calc_free_ips_str</tt><big>(</big><em>range_start_str</em>, <em>range_end_str</em>, <em>ip_type='4'</em><big>)</big><a class="headerlink" href="#core.lib.utils.calc_free_ips_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function counts the number of unused ip addresses in a range. An IP
+is considered &#8216;used&#8217; if an A, PTR, or StaticInterface uses the IP.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>range_start_str</strong> &#8211; The IP where this function should start looking for
+a free ip (inclusive).</li>
+<li><strong>range_end_str</strong> &#8211; The last IP where this function should look for
+a free ip (inclusive).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.lib.utils.create_ipv4_interface">
+<tt class="descclassname">core.lib.utils.</tt><tt class="descname">create_ipv4_interface</tt><big>(</big><em>label</em>, <em>vlan_str</em>, <em>site_str</em>, <em>system</em>, <em>mac</em>, <em>domain_suffix</em>, <em>network_str=None</em><big>)</big><a class="headerlink" href="#core.lib.utils.create_ipv4_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an api for creating an interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> &#8211; The label of the interface.</li>
+<li><strong>vlan_str</strong> (<em>str</em>) &#8211; The name of the vlan the interface should be put into.</li>
+<li><strong>site_str</strong> (<em>str</em>) &#8211; The Datacenter (and possibly the Buisness Unit) the vlan is in.</li>
+<li><strong>system</strong> (<tt class="xref py py-class docutils literal"><span class="pre">System</span></tt>) &#8211; The system the interface belongs to.</li>
+<li><strong>mac</strong> (<em>str</em>) &#8211; The mac address of the new interface.</li>
+<li><strong>domain_suffix</strong> (<em>str</em>) &#8211; The suffix of the domain. This is usually
+&#8216;mozilla.com&#8217;.</li>
+<li><strong>network_str</strong> (<em>str</em>) &#8211; This is an optional paramter. If you get a
+<tt class="xref py py-class docutils literal"><span class="pre">MultipleObjectsReturned</span></tt> error when trying to find a network,
+you can specify which network to use by passing the network&#8217;s name
+using this kwarg. E.g. <tt class="docutils literal"><span class="pre">network=&quot;10.22.9.0/24&quot;</span></tt></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This function returns two values. The first value is the
+<tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt> instance. If the interface was succesfully created
+the second return value is meaningless. If there were errors while creating
+the interface the first value is None and the second return value is an
+ErrorDict containing errors that should be displayed to the user. Always
+check the first return value for being a NoneType.</p>
+<p>Using this function requires that certain objects exist in the database.
+<em>Understanding these objects before using this function is a good thing</em>.</p>
+<div class="highlight-python"><pre>&lt;label&gt; (.&lt;BU&gt;) .&lt;DC&gt; . &lt;domain_suffix&gt;</pre>
+</div>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>This function starts by looking for a site in the site table that has a</dt>
+<dd><p class="first">site path (i.e. <cite>&lt;BU&gt;.&lt;DC&gt;</cite> like &#8216;relenge.scl3&#8217; or just &#8216;scl3&#8217;) equal to the
+&#8216;site_str&#8217; paramter.</p>
+<p class="last">If you get errors from this step (i.e. There is a &#8216;site&#8217; key in the
+errors dictionary), create the site you are trying to use in the Web UI.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">The function then looks in the site found in Step 1 for a <tt class="xref py py-class docutils literal"><span class="pre">Vlan</span></tt>
+instance with a name equal to the &#8216;vlan_str&#8217; parameter.</p>
+<p>If you get errors from this step (i.e. There is a &#8216;vlan&#8217; key in the
+errors dictionary), create the vlan you are trying to use in the Web
+UI.</p>
+</li>
+<li><p class="first">Using the <tt class="xref py py-class docutils literal"><span class="pre">Site</span></tt> and <tt class="xref py py-class docutils literal"><span class="pre">Vlan</span></tt> instance found in Step 1 &amp; 2 and
+the <cite>domain_suffix</cite> paramter, the function constructs the following
+string.:</p>
+<div class="highlight-python"><pre>&lt;vlan&gt;.&lt;site&gt;.&lt;domain_suffix&gt;</pre>
+</div>
+<p>As an example, imaging we were using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">site</span> <span class="o">=</span> <span class="n">relenge</span><span class="o">.</span><span class="n">scl3</span>
+<span class="n">vlan</span> <span class="o">=</span> <span class="n">db</span>
+<span class="n">domain_suffix</span> <span class="o">=</span> <span class="n">mozilla</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+<p>The constructed string would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">relenge</span><span class="o">.</span><span class="n">scl3</span><span class="o">.</span><span class="n">mozilla</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+<p>The function will now use this constructed string as the domain name for
+creating the interface&#8217;s A/PTR records. For this reason <em>a domain with the
+constructed name _must_ be in the database</em>.</p>
+<p>If you get errors from this step (i.e. There is a &#8216;domain&#8217; key in the errors
+dictionary), create the domain you are trying to use in the Web UI.</p>
+</li>
+<li><p class="first">The function then looks at the networks associated with that vlan found in
+Step 2 and chooses the networks that are associated to the site found in
+Step 1.</p>
+<p>If you get errors from this step (i.e. There is a &#8216;network&#8217; key in the errors
+dictionary), create the network you are trying to use in the Web UI and
+associate it with the vlan <em>and</em> site you are trying to use.</p>
+</li>
+<li><p class="first">The function then looks for ranges within the networks found in Step 4. If
+the function finds more than one range it does not make a choice for you
+and returns an error. If the function finds only one range it looks for a
+free IP in that range while returning an error if no free IP is found.</p>
+</li>
+<li><p class="first">Using the &#8216;label&#8217;, &#8216;system&#8217;, &#8216;mac&#8217;, and IP address found in Step 4, a new
+StaticInterface is created. If there are errors while creating the
+Interface those errors are returned. If there are no errors while creating
+the Interface the Interface is returned.</p>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.lib.utils.create_ipv4_intr_from_domain">
+<tt class="descclassname">core.lib.utils.</tt><tt class="descname">create_ipv4_intr_from_domain</tt><big>(</big><em>label</em>, <em>domain_name</em>, <em>system</em>, <em>mac</em>, <em>network_str=None</em><big>)</big><a class="headerlink" href="#core.lib.utils.create_ipv4_intr_from_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for <a class="reference internal" href="#core.lib.utils.create_ipv4_interface" title="core.lib.utils.create_ipv4_interface"><tt class="xref py py-func docutils literal"><span class="pre">create_ipv4_interface()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.lib.utils.create_ipv4_intr_from_range">
+<tt class="descclassname">core.lib.utils.</tt><tt class="descname">create_ipv4_intr_from_range</tt><big>(</big><em>label</em>, <em>domain_name</em>, <em>system</em>, <em>mac</em>, <em>range_start_str</em>, <em>range_end_str</em><big>)</big><a class="headerlink" href="#core.lib.utils.create_ipv4_intr_from_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates an interface using the first free ip in the
+specified range. This function will also ensure that a <tt class="xref py py-class docutils literal"><span class="pre">Domain</span></tt> with
+the name=``domain_name`` exists in the database. If a new domain is created
+it will enheirit it&#8217;s master&#8217;s SOA. If the name <tt class="docutils literal"><span class="pre">&lt;label&gt;.&lt;domain_name&gt;</span></tt>
+is already a domain, the new interface&#8217;s label will be set to the empty
+string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> &#8211; The desired label of the interface.</li>
+<li><strong>domain_name</strong> (<em>str</em>) &#8211; The name of the domain to create the interface in.</li>
+<li><strong>system</strong> (<tt class="xref py py-class docutils literal"><span class="pre">System</span></tt>) &#8211; The system object that the interface should be associated to</li>
+<li><strong>mac</strong> (<em>str</em>) &#8211; The mac address of the interface</li>
+<li><strong>range_start_str</strong> (<em>str</em>) &#8211; The IP where this function should start looking for
+a free ip (inclusive).</li>
+<li><strong>range_end_str</strong> (<em>str</em>) &#8211; The last IP where this function should look for
+a free ip (inclusive).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-core.keyvalue.models"></span><dl class="class">
+<dt id="core.keyvalue.models.KeyValue">
+<em class="property">class </em><tt class="descclassname">core.keyvalue.models.</tt><tt class="descname">KeyValue</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>How this KeyValue class works:
+The KeyValue objects have functions that correspond to different
+keys. When a key is saved an attempt is made to find a validation
+function for that key.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">attr</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kv</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <cite>attr</cite> is not None, then it is checked for callability.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">kv</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If it is callable, it is called with the value of the key.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">kv</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="n">kv</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The validator is then free to raise exceptions if the value being
+inserted is invalid.</p>
+<p>When a validator for a key is not found, the KeyValue class can either
+riase an exception or not. This behavior is controled by the
+&#8216;force_validation&#8217; attribute: if &#8216;force_validation&#8217; is &#8216;True&#8217; and
+KeyValue requires a validation function. The &#8216;require_validation&#8217; param
+to the clean method can be used to override the behavior of
+&#8216;force_validation&#8217;.</p>
+<p>Subclass this class and include a Foreign Key when needed.</p>
+<p>Validation functions can start with &#8216;_aa_&#8217;. &#8216;aa&#8217; stands for auxililary
+attribute.</p>
+<dl class="class">
+<dt id="core.keyvalue.models.KeyValue.Meta">
+<em class="property">class </em><tt class="descname">Meta</tt><a class="headerlink" href="#core.keyvalue.models.KeyValue.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="core.keyvalue.models.KeyValue.Meta.abstract">
+<tt class="descname">abstract</tt><em class="property"> = False</em><a class="headerlink" href="#core.keyvalue.models.KeyValue.Meta.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.clean">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">clean</tt><big>(</big><em>require_validation=True</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.clean_fields">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.date_error_message">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">date_error_message</tt><big>(</big><em>lookup_type</em>, <em>field</em>, <em>unique_for</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.date_error_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.delete">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">delete</tt><big>(</big><em>using=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.keyvalue.models.KeyValue.force_validation">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">force_validation</tt><em class="property"> = False</em><a class="headerlink" href="#core.keyvalue.models.KeyValue.force_validation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.full_clean">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.keyvalue.models.KeyValue.pk">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">pk</tt><a class="headerlink" href="#core.keyvalue.models.KeyValue.pk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.prepare_database_save">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">prepare_database_save</tt><big>(</big><em>unused</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.prepare_database_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.save">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The &#8216;force_insert&#8217; and &#8216;force_update&#8217; parameters can be used to insist
+that the &#8220;save&#8221; must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.save_base">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.serializable_value">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.unique_error_message">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">unique_error_message</tt><big>(</big><em>model_class</em>, <em>unique_check</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.unique_error_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.keyvalue.models.KeyValue.validate_unique">
+<tt class="descclassname">KeyValue.</tt><tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.keyvalue.models.KeyValue.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-core.keyvalue.utils"></span><dl class="class">
+<dt id="core.keyvalue.utils.AuxAttr">
+<em class="property">class </em><tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">AuxAttr</tt><big>(</big><em>KeyValueClass</em>, <em>obj</em>, <em>obj_name</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.AuxAttr" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is a quick hack and is quite magical. This class abstracts the
+retreval and creation of Key Value pairs. Example usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">aa</span> <span class="o">=</span> <span class="n">AuxAttr</span><span class="p">(</span><span class="n">StaticIntrKeyValue</span><span class="p">,</span> <span class="n">intr</span><span class="p">,</span> <span class="s">&#39;intr&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This initializes an <a class="reference internal" href="#core.keyvalue.utils.AuxAttr" title="core.keyvalue.utils.AuxAttr"><tt class="xref py py-class docutils literal"><span class="pre">AuxAttr</span></tt></a> instance with StaticIntrKeyValue,
+(a class that inheirits from <tt class="xref py py-class docutils literal"><span class="pre">KeyValue</span></tt>), an object that has
+a KeyValue store (in this case the &#8216;intr&#8217; object of type
+<tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt>), and the <tt class="xref py py-class docutils literal"><span class="pre">str</span></tt> &#8216;intr&#8217; (the name of the
+object in the &#8216;StaticIntrKeyValue&#8217; class).</p>
+<p>See the StaticInterface class for example usage for this class. Also see
+the unit tests.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.dict_to_kv">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">dict_to_kv</tt><big>(</big><em>kv</em>, <em>KVClass</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.dict_to_kv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.get_aa">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">get_aa</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.get_aa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.get_attrs">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">get_attrs</tt><big>(</big><em>query_dict</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.get_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.get_dhcp_aa">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">get_dhcp_aa</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.get_dhcp_aa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.get_dhcp_docstrings">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">get_dhcp_docstrings</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.get_dhcp_docstrings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.get_docstrings">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">get_docstrings</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.get_docstrings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="core.keyvalue.utils.update_attrs">
+<tt class="descclassname">core.keyvalue.utils.</tt><tt class="descname">update_attrs</tt><big>(</big><em>kv</em>, <em>attrs</em>, <em>KVClass</em>, <em>obj</em>, <em>obj_name</em><big>)</big><a class="headerlink" href="#core.keyvalue.utils.update_attrs" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>kv</strong> (<em>dict</em>) &#8211; The KV pairs being added to the object.</li>
+<li><strong>attrs</strong> (<tt class="xref py py-class docutils literal"><span class="pre">QuerySet</span></tt>) &#8211; The existing KV pairs.</li>
+<li><strong>KVClass</strong> (<em>class</em>) &#8211; The KeyValue Class being used to validate new KV pairs.</li>
+<li><strong>obj</strong> (<em>object</em>) &#8211; The object the KV paris are being associated to.</li>
+<li><strong>obj_name</strong> (<em>str</em>) &#8211; The name of the foreign key back to obj</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../coding_standard/"
+                        title="previous chapter">Coding Ideas (Standards)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../api/"
+                        title="next chapter">Inventory DNS API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/lib.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../api/" title="Inventory DNS API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../coding_standard/" title="Coding Ideas (Standards)"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

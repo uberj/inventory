@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PTR &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="CNAME" href="../cname/" />
+    <link rel="prev" title="Address Record" href="../address_record/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../cname/" title="CNAME"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../address_record/" title="Address Record"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ptr">
+<span id="id1"></span><h1>PTR<a class="headerlink" href="#ptr" title="Permalink to this headline">¶</a></h1>
+<p>A <tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt> instance represents a reverse ip maping. Because in BIND <tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt> recrods need to go into a reverse zone file that contain an SOA, every <tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt> must be under a domain that the system is authoritative for.</p>
+<p>Some examples: Let&#8217;s assume we are authoritative for the network 192.168.0.0/16 and that we want to create a ptr for the name <tt class="docutils literal"><span class="pre">foo.example.com</span></tt> to <tt class="docutils literal"><span class="pre">192.168.1.9</span></tt>. If we were to try to add the <tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt> without first makeing a reverse domain for that ptr, a <tt class="xref py py-class docutils literal"><span class="pre">ValidationError</span></tt> would be raises:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mozdns.ptr.models</span> <span class="kn">import</span> <span class="n">PTR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span> <span class="o">=</span> <span class="n">PTR</span><span class="p">(</span><span class="n">ip_str</span><span class="o">=</span><span class="s">&quot;192.168.1.9&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;foo.example.com&quot;</span><span class="p">,</span> <span class="n">ip_type</span><span class="o">=</span><span class="s">&#39;4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;console&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;/var/www/inventory/mozdns/ptr/models.py&quot;</span>, line <span class="m">83</span>, in <span class="n">clean</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">clean_ip</span><span class="p">(</span><span class="n">update_reverse_domain</span><span class="o">=</span><span class="n">urd</span><span class="p">)</span>
+  File <span class="nb">&quot;/var/www/inventory/mozdns/ip/models.py&quot;</span>, line <span class="m">94</span>, in <span class="n">clean_ip</span>
+    <span class="n">ip_type</span><span class="o">=</span><span class="s">&#39;4&#39;</span><span class="p">))</span>
+  File <span class="nb">&quot;/var/www/inventory/vendor/src/django/django/db/models/fields/related.py&quot;</span>, line <span class="m">327</span>, in <span class="n">__set__</span>
+    <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">object_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<span class="gr">ValueError: Cannot assign None</span>: <span class="n">&quot;PTR.reverse_domain&quot; does not allow null values.</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-func docutils literal"><span class="pre">full_clean()</span></tt> looks for a reverse domain for <tt class="docutils literal"><span class="pre">192.128.1.9</span></tt>. In the code shown above, no reverse domain is found and a <tt class="xref py py-class docutils literal"><span class="pre">ValidationError</span></tt> is raised (admittedly, the error message could be a little more descriptive). Adding an appropriate reverse domain will resolve the traceback:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">domain</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Domain</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="s">&quot;192.in-addr.arpa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span> <span class="o">=</span> <span class="n">PTR</span><span class="p">(</span><span class="n">ip_str</span><span class="o">=</span><span class="s">&quot;192.168.1.9&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;foo.example.com&quot;</span><span class="p">,</span> <span class="n">ip_type</span><span class="o">=</span><span class="s">&#39;4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If we look at the reverse domain of the ptr we created, it will be the reverse domain we just created:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">reverse_domain</span>
+<span class="go">&lt;Domain &#39;192.in-addr.arpa&#39;&gt;</span>
+</pre></div>
+</div>
+<p>If we add a new reverse domain that is a better fit for our PTR, the PTR will be assigned that reverse domain:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">domain</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Domain</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="s">&quot;168.192.in-addr.arpa&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">domain</span><span class="o">.</span><span class="n">master_domain</span>
+<span class="go">&lt;Domain &#39;192.in-addr.arpa&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ptr</span><span class="o">.</span><span class="n">reverse_domain</span>
+<span class="go">&lt;Domain &#39;168.192.in-addr.arpa&#39;&gt;</span>
+</pre></div>
+</div>
+<span class="target" id="module-mozdns.ptr.models"></span><dl class="class">
+<dt id="mozdns.ptr.models.PTR">
+<em class="property">class </em><tt class="descclassname">mozdns.ptr.models.</tt><tt class="descname">PTR</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>A PTR is used to map an IP to a domain name.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">PTR</span><span class="p">(</span><span class="n">ip_str</span><span class="o">=</span><span class="n">ip_str</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">fqdn</span><span class="p">,</span> <span class="n">ip_type</span><span class="o">=</span><span class="n">ip_type</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.clean_ip">
+<tt class="descname">clean_ip</tt><big>(</big><em>update_reverse_domain=True</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.clean_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>The clean method in Ip is different from the rest. It needs
+to be called with the update_reverse_domain flag. Sometimes we
+need to not update the reverse domain of an IP (i.e. when we are
+deleting a reverse_domain).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.dns_name">
+<tt class="descname">dns_name</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.dns_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cononical name of this ptr that can be placed in a
+reverse zone file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.get_absolute_url">
+<tt class="descname">get_absolute_url</tt><big>(</big><em>*moreargs</em>, <em>**morekwargs</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.get_absolute_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.get_create_url">
+<tt class="descname">get_create_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.get_create_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the create url of the type of object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.get_delete_url">
+<tt class="descname">get_delete_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.get_delete_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the delete url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.get_edit_url">
+<tt class="descname">get_edit_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.get_edit_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the edit url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.validate_no_cname">
+<tt class="descname">validate_no_cname</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.validate_no_cname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Considering existing CNAMES must be done when editing and
+creating new <a class="reference internal" href="#mozdns.ptr.models.PTR" title="mozdns.ptr.models.PTR"><tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt></a> objects.</p>
+<blockquote>
+<div><p>&#8220;PTR records must point back to a valid A record, not a
+alias defined by a CNAME.&#8221;</p>
+<p class="attribution">&mdash;<a class="reference external" href="http://tools.ietf.org/html/rfc1912">RFC 1912</a></p>
+</div></blockquote>
+<p>An example of something that is not allowed:</p>
+<div class="highlight-python"><pre>FOO.BAR.COM     CNAME       BEE.BAR.COM
+
+BEE.BAR.COM     A           128.193.1.1
+
+1.1.193.128     PTR         FOO.BAR.COM
+^-- PTR's shouldn't point to CNAMES</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.ptr.models.PTR.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.ptr.models.PTR.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../address_record/"
+                        title="previous chapter">Address Record</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../cname/"
+                        title="next chapter">CNAME</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ptr.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../cname/" title="CNAME"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../address_record/" title="Address Record"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

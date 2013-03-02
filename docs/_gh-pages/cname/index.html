@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CNAME &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="SRV (Service Record)" href="../srv/" />
+    <link rel="prev" title="PTR" href="../ptr/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../srv/" title="SRV (Service Record)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../ptr/" title="PTR"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cname">
+<span id="id1"></span><h1>CNAME<a class="headerlink" href="#cname" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><p>&#8220;Don&#8217;t go overboard with CNAMEs.&#8221;</p>
+<p>&#8220;Domain names in RRs which point at another name should always point at the primary name and not the
+alias.&#8221;</p>
+<p class="attribution">&mdash;<a class="reference external" href="http://tools.ietf.org/html/rfc1034">RFC 1034</a></p>
+</div></blockquote>
+<div class="section" id="id2">
+<h2>CNAME<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-mozdns.cname.models"></span><dl class="class">
+<dt id="mozdns.cname.models.CNAME">
+<em class="property">class </em><tt class="descclassname">mozdns.cname.models.</tt><tt class="descname">CNAME</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>CNAMES can&#8217;t point to an any other records. Said another way,
+CNAMES can&#8217;t be at the samle level as any other record. This means
+that when you are creating a CNAME every other record type must be
+checked to make sure that the name about to be taken by the CNAME
+isn&#8217;t taken by another record. Likewise, all other records must
+check that no CNAME exists with the same name before being created.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">CNAME</span><span class="p">(</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.check_SOA_condition">
+<tt class="descname">check_SOA_condition</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.check_SOA_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>We need to check if the domain is the root domain in a zone.
+If the domain is the root domain, it will have an soa, but the
+master domain will have no soa (or it will have a a different
+soa).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.existing_node_check">
+<tt class="descname">existing_node_check</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.existing_node_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure no other nodes exist at the level of this CNAME.</p>
+<blockquote>
+<div><p>&#8220;If a CNAME RR is present at a node, no other data should be
+present; this ensures that the data for
+a canonical name and its aliases cannot be different.&#8221;</p>
+<p class="attribution">&mdash;<a class="reference external" href="http://tools.ietf.org/html/rfc1034">RFC 1034</a></p>
+</div></blockquote>
+<p>For example, this would be bad:</p>
+<div class="highlight-python"><pre>FOO.BAR.COM     CNAME       BEE.BAR.COM
+
+BEE.BAR.COM     A           128.193.1.1
+
+FOO.BAR.COM     TXT         "v=spf1 include:foo.com -all"</pre>
+</div>
+<p>If you queried the <tt class="docutils literal"><span class="pre">FOO.BAR.COM</span></tt> name, the class of the record
+that would be returned would be ambiguous.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>The following records classes are checked.</dt>
+<dd><ul class="first last simple">
+<li><tt class="xref py py-class docutils literal"><span class="pre">AddressRecord</span></tt> (A and AAAA)</li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">SRV</span></tt></li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">TXT</span></tt></li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></li>
+</ul>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.get_absolute_url">
+<tt class="descname">get_absolute_url</tt><big>(</big><em>*moreargs</em>, <em>**morekwargs</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.get_absolute_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.get_create_url">
+<tt class="descname">get_create_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.get_create_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the create url of the type of object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.get_delete_url">
+<tt class="descname">get_delete_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.get_delete_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the delete url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.get_edit_url">
+<tt class="descname">get_edit_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.get_edit_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the edit url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.cname.models.CNAME.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.cname.models.CNAME.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CNAME</a><ul>
+<li><a class="reference internal" href="#id2">CNAME</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../ptr/"
+                        title="previous chapter">PTR</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../srv/"
+                        title="next chapter">SRV (Service Record)</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/cname.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../srv/" title="SRV (Service Record)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../ptr/" title="PTR"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

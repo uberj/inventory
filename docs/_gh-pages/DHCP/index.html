@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DHCP &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Coding Ideas (Standards)" href="../coding_standard/" />
+    <link rel="prev" title="Validation" href="../validation/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../coding_standard/" title="Coding Ideas (Standards)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../validation/" title="Validation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="dhcp"></span><div class="section" id="id1">
+<h1>DHCP<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">DHCP is implemented for <a class="reference internal" href="../staticinterface/#staticinterface"><em>Static Interface</em></a> objects with IPv4 addresses. <tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt>&#8216;s with IPv6 addresses
+will not be included in the build output.</p>
+</div>
+<p>The core function of the DHCP build system is the <tt class="xref py py-func docutils literal"><span class="pre">build_subnet()</span></tt> function which accecpts a
+<a class="reference internal" href="../network/#network"><em>Network</em></a> instance as it&#8217;s only input. Using the <tt class="docutils literal"><span class="pre">network</span></tt>&#8216;s network address
+(<tt class="docutils literal"><span class="pre">network_start</span></tt>) and network broadcast (<tt class="docutils literal"><span class="pre">network_end</span></tt>) every <tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt> with an IPv4 address
+greater than <tt class="docutils literal"><span class="pre">network_start</span></tt> less than <tt class="docutils literal"><span class="pre">network_end</span></tt> is used to generate a <tt class="docutils literal"><span class="pre">host</span></tt> statement:</p>
+<div class="highlight-python"><pre>host {{ intr.dhcp_name() }} {
+    hardware ethernet {{ intr.mac }};
+    fixed-address {{ intr.ip_str }};
+}</pre>
+</div>
+<p>The above example is a <tt class="docutils literal"><span class="pre">host</span></tt> statement where jinja2 syntax is used to show how data from the
+<tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt> is used to fill in data. The <tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt> member function <tt class="xref py py-func docutils literal"><span class="pre">dhcp_name()</span></tt> is used as a way to
+make sure no two <tt class="docutils literal"><span class="pre">host</span></tt> statements have the same <tt class="docutils literal"><span class="pre">hostname</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because we are on a tight schedule, it might be worth it to just generate the host entries and
+include them in the DHCP flat files in SVN like we are doing with current inventory. This would
+be a slight modification and would save us time. Doing this means we don&#8217;t have to put pool and
+subnet options into inventory (could be time consuming sinse they are hard to parse and would
+probably need to be entered by hand).</p>
+</div>
+<div class="section" id="address-pools">
+<h2>Address Pools<a class="headerlink" href="#address-pools" title="Permalink to this headline">¶</a></h2>
+<p>There is a 1-to-1 mapping betweek address pools and <a class="reference internal" href="../range/#range"><em>Range</em></a> objects. A <tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt> object has a
+reference back to it&#8217;s containing <a class="reference internal" href="../network/#network"><em>Network</em></a>, so <tt class="xref py py-func docutils literal"><span class="pre">build_subnet()</span></tt> selects all <tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt>
+objects and passes the objects one by one into <tt class="xref py py-func docutils literal"><span class="pre">build_pool()</span></tt>. For each range all statements and
+options are gathered and added to the build output. Finally <tt class="docutils literal"><span class="pre">range.start_lower</span></tt> and
+<tt class="docutils literal"><span class="pre">range.end_lower</span></tt> are used as the start and end number in the <tt class="docutils literal"><span class="pre">range</span></tt> statement (<tt class="docutils literal"><span class="pre">start_upper</span></tt>
+and <tt class="docutils literal"><span class="pre">end_upper</span></tt> are only relevent for IPv6 addresses who have more than 64 bits of information).</p>
+</div>
+<div class="section" id="dhcp-options-and-statements">
+<h2>DHCP Options and Statements<a class="headerlink" href="#dhcp-options-and-statements" title="Permalink to this headline">¶</a></h2>
+<p>Both ranges and networks have ways of controlling what options and statements go into their
+respective <tt class="docutils literal"><span class="pre">subnet</span></tt> and <tt class="docutils literal"><span class="pre">pool</span></tt> statements. These options and statements are stored in the
+<tt class="xref py py-class docutils literal"><span class="pre">NetworkKeyValue</span></tt> and <tt class="xref py py-class docutils literal"><span class="pre">RangeKeyValue</span></tt> tables as Key Value pairs.</p>
+<dl class="function">
+<dt id="core.build.subnet.build_subnet">
+<tt class="descclassname">core.build.subnet.</tt><tt class="descname">build_subnet</tt><big>(</big><em>network</em>, <em>raw=False</em><big>)</big><a class="headerlink" href="#core.build.subnet.build_subnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>The core function of building DHCP files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>network</strong> (<tt class="xref py py-class docutils literal"><span class="pre">StaticInterface</span></tt>) &#8211; The network that will be searched for
+<a class="reference internal" href="../staticinterface/#staticinterface"><em>Static Interface</em></a> instances.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.build.subnet.build_pool">
+<tt class="descclassname">core.build.subnet.</tt><tt class="descname">build_pool</tt><big>(</big><em>mrange</em><big>)</big><a class="headerlink" href="#core.build.subnet.build_pool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DHCP</a><ul>
+<li><a class="reference internal" href="#address-pools">Address Pools</a></li>
+<li><a class="reference internal" href="#dhcp-options-and-statements">DHCP Options and Statements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../validation/"
+                        title="previous chapter">Validation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../coding_standard/"
+                        title="next chapter">Coding Ideas (Standards)</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/DHCP.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../coding_standard/" title="Coding Ideas (Standards)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../validation/" title="Validation"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

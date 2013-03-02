@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MX (Mail Server Record) &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="IP" href="../ip/" />
+    <link rel="prev" title="Nameservers" href="../nameserver/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../ip/" title="IP"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../nameserver/" title="Nameservers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="mx-mail-server-record">
+<span id="mx"></span><h1>MX (Mail Server Record)<a class="headerlink" href="#mx-mail-server-record" title="Permalink to this headline">¶</a></h1>
+<p>MX records should not point to cnames.</p>
+<div class="section" id="id1">
+<h2>MX<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-mozdns.mx.models"></span><dl class="class">
+<dt id="mozdns.mx.models.MX">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.models.</tt><tt class="descname">MX</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">MX</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">prio</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">ttl</span><span class="o">=</span><span class="n">tll</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mozdns.mx.models.MX.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.get_absolute_url">
+<tt class="descname">get_absolute_url</tt><big>(</big><em>*moreargs</em>, <em>**morekwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.get_absolute_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.get_create_url">
+<tt class="descname">get_create_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.get_create_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the create url of the type of object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.get_delete_url">
+<tt class="descname">get_delete_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.get_delete_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the delete url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.get_edit_url">
+<tt class="descname">get_edit_url</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.get_edit_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the edit url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.no_point_to_cname">
+<tt class="descname">no_point_to_cname</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.no_point_to_cname" title="Permalink to this definition">¶</a></dt>
+<dd><p>MX records should not point to CNAMES.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.models.MX.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.models.MX.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-mozdns.mx.views"></span><dl class="class">
+<dt id="mozdns.mx.views.MXCreateView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXCreateView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="mozdns.mx.views.MXCreateView.as_view">
+<em class="property">classmethod </em><tt class="descname">as_view</tt><big>(</big><em>**initkwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for a request-response process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_context_object_name">
+<tt class="descname">get_context_object_name</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_context_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name to use for the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_form_class">
+<tt class="descname">get_form_class</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_form_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the form class to use in this view</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_form_kwargs">
+<tt class="descname">get_form_kwargs</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_form_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the keyword arguments for instanciating the form.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_initial">
+<tt class="descname">get_initial</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial data to use for forms on this view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_object">
+<tt class="descname">get_object</tt><big>(</big><em>queryset=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the object the view is displaying.</p>
+<p>By default this requires <cite>self.queryset</cite> and a <cite>pk</cite> or <cite>slug</cite> argument
+in the URLconf, but subclasses can override this to return any object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the queryset to look an object up against. May not be called if
+<cite>get_object</cite> is overridden.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_slug_field">
+<tt class="descname">get_slug_field</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_slug_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a slug field to be used to look up by slug.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.get_template_names">
+<tt class="descname">get_template_names</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.get_template_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of template names to be used for the request. Must return
+a list. May not be called if get_template is overridden.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXCreateView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXCreateView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXCreateView.render_to_response">
+<tt class="descname">render_to_response</tt><big>(</big><em>context</em>, <em>**response_kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXCreateView.render_to_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a response with a template rendered with the given context.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mozdns.mx.views.MXDeleteView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXDeleteView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="mozdns.mx.views.MXDeleteView.as_view">
+<em class="property">classmethod </em><tt class="descname">as_view</tt><big>(</big><em>**initkwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for a request-response process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDeleteView.get_context_object_name">
+<tt class="descname">get_context_object_name</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.get_context_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name to use for the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDeleteView.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the queryset to look an object up against. May not be called if
+<cite>get_object</cite> is overridden.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDeleteView.get_slug_field">
+<tt class="descname">get_slug_field</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.get_slug_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a slug field to be used to look up by slug.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDeleteView.get_template_names">
+<tt class="descname">get_template_names</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.get_template_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of template names to be used for the request. Must return
+a list. May not be called if get_template is overridden.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXDeleteView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDeleteView.render_to_response">
+<tt class="descname">render_to_response</tt><big>(</big><em>context</em>, <em>**response_kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDeleteView.render_to_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a response with a template rendered with the given context.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mozdns.mx.views.MXDetailView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXDetailView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="mozdns.mx.views.MXDetailView.as_view">
+<em class="property">classmethod </em><tt class="descname">as_view</tt><big>(</big><em>**initkwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for a request-response process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.get_context_object_name">
+<tt class="descname">get_context_object_name</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.get_context_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name to use for the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.get_object">
+<tt class="descname">get_object</tt><big>(</big><em>queryset=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the object the view is displaying.</p>
+<p>By default this requires <cite>self.queryset</cite> and a <cite>pk</cite> or <cite>slug</cite> argument
+in the URLconf, but subclasses can override this to return any object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the queryset to look an object up against. May not be called if
+<cite>get_object</cite> is overridden.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.get_slug_field">
+<tt class="descname">get_slug_field</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.get_slug_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a slug field to be used to look up by slug.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.get_template_names">
+<tt class="descname">get_template_names</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.get_template_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of template names to be used for the request. Must return
+a list. May not be called if get_template is overridden.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXDetailView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXDetailView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXDetailView.render_to_response">
+<tt class="descname">render_to_response</tt><big>(</big><em>context</em>, <em>**response_kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXDetailView.render_to_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a response with a template rendered with the given context.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mozdns.mx.views.MXListView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXListView</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="mozdns.mx.views.MXListView.as_view">
+<em class="property">classmethod </em><tt class="descname">as_view</tt><big>(</big><em>**initkwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for a request-response process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_allow_empty">
+<tt class="descname">get_allow_empty</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_allow_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <tt class="docutils literal"><span class="pre">True</span></tt> if the view should display empty lists, and <tt class="docutils literal"><span class="pre">False</span></tt>
+if a 404 should be raised instead.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_context_data">
+<tt class="descname">get_context_data</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_context_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the context for this view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_context_object_name">
+<tt class="descname">get_context_object_name</tt><big>(</big><em>object_list</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_context_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the item to be used in the context.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_paginate_by">
+<tt class="descname">get_paginate_by</tt><big>(</big><em>queryset</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_paginate_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of items to paginate by, or <tt class="docutils literal"><span class="pre">None</span></tt> for no pagination.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_paginator">
+<tt class="descname">get_paginator</tt><big>(</big><em>queryset</em>, <em>per_page</em>, <em>orphans=0</em>, <em>allow_empty_first_page=True</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_paginator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an instance of the paginator for this view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of items for this view. This must be an interable, and may
+be a queryset (in which qs-specific behavior will be enabled).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.get_template_names">
+<tt class="descname">get_template_names</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.get_template_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of template names to be used for the request. Must return
+a list. May not be called if get_template is overridden.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXListView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXListView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.paginate_queryset">
+<tt class="descname">paginate_queryset</tt><big>(</big><em>queryset</em>, <em>page_size</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.paginate_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paginate the queryset, if needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXListView.render_to_response">
+<tt class="descname">render_to_response</tt><big>(</big><em>context</em>, <em>**response_kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXListView.render_to_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a response with a template rendered with the given context.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mozdns.mx.views.MXUpdateView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXUpdateView</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="mozdns.mx.views.MXUpdateView.as_view">
+<em class="property">classmethod </em><tt class="descname">as_view</tt><big>(</big><em>**initkwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.as_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for a request-response process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_context_data">
+<tt class="descname">get_context_data</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_context_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add extra template variables such as form title</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_context_object_name">
+<tt class="descname">get_context_object_name</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_context_object_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name to use for the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_form_class">
+<tt class="descname">get_form_class</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_form_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the form class to use in this view</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_form_kwargs">
+<tt class="descname">get_form_kwargs</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_form_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the keyword arguments for instanciating the form.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_initial">
+<tt class="descname">get_initial</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the initial data to use for forms on this view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_object">
+<tt class="descname">get_object</tt><big>(</big><em>queryset=None</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the object the view is displaying.</p>
+<p>By default this requires <cite>self.queryset</cite> and a <cite>pk</cite> or <cite>slug</cite> argument
+in the URLconf, but subclasses can override this to return any object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_queryset">
+<tt class="descname">get_queryset</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the queryset to look an object up against. May not be called if
+<cite>get_object</cite> is overridden.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_slug_field">
+<tt class="descname">get_slug_field</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_slug_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a slug field to be used to look up by slug.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.get_template_names">
+<tt class="descname">get_template_names</tt><big>(</big><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.get_template_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of template names to be used for the request. Must return
+a list. May not be called if get_template is overridden.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXUpdateView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mozdns.mx.views.MXUpdateView.render_to_response">
+<tt class="descname">render_to_response</tt><big>(</big><em>context</em>, <em>**response_kwargs</em><big>)</big><a class="headerlink" href="#mozdns.mx.views.MXUpdateView.render_to_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a response with a template rendered with the given context.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mozdns.mx.views.MXView">
+<em class="property">class </em><tt class="descclassname">mozdns.mx.views.</tt><tt class="descname">MXView</tt><a class="headerlink" href="#mozdns.mx.views.MXView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Group together common attributes.</p>
+<dl class="attribute">
+<dt id="mozdns.mx.views.MXView.model">
+<tt class="descname">model</tt><a class="headerlink" href="#mozdns.mx.views.MXView.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MX</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">MX (Mail Server Record)</a><ul>
+<li><a class="reference internal" href="#id1">MX</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../nameserver/"
+                        title="previous chapter">Nameservers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../ip/"
+                        title="next chapter">IP</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/mx.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../ip/" title="IP"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../nameserver/" title="Nameservers"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
