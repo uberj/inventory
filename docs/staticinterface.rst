@@ -149,7 +149,7 @@ Start over by deleting all BI objects and then delete the SI object.
 
 
 Inferring an IP address for an Interface with it's Hostname
-----------------------------------------------------------
+-----------------------------------------------------------
 
 Just by looking at an Interfaces requested hostname we can determine which site
 (datacenter and possible business unit) and vlan an Interface is in. Using the
