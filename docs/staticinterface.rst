@@ -5,6 +5,9 @@ Static Interface
 A static interface allows a user to easily create an A/AAAA :class:`AddressRecord` record,
 :class:`PTR` record, and register the interface in the DHCP configs.
 
+.. figure:: images/static_interface.png
+    :width: 80%
+
 A static interface relys on having a ``hostname``, ``ip`` and a ``mac`` to
 generates DNS and DHCP entries. The DNS entries are an A/AAAA record and a PTR record::
 
@@ -25,14 +28,14 @@ Bonded Interfaces
 Context
 +++++++
 :class:`BondedInterface` (BI) objects are used to associate additional interfaces
-with a StaticInterface (SI) without causing duplicate DNS data. The are usually
-created when you want multipile DHCP host entries with the same hostname/ip but
+with a StaticInterface (SI) without causing duplicate DNS data. They are usually
+created when you want multiple DHCP host entries with the same hostname/ip but
 with different MAC addresses.
 
 As an example, consider a host with the following interfaces::
 
     bond0     Link encap:Ethernet  HWaddr DE:AD:DE:1C:BB:F0
-              inet addr:10.8.100.10  Bcast:10.8.101.255  Mask:255.255.254.0
+              inet addr:10.8.70.11  Bcast:10.8.71.255  Mask:255.255.254.0
               inet6 addr: fe80::1ec1:deff:fe1c:bbf0/64 Scope:Link
               UP BROADCAST RUNNING MASTER MULTICAST  MTU:1500  Metric:1
               RX packets:85877116344 errors:5 dropped:15157 overruns:46564 frame:2
@@ -106,12 +109,13 @@ Also note the contents of ``/proc/net/bonding/bond0``::
 
 
 
-Here there are three important objects: bond0, eth0, and eth1. From a DNS
-prespective this host would need one A record and one PTR record. From a DHCP
-prespective this host would need two ``host`` statements where the
-host statements would be identical except for the mac addresses specified with
+Here there are three important objects: ``bond0``, ``eth0``, and ``eth1``. From
+a DNS perspective this host would need one ``A`` record and one ``PTR`` record.
+From a DHCP perspective this host would need two nearly identical ``host``
+statements whose only difference would be the mac addresses specified by
 ``hardware ethernet``.  The near duplicate ``host`` statements are needed for
-when bond0 fails over and starts using the back-up nic's mac address.
+the situation when ``eth0`` fails and ``bond0`` begins using ``eth1``'s  mac
+address.
 
 Implementation
 ++++++++++++++
@@ -119,27 +123,32 @@ In Inventory, the relationship between a BondedInterface (BI) and a
 StaticInterface (SI) is that of a many to one relationship; an SI can have
 multiple BI's associated with it, but a BI is associated with exactly one SI.
 
-In our example, bond0 would be an SI object and both eth0 and eth1 would be BI
-objects. bond0's SI object would be the source of DNS information (like fqdn
-and ip address) and would have it's mac address set to something like 'virtual'
-or 'bonded'. Both eth0 and eth1 would be represented by two seperate BI objects
-which would point to bond0. They would be the source of the two different mac
-addresses used in the two DHCP ``host`` statements.
+.. figure:: images/bonded.png
+    :width: 80%
 
-If you need to coerce an SI into a BI, you can select that the SI become a BI
-via the 'bonded interface' checkbox. When you submit this change a new BI
-object will be created and will automatically be assocaiated with the original
-SI. Note that the original SI *will* still exist and will continue to serve as
-the source of DNS information. The SI that is pointed to by one or more BIs can
-be thought of as the virtual interface, which could be named ``bond0``. The new BI
-created after coercion will have the same interface name and mac address as
-the original SI.
+In our example (shown in the figure above), ``bond0`` would be an SI object and
+both ``eth0`` and ``eth1`` would be BI objects. ``bond0``'s SI object would be
+the source of DNS information (like fqdn and ip address) and would have it's
+mac address set to something like 'virtual' or 'bonded'. Two seperate BI
+objects would represent ``eth0`` and ``eth1`` and would point to ``bond0``. The
+BI's would be the source of the two different mac addresses used in the two
+DHCP ``host`` statements.
 
-An SI with corresponding BI objects can only have it's 'bonded interface'
-attribute unchecked when all BI objects have been deleted.
+Going from Static to Bonded
++++++++++++++++++++++++++++
+If you need to coerce a StaticInterface into an SI that supports
+BondedInterfaces, you can select that the SI supports BIs via the 'bonded
+interface' checkbox. When you submit this change a new BI object will be
+created and will automatically be associated with the original SI. Note that
+the original SI *will* still exist and will continue to serve as the source of
+DNS information.
+
+Going from Bonded to Static
++++++++++++++++++++++++++++
+Start over by deleting all BI objects and then delete the SI object.
 
 
-Infering an IP address for an Interface with it's Hostname
+Inferring an IP address for an Interface with it's Hostname
 ----------------------------------------------------------
 
 Just by looking at an Interfaces requested hostname we can determine which site
