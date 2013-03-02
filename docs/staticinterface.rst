@@ -109,13 +109,12 @@ Also note the contents of ``/proc/net/bonding/bond0``::
 
 
 
-Here there are three important objects: ``bond0``, ``eth0``, and ``eth1``. From
-a DNS perspective this host would need one ``A`` record and one ``PTR`` record.
-From a DHCP perspective this host would need two nearly identical ``host``
-statements whose only difference would be the mac addresses specified by
-``hardware ethernet``.  The near duplicate ``host`` statements are needed for
-the situation when ``eth0`` fails and ``bond0`` begins using ``eth1``'s  mac
-address.
+From a DNS perspective this host would need one ``A`` record and one
+``PTR`` record.  From a DHCP perspective this host would need two nearly
+identical ``host`` statements whose only difference would be the mac addresses
+specified by ``hardware ethernet``.  The near duplicate ``host`` statements are
+needed for the situation when ``eth0`` fails and ``bond0`` begins using
+``eth1``'s  mac address.
 
 Implementation
 ++++++++++++++
@@ -136,8 +135,8 @@ DHCP ``host`` statements.
 
 Going from Static to Bonded
 +++++++++++++++++++++++++++
-If you need to coerce a StaticInterface into an SI that supports
-BondedInterfaces, you can select that the SI supports BIs via the 'bonded
+If you need to coerce a normal StaticInterface into an SI that supports
+bonding, you can select that the SI supports BIs via the 'bonded
 interface' checkbox. When you submit this change a new BI object will be
 created and will automatically be associated with the original SI. Note that
 the original SI *will* still exist and will continue to serve as the source of
@@ -148,9 +147,8 @@ Going from Bonded to Static
 Start over by deleting all BI objects and then delete the SI object.
 
 
-Inferring an IP address for an Interface with it's Hostname
------------------------------------------------------------
-
+Free IP Addresses
+=================
 Just by looking at an Interfaces requested hostname we can determine which site
 (datacenter and possible business unit) and vlan an Interface is in. Using the
 names of the site and vlan we can use information stored in the :ref:`core`
@@ -197,6 +195,6 @@ Getting a free ip is easy.::
 We just found a free ip in vlan webops in scl3.
 
 Static Interface
-----------------
+================
 .. automodule:: core.interface.static_intr.models
     :inherited-members: StaticInterface
