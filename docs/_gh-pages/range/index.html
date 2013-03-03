@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Range &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Network Flows" href="../flows/" />
+    <link rel="prev" title="Network" href="../network/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../flows/" title="Network Flows"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../network/" title="Network"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="range">
+<span id="id1"></span><h1>Range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h1>
+<p>Ranges exist inside Networks.</p>
+<span class="target" id="module-core.range.models"></span><dl class="class">
+<dt id="core.range.models.Range">
+<em class="property">class </em><tt class="descclassname">core.range.models.</tt><tt class="descname">Range</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#core.range.models.Range" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Range class.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start_ip</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end_ip</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">defualt_domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ranges live inside networks; their start ip address is greater than or
+equal to the the start of their network and their end ip address is less
+than or equal to the end of their network; both the Range and the network
+class enforce these requirements. Good practice says ranges should not
+start on the network address of their network and they should not end on
+the broadcast address of their network; the Range and Network classes do
+not enforce this.</p>
+<p>Chaning a Range</p>
+<p>Things that happen when a static range is changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The new <cite>start</cite> and <cite>end</cite> values are checked against the range&#8217;s
+network to ensure that the range still exists within the network.</li>
+<li>The new <cite>start</cite> and <cite>end</cite> values are checked against all other
+existing range&#8217;s <cite>start</cite> and <cite>end</cite> values to make sure that the new
+range does not overlap.</li>
+</ul>
+</div></blockquote>
+<p>Ranges should try to enforce the host template found in Mana
+<a class="reference external" href="https://mana.mozilla.org/wiki/display/NETOPS/Node+deployment">https://mana.mozilla.org/wiki/display/NETOPS/Node+deployment</a></p>
+<dl class="method">
+<dt id="core.range.models.Range.check_for_overlaps">
+<tt class="descname">check_for_overlaps</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.check_for_overlaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will look at all the other ranges and make sure we
+don&#8217;t overlap with any of them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.range.models.Range.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.edit_url">
+<tt class="descname">edit_url</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.edit_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the edit url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.range.models.Range.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.get_absolute_url">
+<tt class="descname">get_absolute_url</tt><big>(</big><em>*moreargs</em>, <em>**morekwargs</em><big>)</big><a class="headerlink" href="#core.range.models.Range.get_absolute_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the absolute url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.get_create_url">
+<tt class="descname">get_create_url</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.get_create_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the create url of the type of object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.get_delete_url">
+<tt class="descname">get_delete_url</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.get_delete_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the delete url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.get_edit_url">
+<tt class="descname">get_edit_url</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.get_edit_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the edit url of an object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.get_next_ip">
+<tt class="descname">get_next_ip</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.get_next_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find&#8217;s the most appropriate ip address within a range. If it can&#8217;t
+find an IP it returns None. If it finds an IP it returns an IPv4Address
+object.</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">returns:</th><td class="field-body">ipaddr.IPv4Address</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.range.models.Range.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#core.range.models.Range.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.update_ipf">
+<tt class="descname">update_ipf</tt><big>(</big><big>)</big><a class="headerlink" href="#core.range.models.Range.update_ipf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the IP filter. Used for compiling search queries and firewall
+rules.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.Range.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.range.models.Range.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="core.range.models.RangeKeyValue">
+<em class="property">class </em><tt class="descclassname">core.range.models.</tt><tt class="descname">RangeKeyValue</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>RangeKeyValue(id, key, value, is_option, is_statement, has_validator, obj_id)</p>
+<dl class="method">
+<dt id="core.range.models.RangeKeyValue.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.RangeKeyValue.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.RangeKeyValue.save">
+<tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The &#8216;force_insert&#8217; and &#8216;force_update&#8217; parameters can be used to insist
+that the &#8220;save&#8221; must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.RangeKeyValue.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.range.models.RangeKeyValue.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#core.range.models.RangeKeyValue.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="core.range.models.find_free_ip">
+<tt class="descclassname">core.range.models.</tt><tt class="descname">find_free_ip</tt><big>(</big><em>start</em>, <em>end</em>, <em>ip_type='4'</em><big>)</big><a class="headerlink" href="#core.range.models.find_free_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given start and end numbers, find a free ip.
+:param start: The start number
+:type start: int
+:param end: The end number
+:type end: int
+:param ip_type: The type of IP you are looking for.
+:type ip_type: str either &#8216;4&#8217; or &#8216;6&#8217;</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../network/"
+                        title="previous chapter">Network</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../flows/"
+                        title="next chapter">Network Flows</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/range.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../flows/" title="Network Flows"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../network/" title="Network"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Label Domain Paradigm &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Building Bind Files" href="../BIND/" />
+    <link rel="prev" title="Domain" href="../domain/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../BIND/" title="Building Bind Files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../domain/" title="Domain"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="label-domain-paradigm">
+<span id="label-domain"></span><h1>Label Domain Paradigm<a class="headerlink" href="#label-domain-paradigm" title="Permalink to this headline">¶</a></h1>
+<p>This page only applied to forward domains.</p>
+<p>All DNS records are centered around the &#8216;label and domain&#8217; paradigm. This is a good unambiguous
+underlying data structure for the system to understand but it quite unfriendly to the user.</p>
+<p>An interesting case is this: say we only have two domains in our db, <tt class="docutils literal"><span class="pre">com</span></tt> and <tt class="docutils literal"><span class="pre">example.com</span></tt>,
+and we want to add the <a class="reference internal" href="../address_record/#address-record"><em>Address Record</em></a> <tt class="docutils literal"><span class="pre">foo.bar.x.y.z.example.com</span>&nbsp; <span class="pre">A</span>&nbsp;&nbsp; <span class="pre">192.168.3.3</span></tt>. Four
+new domains would need to be created to store this record:  <tt class="docutils literal"><span class="pre">z.example.com</span></tt>, <tt class="docutils literal"><span class="pre">y.z.example.com</span></tt>,
+<tt class="docutils literal"><span class="pre">x.y.z.example.com</span></tt>, and <tt class="docutils literal"><span class="pre">bar.x.y.z.example.com</span></tt>. The last domain would be the record&#8217;s domain
+and <tt class="docutils literal"><span class="pre">foo</span></tt> would be the value of it&#8217;s label. Instead of having the user create all these domains,
+just saying &#8216;create an <tt class="docutils literal"><span class="pre">A</span></tt> record with the name <tt class="docutils literal"><span class="pre">foo.bar.x.y.z.example.com</span></tt>&#8216; should be possible.</p>
+<p>The algorithm for creating a new name:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">ensure_label_domain</span><span class="p">(</span><span class="n">fqdn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a label and domain object.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">Domain</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">fqdn</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">Domain</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">fqdn</span><span class="p">)</span>
+    <span class="n">fqdn_partition</span> <span class="o">=</span> <span class="n">fqdn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fqdn_partition</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="n">Domain</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">fqdn</span><span class="p">)</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">domain</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">domain_name</span> <span class="o">=</span> <span class="n">fqdn_partition</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fqdn_partition</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="n">ensure_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">purgeable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">ensure_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">purgeable</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function will take ``domain_name`` and make sure that that domain with that name</span>
+<span class="sd">    exists in the db. If this function creates a domain it will set the domain&#39;s purgeable flag</span>
+<span class="sd">    to the value of the named arguement ``purgeable``.&quot;&quot;&quot;</span>
+    <span class="c"># Complicated code.</span>
+</pre></div>
+</div>
+<p>Deleting an object that caused four domains to be created should not clutter the domain table with
+unused domains. <em>A domain is considered &#8216;unused&#8217; when it&#8217;s id, or pk (primary key), is not used in
+any DNS record</em>. When a record is deleted the effect of the following function should be applied to the
+record&#8217;s domain after it is deleted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">prune_tree</span><span class="p">(</span><span class="n">domain</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">domain</span><span class="o">.</span><span class="n">has_record_set</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>  <span class="c"># There are records for this domain</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">domain</span><span class="o">.</span><span class="n">purgeable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>  <span class="c"># This domain should not be deleted by a computer.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">child_domains</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">domain_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">domain</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">child_domain</span> <span class="ow">in</span> <span class="n">child_domains</span><span class="p">:</span>
+            <span class="n">prune_tree</span><span class="p">(</span><span class="n">child_domain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>During the process of creating a new domain, a new domain&#8217;s name could conflict with an existing
+record&#8217;s name.  For example, while creating the domain <tt class="docutils literal"><span class="pre">foo.example.com</span></tt> there may already be a
+record with a label equal to <tt class="docutils literal"><span class="pre">foo</span></tt> and it&#8217;s domain pointed at <tt class="docutils literal"><span class="pre">example.com</span></tt>. To handle these
+conflicts the function <tt class="docutils literal"><span class="pre">ensure_domain</span></tt> will delete conflicting records, create the new domain, and
+then recreate the record in the newly created domain and set the record&#8217;s label to <tt class="docutils literal"><span class="pre">''</span></tt> (the empty string).</p>
+<div class="section" id="purgeable-domains">
+<h2>Purgeable Domains<a class="headerlink" href="#purgeable-domains" title="Permalink to this headline">¶</a></h2>
+<p>The domain&#8217;s <tt class="docutils literal"><span class="pre">purgeable</span></tt> attribute is set to <tt class="docutils literal"><span class="pre">True</span></tt> when it is created with the
+<tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> function. When a record is deleted, the <tt class="docutils literal"><span class="pre">prune_tree</span></tt> function may delete
+unused domains. Some domains that are created should not be purged if they are empty, these domains
+should have purgeable set to <tt class="docutils literal"><span class="pre">False</span></tt>. Some example of domain types that should not be purged:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Any domain created in the Web UI should default to purgeable = False.
+- If a user has gone out of his way to fill out a form to create a domain, don&#8217;t delete it.</li>
+<li>All domains that are at the root of a SOA should default to purgeable = False.</li>
+</ul>
+</div></blockquote>
+<p>Some examples of when a domain will be passed to the <tt class="docutils literal"><span class="pre">prune_tree</span></tt> function.</p>
+<blockquote>
+<div><ul class="simple">
+<li>A record that has just been deleted will pass it&#8217;s domain to <tt class="docutils literal"><span class="pre">prune_tree</span></tt>.</li>
+<li>When a record is saved the domain that the record had <em>before</em> the update will have
+<tt class="docutils literal"><span class="pre">prune_tree</span></tt> called on it (this doesn&#8217;t happen when the record is first created).</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When calling <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> it is optimal to not allow domain leaks to happen. One way
+a domain leak can happen is if you call <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt>, assign the returned domain to
+an object, and then back out of the creation of the object for some reason (likely an error
+during object validation). To prevent this kind of leak, you should call <tt class="docutils literal"><span class="pre">prune_tree</span></tt> on the
+domain returned by <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> if the creation of an object fails.</p>
+</div>
+</div>
+<div class="section" id="delegated-domains">
+<h2>Delegated Domains<a class="headerlink" href="#delegated-domains" title="Permalink to this headline">¶</a></h2>
+<p>If a request is made to <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> that would cause domains to be created under a
+delegated domain, a <tt class="xref py py-class docutils literal"><span class="pre">ValidationError</span></tt> is raised.</p>
+</div>
+<div class="section" id="soa-requirements">
+<h2>SOA Requirements<a class="headerlink" href="#soa-requirements" title="Permalink to this headline">¶</a></h2>
+<p>The first domain that <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> creates must be under a domain that claims to be part
+of zone (points to an SOA). This requirement is meant to ward off mass domain creation due to a
+typo. For exmaple: when attempting to create <tt class="docutils literal"><span class="pre">bar.x.y.z.example.com</span></tt> a user could accidentally
+write <tt class="docutils literal"><span class="pre">bar.x.y.z.example.cm</span></tt> and end up creating a stray root domain and five sub-domains.</p>
+<p>If a request is made to <tt class="docutils literal"><span class="pre">ensure_label_domain</span></tt> that would cause the creation of a domain that isn&#8217;t
+in a zone, a <tt class="xref py py-class docutils literal"><span class="pre">ValidationError</span></tt> is raised.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Label Domain Paradigm</a><ul>
+<li><a class="reference internal" href="#purgeable-domains">Purgeable Domains</a></li>
+<li><a class="reference internal" href="#delegated-domains">Delegated Domains</a></li>
+<li><a class="reference internal" href="#soa-requirements">SOA Requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../domain/"
+                        title="previous chapter">Domain</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../BIND/"
+                        title="next chapter">Building Bind Files</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/label_domain.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../BIND/" title="Building Bind Files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../domain/" title="Domain"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
