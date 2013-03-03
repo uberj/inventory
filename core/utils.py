@@ -10,6 +10,7 @@ from settings.local import inventorys_email
 
 # http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html
 # Prevent this case http://people.mozilla.com/~juber/public/t1_t2_scenario.txt
+# TODO, put this in a try accept and always unlock things
 def locked_function(lock_name, timeout=10):
     def decorator(f):
         def new_function(*args, **kwargs):

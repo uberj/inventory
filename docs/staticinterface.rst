@@ -6,7 +6,7 @@ A static interface allows a user to easily create an A/AAAA :class:`AddressRecor
 :class:`PTR` record, and register the interface in the DHCP configs.
 
 .. figure:: images/static_interface.png
-    :width: 80%
+    :width: 100%
 
 A static interface relys on having a ``hostname``, ``ip`` and a ``mac`` to
 generates DNS and DHCP entries. The DNS entries are an A/AAAA record and a PTR record::
@@ -123,7 +123,7 @@ StaticInterface (SI) is that of a many to one relationship; an SI can have
 multiple BI's associated with it, but a BI is associated with exactly one SI.
 
 .. figure:: images/bonded.png
-    :width: 80%
+    :width: 100%
 
 In our example (shown in the figure above), ``bond0`` would be an SI object and
 both ``eth0`` and ``eth1`` would be BI objects. ``bond0``'s SI object would be

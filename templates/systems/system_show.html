@@ -141,14 +141,14 @@
 </dl>
 
 <!--- Disabling this until DHCP is deployed -->
-<div style="clear:both;display:none;">
+<div style="clear:both;">
 <dl class="show">
 <dt>Interfaces (for DNS): </dt>
     <table>
     <tr><th>Int</th><th>MAC</th><th>FQDN</th><th>IP Address</th><th>DHCP</th><th>DNS</th><th>Action</th></tr>
     {% for intr in interfaces %}
         <tr>
-        <td>{{ intr.interface_name() }}</td>
+        <td>{{ intr.interface_id() }}</td>
         <td>{{ intr.mac }}</td>
         {% if intr.label == "" %}
         <td><a href='{{ intr.domain.get_absolute_url() }}'>{{intr.fqdn}}</a></td>

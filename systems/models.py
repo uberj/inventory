@@ -370,7 +370,13 @@ class System(DirtyFieldsMixin, models.Model):
         return "/systems/show/{0}/".format(self.pk)
 
     def update_adapter(self, **kwargs):
-        from api_v3.system_api import SystemResource
+        """
+            Method to update a netwrok adapter
+
+            :param **kwargs: keyword arguments of what to update
+            :type **kwargs: dict
+            :return: True on deletion, exception on failure
+        """
         interface = kwargs.pop('interface', None)
         ip_address = kwargs.pop('ip_address', None)
         mac_address = kwargs.pop('mac_address', None)
@@ -379,24 +385,16 @@ class System(DirtyFieldsMixin, models.Model):
             raise ValidationError("Interface required to update")
 
         for intr in self.staticinterface_set.all():
-            if intr.interface_name() == interface:
+            if intr.interface_name == interface:
                 if ip_address:
                     intr.ip_str = ip_address
                 if mac_address:
                     intr.mac = mac_address
                 intr.save()
         return True
-                
 
-        """
-            method to update a netwrok adapter
 
-            :param **kwargs: keyword arguments of what to update
-            :type **kwargs: dict
-            :return: True on deletion, exception on failure
-        """
     def delete_adapter(self, adapter_name):
-        from api_v3.system_api import SystemResource
         """
             method to get the next adapter
             we'll want to always return an adapter with a 0 alias
@@ -406,11 +404,9 @@ class System(DirtyFieldsMixin, models.Model):
             :type adapter_name: str
             :return: True on deletion, exception raid if not exists
         """
-        adapter_type, primary, alias = SystemResource.extract_nic_attrs(adapter_name)
-        #self.staticinterface_set.get(type = adapter_type, primary = primary, alias = alias).delete()
         for i in self.staticinterface_set.all():
             i.update_attrs()
-            if i.attrs.interface_type == adapter_type and i.attrs.primary == primary and i.attrs.alias == alias:
+            if i.attrs.interface_id == adapter_name:
                 i.delete()
         return True
 

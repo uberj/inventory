@@ -15,3 +15,23 @@ def validate_mac(mac):
     # TODO, I'm drunk. Write a better regex
     if not is_mac.match(mac):
         raise ValidationError("Mac Address not in valid format.")
+
+valid_name_formats = [
+    re.compile("^eth\d+$"),
+    re.compile("^nic\d+$"),
+    re.compile("^mgmt\d+$")
+]
+
+def validate_bonded_intr_name(name):
+    # TODO ^ fix that regex, he was drunk.
+    for f in valid_name_formats:
+        if f.match(name):
+            return
+    raise ValidationError(
+        "Not in valid format. Try something like eth0 or eth1."
+    )
+
+def validate_intr_name(name):
+    if name.lower() != 'virtual':
+        validate_bonded_intr_name(name)
+

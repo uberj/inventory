@@ -198,6 +198,7 @@ class AAAA_(A_):
 
 @tag_rdtype
 class INTR_(RecordView):
+    form_template = 'record/intr_ajax_form.html'
     Klass = StaticInterface
     form = StaticInterfaceForm
     DisplayForm = StaticInterfaceFQDNForm

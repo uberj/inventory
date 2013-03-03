@@ -1,14 +1,27 @@
-def get_available_ip_by_domain(domain):
-    """
-    :param domain: The domain to choose from
-    :type domain: class:`Domain`
-    :param system: The system the interface belongs to
-    :returns: ip_address
+from django.core.exceptions import ValidationError
 
-    This function looks at `domain.name` and strips off 'mozilla.com' (yes it
-    needs to be `<something>.mozilla.com`). The function then tries to
-    determine which site and vlan the domain is in. Once it knows the site and
-    vlan it looks for network's in the vlan and eventually for ranges and a
-    free ip in that range. If at any time this function can't do any of those
-    things it raises a ValidationError.
+from core.interface.bonded_intr import BondedInterface
+
+def coerce_to_bonded(intr):
     """
+    Coerce a non bonded StaticInterface into a bonded Interface.
+    :param intr:
+    :type intr: :class:`StaticInterface`
+    :returns: (:class:`StaticInterface, :class:`BondedInterface`)
+    :raises: ValidationError
+
+    If there are errors errors a ValidationError will be raised with a message
+    the should be shown to the user.
+    """
+    if intr.bondedintr_set.all().exists():
+        raise ValidationError("This interface is already a bonded interface")
+
+    bi = BondedInterface(
+        mac=intr.mac, interface_name=intr.interface_name, intr=intr
+    )
+    bi.clean()
+    bi.save()
+
+    intr.mac = 'virtual'
+    intr.interface_name = intr.system.get_next_bond_name()
+    return intr, bi

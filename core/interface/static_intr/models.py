@@ -6,7 +6,7 @@ from systems.models import System
 import mozdns
 from core.keyvalue.models import KeyValue
 from core.keyvalue.utils import AuxAttr
-from core.validation import validate_mac
+from core.validation import validate_mac, validate_intr_name
 from mozdns.address_record.models import BaseAddressRecord
 from mozdns.domain.models import Domain
 from mozdns.ip.utils import ip_to_dns_form
@@ -50,34 +50,55 @@ class StaticInterface(BaseAddressRecord):
     >>> intr = <Assume this is an existing StaticInterface instance>
     >>> intr.update_attrs()  # This updates the object with keys/values already
     >>> # in the KeyValue store.
-    >>> intr.attrs.primary
+<<<<<<< Updated upstream
+    >>> intr.attrs.baz
     '0'
 
-    In the previous line, there was a key called 'primary' and it's value
-    would be returned when you accessed the attribute 'primary'.
+    In the previous line, there was a key called 'baz' and it's value
+    would be returned when you accessed the attribute 'baz'.
+=======
+    >>> intr.attrs.interface_id
+    'eth0'
 
-    >>> intr.attrs.alias
+    In the previous line, there was a key called 'interface_id' and it's value
+    would be returned when you accessed the attribute 'interface_id'.
+>>>>>>> Stashed changes
+
+    >>> intr.attrs.foo
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-    AttributeError: 'attrs' object has no attribute 'alias'
+    AttributeError: 'attrs' object has no attribute 'foo'
 
-    Here 'attrs' didn't have an attribute 'alias' which means that there was no
-    KeyValue with key 'alias'. If we wanted to create that key and give it a
+    Here 'attrs' didn't have an attribute 'foo' which means that there was no
+    KeyValue with key 'foo'. If we wanted to create that key and give it a
+<<<<<<< Updated upstream
     value of '0' we would do:
 
-    >>> intr.attrs.alias = '0'
+    >>> intr.attrs.foo = 'bar'
 
-    This *immediately* creates a KeyValue pair with key='alias' and value='0'.
+    This *immediately* creates a KeyValue pair with key='foo' and value='bar'.
 
-    >>> intr.attrs.alias = '1'
+    >>> intr.attrs.foo = '1'
+=======
+    value of 'bar' we would do:
 
-    This *immediately* updates the KeyValue object with a value of '1'. It is
+    >>> intr.attrs.bar = 'foo'
+
+    This *immediately* creates a KeyValue pair with key='bar' and value='foo'.
+
+    >>> intr.attrs.bar = 'baz'
+>>>>>>> Stashed changes
+
+    This *immediately* updates the KeyValue object with a value of 'baz'. It is
     not like the Django ORM where you must call the `save()` function for any
     changes to propagate to the database.
     """
     id = models.AutoField(primary_key=True)
     mac = models.CharField(max_length=17, validators=[validate_mac],
                            help_text="Mac address in format XX:XX:XX:XX:XX:XX")
+    interface_name = models.CharField(
+        max_length=255, validators=[validate_intr_name], null=False
+    )
     reverse_domain = models.ForeignKey(Domain, null=True, blank=True,
                                        related_name="staticintrdomain_set")
 
@@ -127,22 +148,17 @@ class StaticInterface(BaseAddressRecord):
     def get_absolute_url(self):
         return "/systems/show/{0}/".format(self.system.pk)
 
-    def interface_name(self):
+<<<<<<< Updated upstream
+=======
+    @property
+    def interface_id(self):
         self.update_attrs()
         try:
-            itype, primary, alias = '', '', ''
-            itype = self.attrs.interface_type
-            primary = self.attrs.primary
-            alias = self.attrs.alias
+            return self.attrs.interface_id
         except AttributeError:
-            pass
-        if itype == '' or primary == '':
-            return "None"
-        elif alias == '':
-            return "{0}{1}".format(itype, primary)
-        else:
-            return "{0}{1}.{2}".format(itype, primary, alias)
+            return "No-name"
 
+>>>>>>> Stashed changes
     def clean(self, *args, **kwargs):
         self.mac = self.mac.lower()
         if not self.system:
@@ -237,20 +253,6 @@ class StaticIntrKeyValue(KeyValue):
         db_table = "static_inter_key_value"
         unique_together = ("key", "value", "obj")
 
-    def _aa_primary(self):
-        """
-        The primary number of this interface (I.E. eth1.0 would have a primary
-        number of '1')
-        """
-        if not self.value.isdigit():
-            raise ValidationError("The primary number must be a number.")
-
-    def _aa_alias(self):
-        """The alias of this interface (I.E. eth1.0 would have a primary
-        number of '0')."""
-        if not self.value.isdigit():
-            raise ValidationError("The alias number must be a number.")
-
     def _aa_hostname(self):
         """DHCP option hostname
         """
@@ -275,8 +277,19 @@ class StaticIntrKeyValue(KeyValue):
         if not self.value:
             raise ValidationError("Filename Required")
 
-    def _aa_interface_type(self):
-        """Either eth (ethernet) or mgmt (mgmt)."""
-        if not (is_eth.match(self.value) or is_mgmt.match(self.value)):
-            raise ValidationError("Interface type must either be 'eth' "
-                                  "or 'mgmt'")
+    valid_name_formats = [
+        re.compile("^eth\d+$"),
+        re.compile("^nic\d+$"),
+        re.compile("^mgmt\d+$")
+    ]
+    def _aa_interface_id(self):
+        """
+        Something like eth\d+, mgmt\d+, or nic\d+
+        """
+        for f in self.valid_name_formats:
+            if f.match(self.value):
+                return
+        raise ValidationError(
+            "Not in valid format. Try something like eth0 or eth1."
+        )
+>>>>>>> Stashed changes

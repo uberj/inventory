@@ -19,7 +19,7 @@ kv_users = {
     'range': Range,
     'site': Site,
     'soa': SOA,
-    'interface': StaticInterface,
+    'intr': StaticInterface,
     'vlan': Vlan,
 }
 

@@ -56,6 +56,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'core.lib',
     'core.interface',
     'core.interface.static_intr',
+    'core.interface.bonded_intr',
     'core.search',
     'core.lib',
     'core.keyvalue',

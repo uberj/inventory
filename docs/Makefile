@@ -134,4 +134,4 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 people:
-	scp -r _build/html people.mozilla.com:~/public_html/public/docs
+	ssh admin1a.private.scl3.mozilla.com -A -t ssh -A -t boris.mozilla.com -A -t ssh people.mozilla.com -A -t scp -r toolsdev1.dmz.scl3.mozilla.com:~/inventory_dev/inventory/docs/_build/ ~/public_html/public/docs/
