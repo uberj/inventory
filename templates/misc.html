@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Other Sections:</h2>
+
+<ul>
+    <li><a href="{{ "allocation-list"|url() }}">Allocations</a></li>
+    <li><a href="{{ "location-list"|url() }}">Location</a></li>
+    <li><a href="{{ "server_model-list"|url() }}">Server Models</a></li>
+    <li><a href="{{ "system-csv-import"|url() }}">System CSV Import</a></li>
+</ul>
+{% endblock %}

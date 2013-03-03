@@ -1,0 +1,36 @@
+We all think it would be a good thing to start using Inventory2.0 (I can't think of a more creative
+name #fail), but when is that an option? Here are the four main things we need to consider.
+
+    1) Is INV2 fully usable.
+    2) What DNS zones should/can be in INV2.
+    3) What happens when I leave.
+    4) Is everyone ready?
+
+Some concerns that were raised in London:
+
+    * API matureness
+      - Right now arr and dustin can mass import data into the current inventory for DHCP and can
+        do mass creation of A/PTR records and include them in BIND zone files. The ability to do this
+        sort of mass creation *must* be supported when INV2 is deployed.
+      - As of now, the only way to mass create records is writing local code and executing it via
+        the ``python manage.py shell`` interface on the server running INV2.
+
+    * Web Usability and Clarity
+      - Currently the web UI is %100 functional (all DNS records can be added, deleted, and
+        updated with a form), but it was suggested that 'tool-tips' be added to the web UI.
+      - Better UI documentation  *should* be implemented when INV2 is deployed, but imo it is not
+        a critical feature.
+
+    * Choose the DNS zones that should be initially be imported and homed in INV2.
+      - Both jakem and I think that we should take an incremental approach and initially leave out
+        some zones until the system has proven itself.  jd pointed out that this partial migration
+        might lead to another mess in DNS; we fear that there is a chance the migration of all DNS
+        data into the system will never happen and that DNS will be in two places. Imo, the system
+        can and will have all DNS data in it but the full migration will likely happen when I
+        return.
+      - zones with datacenter specific views need to be 'fixed' before they can be in INV2 (I
+        know limed is working on this)
+      - I am currently writing a more formal migration plan.
+
+During work week atoll showed me how services does DNS. We might want to exclude importing any of
+their data, including their reverse address space zones, into INV2.

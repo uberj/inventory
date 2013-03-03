@@ -1,0 +1,10 @@
+src/django-piston
+src/django-tastypie
+src/django-tastytools
+src/django-multidb-router
+src/mimeparse
+src/django-extensions
+src/django-reversion/src
+src/iscpy
+src/dnspython
+src/django-south
