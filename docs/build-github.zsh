@@ -34,7 +34,7 @@ pushd $GH
 # Commit.
 git add .
 git commit -am "gh-pages build on $(date)"
-git push origin gh-pages
+git push --force origin gh-pages
 
 popd
 popd
