@@ -16,9 +16,13 @@ def validate_mac(mac):
     if not is_mac.match(mac):
         raise ValidationError("Mac Address not in valid format.")
 
+def validate_intr_mac(mac):
+    if mac.lower() != 'virtual':
+        validate_mac(mac)
+
 valid_name_formats = [
     re.compile("^eth\d+$"),
-    re.compile("^nic\d+$"),
+    re.compile("^bond\d+$"),
     re.compile("^mgmt\d+$")
 ]
 

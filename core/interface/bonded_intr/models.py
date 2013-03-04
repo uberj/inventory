@@ -22,7 +22,9 @@ class BondedInterface(models.Model):
     interface_name = models.CharField(
         max_length=255, validators=[validate_bonded_intr_name]
     )
-    intr = models.ForeignKey(StaticInterface, null=True, blank=True)
+    intr = models.ForeignKey(
+        StaticInterface, null=True, blank=True, related_name='bondedintr_set'
+    )
     search_fields = ("mac", "interface_name", "intr__fqdn")
 
     def update_attrs(self):
@@ -36,7 +38,7 @@ class BondedInterface(models.Model):
 
     class Meta:
         db_table = "bonded_interface"
-        unique_together = ("mac", "intr")
+        unique_together = ("mac", "intr", "interface_name")
 
     @classmethod
     def get_api_fields(cls):

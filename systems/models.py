@@ -410,50 +410,27 @@ class System(DirtyFieldsMixin, models.Model):
                 i.delete()
         return True
 
-
-    def get_adapters(self):
-        """
-            method to get all adapters
-            :return: list of objects and attributes if exist, None if empty
-        """
-        adapters = None
-        if self.staticinterface_set.count() > 0:
-            adapters = []
-            for i in self.staticinterface_set.all():
-                i.update_attrs()
-                adapters.append(i)
-        return adapters
-
     def get_next_adapter(self, intr_type='eth'):
-        """
-            method to get the next adapter
-            we'll want to always return an adapter with a 0 alias
-            take the highest primary if exists, increment by 1 and return
+        intrs = self.staticinterface_set.all()
+        taken = []
+        for intr in intrs:
+            nic_number = intr.interface_name.strip(intr_type)
+            if nic_number.isdigit():
+                taken.append(int(nic_number))
+            bis = intr.bondedintr_set.filter(
+                interface_name__startswith=intr_type
+            )
+            for bi in bis:
+                bi_number = bi.interface_name.strip(intr_type)
+                if bi_number.isdigit():
+                    taken.append(int(bi_number))
 
-            :param type: The type of network adapter
-            :type type: str
-            :return: 3 strings 'adapter_name', 'primary_number', 'alias_number'
-        """
-        if self.staticinterface_set.count() == 0:
-            return intr_type, '0', '0'
-        else:
-            primary_list = []
-            for i in self.staticinterface_set.all():
-                i.update_attrs()
-                try:
-                    primary_list.append(int(i.attrs.primary))
-                except AttributeError, e:
-                    continue
 
-            ## sort and reverse the list to get the highest
-            ## perhaps someday come up with the lowest available
-            ## this should work for now
-            primary_list.sort()
-            primary_list.reverse()
-            if not primary_list:
-                return intr_type, '0', '0'
-            else:
-                return intr_type, str(primary_list[0] + 1), '0'
+        next = 0
+        while next in taken:
+            next += 1
+
+        return intr_type + str(next)
 
     def get_next_key_value_adapter(self):
         """

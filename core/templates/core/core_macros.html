@@ -114,3 +114,34 @@
         </div>
     {% endif %}
 {%- endmacro %}
+
+{% macro display_intr(intr) -%}
+    <tr>
+        <td>{{intr.fqdn}}</td>
+        <td>{{intr.ip_str}}</td>
+        <td>{{intr.interface_name}}</td>
+        <td>{{intr.mac}}</td>
+    </tr>
+    {% if intr.bondedintr_set.exists() %}
+        {% for bi in intr.bondedintr_set.all() %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td>{{bi.interface_name}}</td>
+            <td>{{bi.mac}}</td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+{%- endmacro %}
+
+{% macro display_intrs(intrs) -%}
+    <table class="tablesorter">
+    <th>FQDN</th>
+    <th>IP</th>
+    <th>Inteface Name</th>
+    <th>MAC</th>
+    {% for intr in intrs %}
+        {{ display_intr(intr) }}
+    {% endfor %}
+    </table>
+{%- endmacro %}

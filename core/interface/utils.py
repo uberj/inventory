@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 
-from core.interface.bonded_intr import BondedInterface
+from core.interface.bonded_intr.models import BondedInterface
 
 def coerce_to_bonded(intr):
     """
@@ -13,7 +13,7 @@ def coerce_to_bonded(intr):
     If there are errors errors a ValidationError will be raised with a message
     the should be shown to the user.
     """
-    if intr.bondedintr_set.all().exists():
+    if intr.bondedintr_set.exists():
         raise ValidationError("This interface is already a bonded interface")
 
     bi = BondedInterface(
@@ -23,5 +23,6 @@ def coerce_to_bonded(intr):
     bi.save()
 
     intr.mac = 'virtual'
-    intr.interface_name = intr.system.get_next_bond_name()
+    intr.interface_name = intr.system.get_next_adapter(intr_type='bond')
+    intr.save()
     return intr, bi

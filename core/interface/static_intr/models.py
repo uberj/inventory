@@ -6,12 +6,11 @@ from systems.models import System
 import mozdns
 from core.keyvalue.models import KeyValue
 from core.keyvalue.utils import AuxAttr
-from core.validation import validate_mac, validate_intr_name
+from core.validation import validate_intr_mac, validate_intr_name
 from mozdns.address_record.models import BaseAddressRecord
 from mozdns.domain.models import Domain
 from mozdns.ip.utils import ip_to_dns_form
 
-import re
 from gettext import gettext as _
 
 
@@ -50,19 +49,11 @@ class StaticInterface(BaseAddressRecord):
     >>> intr = <Assume this is an existing StaticInterface instance>
     >>> intr.update_attrs()  # This updates the object with keys/values already
     >>> # in the KeyValue store.
-<<<<<<< Updated upstream
     >>> intr.attrs.baz
     '0'
 
     In the previous line, there was a key called 'baz' and it's value
     would be returned when you accessed the attribute 'baz'.
-=======
-    >>> intr.attrs.interface_id
-    'eth0'
-
-    In the previous line, there was a key called 'interface_id' and it's value
-    would be returned when you accessed the attribute 'interface_id'.
->>>>>>> Stashed changes
 
     >>> intr.attrs.foo
     Traceback (most recent call last):
@@ -71,15 +62,6 @@ class StaticInterface(BaseAddressRecord):
 
     Here 'attrs' didn't have an attribute 'foo' which means that there was no
     KeyValue with key 'foo'. If we wanted to create that key and give it a
-<<<<<<< Updated upstream
-    value of '0' we would do:
-
-    >>> intr.attrs.foo = 'bar'
-
-    This *immediately* creates a KeyValue pair with key='foo' and value='bar'.
-
-    >>> intr.attrs.foo = '1'
-=======
     value of 'bar' we would do:
 
     >>> intr.attrs.bar = 'foo'
@@ -87,14 +69,13 @@ class StaticInterface(BaseAddressRecord):
     This *immediately* creates a KeyValue pair with key='bar' and value='foo'.
 
     >>> intr.attrs.bar = 'baz'
->>>>>>> Stashed changes
 
     This *immediately* updates the KeyValue object with a value of 'baz'. It is
     not like the Django ORM where you must call the `save()` function for any
     changes to propagate to the database.
     """
     id = models.AutoField(primary_key=True)
-    mac = models.CharField(max_length=17, validators=[validate_mac],
+    mac = models.CharField(max_length=17, validators=[validate_intr_mac],
                            help_text="Mac address in format XX:XX:XX:XX:XX:XX")
     interface_name = models.CharField(
         max_length=255, validators=[validate_intr_name], null=False
@@ -139,26 +120,6 @@ class StaticInterface(BaseAddressRecord):
     def rdtype(self):
         return 'INTR'
 
-    def get_edit_url(self):
-        return "/core/interface/{0}/update/".format(self.pk)
-
-    def get_delete_url(self):
-        return "/core/interface/{0}/delete/".format(self.pk)
-
-    def get_absolute_url(self):
-        return "/systems/show/{0}/".format(self.system.pk)
-
-<<<<<<< Updated upstream
-=======
-    @property
-    def interface_id(self):
-        self.update_attrs()
-        try:
-            return self.attrs.interface_id
-        except AttributeError:
-            return "No-name"
-
->>>>>>> Stashed changes
     def clean(self, *args, **kwargs):
         self.mac = self.mac.lower()
         if not self.system:
@@ -236,12 +197,9 @@ class StaticInterface(BaseAddressRecord):
     def __str__(self):
         # return "IP:{0} Full Name:{1} Mac:{2}".format(self.ip_str,
         #        self.fqdn, self.mac)
-        return "IP:{0} Full Name:{1}".format(self.ip_str,
-                                             self.fqdn)
-
-
-is_eth = re.compile("^eth$")
-is_mgmt = re.compile("^mgmt$")
+        return "FQDN: {0} IP: {1} NIC: {2} MAC: {3}".format(
+            self.fqdn, self.ip_str, self.interface_name, self.mac
+        )
 
 
 class StaticIntrKeyValue(KeyValue):
@@ -276,20 +234,3 @@ class StaticIntrKeyValue(KeyValue):
         """
         if not self.value:
             raise ValidationError("Filename Required")
-
-    valid_name_formats = [
-        re.compile("^eth\d+$"),
-        re.compile("^nic\d+$"),
-        re.compile("^mgmt\d+$")
-    ]
-    def _aa_interface_id(self):
-        """
-        Something like eth\d+, mgmt\d+, or nic\d+
-        """
-        for f in self.valid_name_formats:
-            if f.match(self.value):
-                return
-        raise ValidationError(
-            "Not in valid format. Try something like eth0 or eth1."
-        )
->>>>>>> Stashed changes

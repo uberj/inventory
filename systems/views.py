@@ -6,10 +6,11 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import  redirect, get_object_or_404
+from django.shortcuts import  redirect, get_object_or_404, render
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils import translation
+
 
 import _mysql_exceptions
 
@@ -99,9 +100,11 @@ def system_rack_elevation(request, rack_id):
 
 def get_next_intr_name(request, system_pk):
     system = get_object_or_404(models.System, pk=system_pk)
-    interface_type, primary, alias = system.get_next_adapter()
-    return HttpResponse(json.dumps({'success': True,
-        'intr_name': "{0}{1}.{2}".format(interface_type, primary, alias)}))
+    interface_name = system.get_next_adapter()
+    return HttpResponse(json.dumps(
+        {'success': True,
+        'intr_name': interface_name}
+    ))
 
 @csrf_exempt
 def create_adapter(request, system_id):
@@ -613,15 +616,14 @@ def system_show(request, id):
 
     intrs = StaticInterface.objects.filter(system = system)
 
-    return render_to_response('systems/system_show.html', {
+    return render(request, 'systems/system_show.html', {
             'system': system,
             'interfaces': intrs,
             'adapters': adapters,
             'key_values': key_values,
             'is_release': is_release,
             'read_only': getattr(request, 'read_only', False),
-           },
-           RequestContext(request))
+           })
 
 @allow_anyone
 def system_show_by_asset_tag(request, id):

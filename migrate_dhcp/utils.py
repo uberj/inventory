@@ -1,13 +1,15 @@
+from django.db.models import Q
+
 from libs.DHCPHelper import DHCPHelper
-from django.test.client import Client
-from systems.models import ScheduledTask
 from mozdns.address_record.models import AddressRecord
 from mozdns.ptr.models import PTR
 from mozdns.utils import ensure_label_domain, prune_tree
 from core.interface.static_intr.models import StaticInterface
+from core.interface.bonded_intr.models import BondedInterface
 from core.interface.static_intr.models import StaticIntrKeyValue
 from core.vlan.models import Vlan
 from core.network.models import Network
+from core.interface.utils import coerce_to_bonded
 from settings import DHCP_CONFIG_OUTPUT_DIRECTORY
 
 from systems.models import System
@@ -91,7 +93,7 @@ def migrate_hosts(dhcp_scope):
             migrate_interface(system, adapter, a, ptr, dhcp_scope)
     print "Total: {0}\nA: {1}\nPTR {2}".format(total, found_a, found_ptr)
 
-def migrate_host(hostname, ip_str, mac, options):
+def migrate_host(hostname, ip_str, mac, nic_name, options):
     system, created = System.objects.get_or_create(hostname=hostname)
     if created:
         print "Couldn't find a system with hostname {0}"
@@ -111,7 +113,7 @@ def migrate_host(hostname, ip_str, mac, options):
     if a and ptr:
         print "Found matches for {0}".format(system)
 
-    intr = migrate_interface(system, a, ptr, ip_str, mac, hostname)
+    intr = migrate_interface(system, a, ptr, ip_str, mac, nic_name, hostname)
 
     for o in options:
         try:
@@ -130,7 +132,7 @@ CREATE_MISSING_PTR = True
 
 
 
-def migrate_interface(system, a, ptr, ip_str, mac, fqdn):
+def migrate_interface(system, a, ptr, ip_str, mac, nic_name, fqdn):
     """
     Migrate a single nic. This function only worries about the A, PTR, and INTR
     objects. Other things take care of KV store options.
@@ -142,6 +144,7 @@ def migrate_interface(system, a, ptr, ip_str, mac, fqdn):
     :param fqdn: The fqdn of the interface (usually the same as a.fqdn and
         ptr.name)
     """
+    interface_name = nic_name.replace('nic', 'eth')
     if a and ptr and set(a.views.all()) != set(ptr.views.all()):
         import pdb;pdb.set_trace()
         # Shit
@@ -178,26 +181,47 @@ def migrate_interface(system, a, ptr, ip_str, mac, fqdn):
         raise Exception(msg)
 
     print "Going to migrate {0}".format(system)
-    kwargs = {
-        'ip_str': ip_str,
-        'ip_type': '4',
-        'system': system,
-        'mac': mac,
-    }
     if a:
         a.delete(check_cname=False)
     if ptr:
         ptr.delete()
+    # i_n = interface_name
+    # The cases:
+    # 1) There is no SI with this ip, fqdn
+    #   * Create new SI
+    # 2) There is an SI with this ip, fqdn, i_n and mac
+    #   * Already migrated
+    # 3) There is an SI with this ip, fqdn, i_n but different mac
+    #   * Do bonding logic
+    # 4) There is an SI with this ip, fqdn, but different i_n/mac
+    #   * Do bonding logic
+    # Bonding Logic (a SI 'intr' has already been created):
+    #   There is a BI with this mac, i_in
+    #       * Migration has already happened
+    #   There is a BI with this mac, different i_in
+    #       * There is probably a typo in the config, assume migration has
+    #       already happened
+    #   There is no BI with this mac
+    #       * If bonded nics exist, create a new bonded nic
+    #       * No bonded nics exist, call coerce on intr
+
+    kwargs = {
+        'ip_str': ip_str,
+        'ip_type': '4',
+        'fqdn': fqdn
+    }
+    # 1) There is no SI with this ip, fqdn
+    #   * Create new SI
     try:
-        try:
-            intr = StaticInterface.objects.get(**kwargs)
-            print "Interface already created."
-        except StaticInterface.DoesNotExist:
+        if not StaticInterface.objects.filter(**kwargs).exists():
             print "Creating new Interface"
             domain = None
             try:
                 label, domain = ensure_label_domain(fqdn)
                 kwargs['label'], kwargs['domain'] = label, domain
+                kwargs['system'] = system
+                kwargs['mac'] = mac
+                kwargs['interface_name'] = interface_name
                 intr = StaticInterface(**kwargs)
                 intr.full_clean()
                 intr.save()
@@ -206,6 +230,20 @@ def migrate_interface(system, a, ptr, ip_str, mac, fqdn):
             except:
                 prune_tree(domain)
                 raise
+            return intr
+        elif StaticInterface.objects.filter(mac=mac, **kwargs).exists():
+    # 2) There is an SI with this ip, fqdn, i_n and mac
+    #   * Already migrated
+            print "Interface already migrated"
+            return StaticInterface.objects.get(mac=mac, **kwargs)
+
+    # 3) There is an SI with this ip, fqdn, i_n but different mac
+    #   * Do bonding logic
+    # 4) There is an SI with this ip, fqdn, but different i_n/mac
+    #   * Do bonding logic
+        if StaticInterface.objects.filter(~Q(mac=mac), **kwargs).exists():
+            intr = StaticInterface.objects.get(~Q(mac=mac), **kwargs)
+            do_bonding(intr, mac, interface_name)
     except:
         if backup_a:
             backup_a.save()
@@ -213,6 +251,39 @@ def migrate_interface(system, a, ptr, ip_str, mac, fqdn):
             backup_ptr.save()
         raise
     return intr
+
+# Bonding Logic (a SI 'intr' has already been created):
+def do_bonding(intr, mac, interface_name):
+    bis = intr.bondedintr_set.all()
+#   There is a BI with this mac, i_in
+#       * Migration has already happened
+    if bis.filter(mac=mac, interface_name=interface_name).exists():
+        print "Bonded nic already exists"
+        bi = bis.objects.get(mac=mac, interface_name=interface_name)
+
+#   There is a BI with this mac, different i_in
+#       * There is probably a typo in the config, assume migration has
+#       already happened
+    elif bis.filter(~Q(interface_name=interface_name), mac=mac).exists():
+        print "!!! Possible typo in the config"
+        bi = bis.objects.get(~Q(interface_name=interface_name), mac=mac)
+
+#   There is no BI with this mac
+#       * If bonded nics exist, create a new bonded nic
+#       * No bonded nics exist, call coerce on intr
+    elif not bis.exists():
+        print "Coercing {0} to bonded".format(intr)
+        intr, bi1 = coerce_to_bonded(intr)
+        print "Creating new BI for {0} {1}".format(mac, interface_name)
+        bi, _ = BondedInterface.objects.get_or_create(
+            mac=mac, interface_name=interface_name, intr=intr
+        )
+    else:
+        bi, _ = BondedInterface.objects.get_or_create(
+            mac=intr.mac, interface_name=interface_name, intr=intr
+        )
+        print "Bonded nic: ".format(bi)
+    return intr, bi
 
 
 def do_migrate(scope):

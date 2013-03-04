@@ -93,7 +93,6 @@ class ISCGrammar(parsley.makeGrammar(grammar, {}, unwrap=True)):
         if m:
             hostname = m.group(1)
             nic_name = m.group(2)
-            options_params.append(('parameter','interface_id', nic_name))
         else:
             import pdb;pdb.set_trace()
 
@@ -113,7 +112,7 @@ class ISCGrammar(parsley.makeGrammar(grammar, {}, unwrap=True)):
             print "Couldn't find mac and ip for {0}".format(hostname)
             return None
 
-        return migrate_host(hostname, ip_str, mac, kvs)
+        return migrate_host(hostname, ip_str, mac, nic_name, kvs)
 
         print options_params
         return hostname, options_params
