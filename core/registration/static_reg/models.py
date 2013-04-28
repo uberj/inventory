@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from systems.models import System
 
 import mozdns
-from core.keyvalue.base_option import DHCPKeyValue, InerfaceMixin
+from core.keyvalue.base_option import DHCPKeyValue
 from core.keyvalue.utils import AuxAttr
 from core.keyvalue.mixins import KVUrlMixin
 from mozdns.address_record.models import BaseAddressRecord
@@ -180,7 +180,7 @@ class StaticReg(BaseAddressRecord, BasePTR, KVUrlMixin):
         return super(StaticReg, self).bind_render_record(pk=pk, **kwargs)
 
 
-class StaticRegKeyValue(DHCPKeyValue, InerfaceMixin):
+class StaticRegKeyValue(DHCPKeyValue):
     obj = models.ForeignKey(
         StaticReg, related_name='keyvalue_set', null=False
     )

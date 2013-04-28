@@ -22,7 +22,7 @@ class DHCPKeyValue(KeyValue):
         return value
 
 
-class InerfaceMixin(object):
+class HardwareAdapterMixin(object):
     # Make sure you mix this in with a class that inherits from DHCPKeyValue
     def _aa_host_name(self):
         """
@@ -73,7 +73,7 @@ class InerfaceMixin(object):
             raise ValidationError("Hostname Required")
 
 
-class CommonOption(DHCPKeyValue):
+class CommonOption(object):
     class Meta:
         abstract = True
 
