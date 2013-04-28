@@ -37,6 +37,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'systems',
     'oncall',
     'migrate_dns',
+    'migrate_dhcp',
     'user_systems',
     'build',
     'dhcp',
@@ -54,12 +55,11 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'core.vlan',
     'core.network',
     'core.range',
-    'core.build',
-    'core.lib',
-    'core.interface',
-    'core.interface.static_intr',
+    'core.dhcp',
+    'core.group',
+    'core.registration',
+    'core.registration.static_reg',
     'core.search',
-    'core.lib',
     'core.keyvalue',
     'mozdns',
     'mozdns.address_record',
@@ -77,7 +77,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'mozdns.mozbind',
     'mozdns.record',
     'mozdns.create_zone',
-    #'debug_toolbar',
+    'debug_toolbar',
     'tastypie',
     'tastytools',
     'reversion',
@@ -88,7 +88,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
 # Because Jinja2 is the default template loader, add any non-Jinja templated
 # apps here:
 JINGO_EXCLUDE_APPS = [
-    #'debug_toolbar',
+    'debug_toolbar',
     'build',
     'admin',
     'user_systems',
@@ -146,8 +146,9 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logger.LoggingPanel',
 )
 TMP_MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
+    #'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 MIDDLEWARE_CLASSES = []
 for mc in TMP_MIDDLEWARE_CLASSES:

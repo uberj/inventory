@@ -1,0 +1,145 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Network Flows &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Domain" href="../domain/" />
+    <link rel="prev" title="Range" href="../range/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../domain/" title="Domain"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../range/" title="Range"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="network-flows">
+<span id="flows"></span><h1>Network Flows<a class="headerlink" href="#network-flows" title="Permalink to this headline">¶</a></h1>
+<p>Network Flow language:</p>
+<div class="highlight-python"><pre>&lt;stmt&gt;    -&gt; permit &lt;sevice&gt; from &lt;objects&gt;
+
+&lt;service&gt;   -&gt; &lt;app&gt; | &lt;app&gt;, &lt;service&gt;
+&lt;app&gt;       -&gt; &lt;proto&gt;: &lt;port&gt; &lt;DSO&gt;
+&lt;proto&gt;     -&gt; ICMP | UDP | TCP ...
+&lt;port&gt;      -&gt; [0 .. 2**32]
+&lt;DSO&gt;       -&gt; Device (system) specific options
+
+&lt;objects&gt;   -&gt; &lt;net_list&gt; &lt;site_list&gt; &lt;host_list&gt;
+
+&lt;net_list&gt;  -&gt; &lt;network&gt; | &lt;network&gt;, &lt;net_list&gt; | Null
+&lt;network&gt;   -&gt; IPv6Network | IPv4Network
+
+&lt;site_list&gt; -&gt; &lt;site&gt; | &lt;site&gt;, &lt;site_list&gt; | Null
+&lt;site&gt;      -&gt; Network with shortest prefix length in the site
+
+&lt;host_list&gt; -&gt; &lt;system&gt; | &lt;system&gt;, &lt;system_list&gt; | Null
+&lt;host&gt;      -&gt; &lt;hostname&gt; &lt;limiter&gt;
+
+&lt;limiter&gt;   -&gt; &lt;interface name&gt; | &lt;vlan&gt; | &lt;vlan&gt;:&lt;site&gt;
+
+&lt;intr_name&gt; -&gt; ethX.Y | mgmtX.Y
+&lt;vlan&gt;      -&gt; &lt;name&gt; | &lt;number&gt;
+
+&lt;site&gt;      -&gt; &lt;name&gt;</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../range/"
+                        title="previous chapter">Range</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../domain/"
+                        title="next chapter">Domain</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/flows.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../domain/" title="Domain"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../range/" title="Range"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

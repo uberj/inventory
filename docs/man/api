@@ -1,0 +1,182 @@
+.TH API  "" "" ""
+.SH NAME
+api \- StaticInterface
+.\" Man page generated from reStructuredText.
+.
+.sp
+The general form of any operation on a \fBStaticInterface\fP is as follows:
+.sp
+.nf
+.ft C
+\&./api.py interface <action> <system\-spec> <modifier>
+
+<action>        \-> create | update | delete
+<system\-spec>   \-> \(aqsystem id\(aq | \(aqsystem name\(aq
+.ft P
+.fi
+.SH CREATION
+.sp
+The general form of creating an interface is as follows:
+.sp
+.nf
+.ft C
+\&./api.py interface <action> <system\-spec> [options]
+.ft P
+.fi
+.sp
+When creating an interface it is a user\(aqs responsiblity to ensure that the information passed to the
+API is specific enough to determine which \fBRange\fP an interface is \fIor\fP provide a specific IP
+address to use when creating the interface.
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B \-s,  \-\-site
+The site to search for a free IP in. When using \-s the \-v option must also be used to specify which site
+(DC/BU) the vlan is in. The value assocated with this option is the name of the site.
+.TP
+.B \-v,  \-\-vlan
+The vlan to search for a free IP in. When using \-v the \-s option must also be used to specify which site
+(DC/BU) the vlan is in. The value assocated with this option is the name of the vlan.
+.TP
+.B \-b,  \-\-base\-domain
+The base domain to use when creating an interface. By default this is set to \(aqmozilla.com\(aq
+.TP
+.B \-n,  \-\-network
+The network to search for a free IP in. This option requres that there only exist one
+declared range within the network. If there is more than one range, use the \-r option.
+.TP
+.B \-r,  \-\-range
+When using \-r, it is explicityly specififed which range of IP\(aqs the interface is allowed to
+have. The first IP in the range that has no A, PTR, or Interface associated with it is used
+for the new interface. The value associated with this option is either two IP addresses in
+either dotted quad format or IPv6 colon format.
+.TP
+.B \-i,  \-\-ip
+When using \-i the interface will be made with this ip. The value associated with this option
+is an IP address in either dotted quad format or IPv6 colon format.
+.TP
+.B \-m,  \-\-mac
+The mac address of the new interface
+.TP
+.B \-l,  \-\-label
+If the the \-s and \-v options are used in creating an interface the \-l option will be used to
+derive the fqdn of the interface.
+.TP
+.B \-n,  \-\-fqdn
+If the \-n option is used, the value of the option will be used as the fqdn of the interface.
+The correct DNS domain\(aqs must exist and creation will fail if an appropriate domain for the
+interface\(aqs name is not found.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+Here are some examples.
+.sp
+Example 0. This is the most useful command:
+.sp
+.nf
+.ft C
+\&./api.py interface create system1 \-m <mac> \-f <full hostname> \-r <start\-ip>,<end\-ip>
+.ft P
+.fi
+.sp
+For example:
+.sp
+.nf
+.ft C
+\&./api.py interface create system1 \-m f0:de:f1:db:b9:25 \-f system1.db.scl3.mozilla.com \-r 10.22.3.230,10.22.3.240
+.ft P
+.fi
+.sp
+This command will attempt to create an interface with the mac \fBf0:de:f1:db:b9:25\fP, the name
+\fBsystem1.db.scl3.mozilla.com\fP and an IP in the range \fB10.22.3.230,10.22.3.240\fP. The first IP in
+the range \fB10.22.3.230,10.22.3.240\fP that has no A, PTR, or Interface associated with it will be
+used as the interface\(aqs IP.
+.sp
+While other commands may be syntactically simpler, the command here is non\-ambigouse to the underlying
+system and will only fail if there are no unused IP addresses in the specified range.
+.sp
+Example 1:
+.sp
+.nf
+.ft C
+\&./api.py interface create system1 \-m f0:de:f1:db:b9:25 \-l system1 \-v db \-s scl3
+.ft P
+.fi
+.sp
+This command will attempt to create an interface associated with the system \fBsystem1\fP, with a mac
+address \fBf0:de:f1:db:b9:25\fP, with the name \fBsystem1.db.scl3.mozilla.com\fP and will look for a
+free IP in the db vlan in scl3. If no free IP address is found the command will return FAIL. When
+there is more than one network is associated with the db vlan in scl3 the command will return FAIL.
+If there is one network associated with the db vlan in scl3 but there is more than one range
+associated with the network the command will return FAIL. Upon successly creating an interface the
+command will return 0 and a JSON containing information about the interface.
+.sp
+Example 2:
+.sp
+.nf
+.ft C
+\&./api.py interface create system1 \-m f0:de:f1:db:b9:25 \-l system1 \-b mozilla.net \-v db \-s scl3
+.ft P
+.fi
+.sp
+This command is exactly the same as Example1 except instead of inferring the interface\(aqs name as
+\fBsystem1.db.scl3.mozilla.com\fP the \-b flag causes the name to be \fBsystem1.db.scl3.mozilla.net\fP
+.SH CREATION RETURN VALUES
+.sp
+Successful creation:
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.IP 1. 3
+Return value is 0
+.IP 2. 3
+A JSON is printed to STDOUT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Unsuccessful creation:
+.INDENT 7.0
+.IP 1. 3
+Return value is 1
+.IP 2. 3
+A JSON is printed to STDOUT
+.UNINDENT
+.UNINDENT
+.sp
+The keys and values in the JSON will depend on whether an interface was created or not. Here is an
+example of the JSON that will be printed to STDOUT during a successful creation:
+.sp
+.nf
+.ft C
+{
+    "created": "True",
+    "id": "5"
+    "ip_str": "10.22.3.234",
+    "label": "system1",
+    "domain": "db.scl3.mozilla.com",
+    "interface": "eth0",
+    "mac": "f0:de:f1:db:b9:25"
+}
+.ft P
+.fi
+.IP Warning
+You can be sure that all of these values will be present but you should not assume that more
+values will be added to the JSON at a later time. Write your code accordingly.
+.RE
+.sp
+Here is an example of the JSON that will be printed to STDOUT during an unsuccessful creation:
+.sp
+.nf
+.ft C
+{
+    "created": "false",
+    "error": "No free IP addresses in the range 10.22.3.230,10.22.3.240"
+}
+.ft P
+.fi
+.\" Generated by docutils manpage writer.
+.

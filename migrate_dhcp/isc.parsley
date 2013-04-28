@@ -1,0 +1,73 @@
+# Quick and dirty hack to parse isc config files
+# Basic
+ws_ = ' ' | '\t'
+ws = ws_*
+digit = :d ?(d in '0123456789') -> d
+letter = :c ?('a' <= c <= 'z' or 'A' <= c <= 'Z') -> c
+other = :c ?(c in ('-', '_', '.', "'", '"', ',', '/', '(', ')', ':')) -> c
+
+# value chars (non-meaningful)
+vchar = letter | other | digit
+
+keyword:k = token(k) ws -> k
+
+
+# Option
+opt_rval = vchar ws | vchar
+opt_lval = vchar
+option = keyword('option') <opt_lval*>:lval ws <opt_rval*>:rval token(';') ws
+            -> ('option', lval, rval)
+         | keyword('option') <opt_lval*>:lval ws token('=') ws <opt_rval*>:rval token(';') ws
+            -> ('parameter', lval, rval)
+         | 'hardware' ws 'ethernet' ws <opt_rval*>:rval token(';') ws
+            -> ('parameter', 'hardware-ethernet', rval)
+         | keyword('option') <opt_lval*>:lval ws <opt_rval*>:rval_1 token('=') ws <opt_rval*>:rval_2 token(';') ws
+            -> ('parameter', lval, rval_1 + ' = ' + rval_2)
+         | <opt_lval*>:lval ws <opt_rval*>:rval token(';') ws
+            -> ('parameter', lval, rval)
+
+# IPv4 Addresses
+non_zero = digit:c ?(c != '0') -> c
+octet = <non_zero digit{0,2}>:d ?(int(d) < 256) -> d
+        | '0'
+ipv4_address = <octet '.' octet '.' octet '.' octet>
+
+# Subnet Statement
+subnet_stmt = ws keyword('subnet') ipv4_address:n ws keyword('netmask') ipv4_address:m ws token('{')
+                    ws stmt_list:stmts
+              token('}') -> self.subnet(n, m, stmts)
+
+# Conditionals
+bin_operator = '=' | '<=' | '>='
+in_expr = vchar ws
+
+expr = <in_expr*>:lhs bin_operator:bop ws <in_expr*>:rhs ws -> (lhs, bop, rhs)
+        | token('exists') ws <in_expr*>:cond ws -> ('exists ' + cond)
+
+# TODO, else and elif
+if_stmt = token('if') ws expr:cond token('{') ws stmt_list:then token('}') ws -> self.if_stmt(cond, then)
+
+# Host Statment
+# TODO, make hostname matching smarter
+hostname = <vchar*>
+host_stmt = token('host') ws hostname:h ws token('{')
+                ws stmt_list:stmts ws
+            token('}') ws -> self.host(h, stmts)
+
+
+# Pool Statment
+pool_stmt = token('pool') ws token('{')
+                ws stmt_list:stmts ws
+            token('}') ws -> self.pool(stmts)
+
+# Group Statment
+group_stmt = token('group') ws token('{') ws stmt_list:stmts ws token('}') ws -> self.group(stmts)
+
+# Include
+include = keyword('include') token('"')<(~'"' vchar)*>:path token('"') ws ';' ws
+            -> self.resolve_include(path)
+
+
+stmt = subnet_stmt | if_stmt | include | option | host_stmt | pool_stmt | include | group_stmt
+
+stmt_list = stmt*:s ws -> s

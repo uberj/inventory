@@ -1,0 +1,524 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Inventory DNS API &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="Migration" href="../migration/" />
+    <link rel="prev" title="Usefull functions" href="../lib/" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../migration/" title="Migration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../lib/" title="Usefull functions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="inventory-dns-api">
+<h1>Inventory DNS API<a class="headerlink" href="#inventory-dns-api" title="Permalink to this headline">¶</a></h1>
+<p>A high level view of how the API works:</p>
+<div class="highlight-python"><pre>+------+
+| User |
++------+
+    |
++------------------------+
+| Command Line Interface |   &lt;----------- See page on CLI for this
++------------------------+
+    |
++---------------+
+| HTTP POST/GET |   &lt;----------- This document defines what is happening here.
++---------------+
+    |
++----------+
+| Iventory |
++----------+
+    |
++----------+
+| Database |
++----------+</pre>
+</div>
+<div class="section" id="invtool">
+<h2>invtool<a class="headerlink" href="#invtool" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="a-command-line-interface-for-poking-at-mozilla-s-inventory-project">
+<h2>A Command Line Interface for poking at Mozilla&#8217;s Inventory project.<a class="headerlink" href="#a-command-line-interface-for-poking-at-mozilla-s-inventory-project" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body"><a class="reference external" href="mailto:juber&#37;&#52;&#48;mozilla&#46;com">juber<span>&#64;</span>mozilla<span>&#46;</span>com</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">organization:</th><td class="field-body">Mozilla IT</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Bugs:</th><td class="field-body">Report any bugs to <a class="reference external" href="mailto:juber&#37;&#52;&#48;mozilla&#46;com">juber<span>&#64;</span>mozilla<span>&#46;</span>com</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Copyright:</th><td class="field-body">Mozilla Public Licence</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">0.0.1</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Manual section:</th><td class="field-body">1</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Manual group:</th><td class="field-body">User Tools</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="synopsis">
+<h3>SYNOPSIS<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">invtool</span></tt> <tt class="docutils literal"><span class="pre">--help</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">invtool</span></tt> [ &#8211;json | &#8211;silent ] search [ <tt class="docutils literal"><span class="pre">--query</span></tt> | <tt class="docutils literal"><span class="pre">--range</span></tt> ] <em>query-string</em></p>
+<p><tt class="docutils literal"><span class="pre">invtool</span></tt> [ &#8211;json | &#8211;silent ] <tt class="docutils literal"><span class="pre">rdtype</span></tt> <tt class="docutils literal"><span class="pre">action</span></tt> [ args | &#8211;help ]</p>
+<blockquote>
+<div><p><tt class="docutils literal"><span class="pre">rdtype</span></tt> [ A | AAAA | CNAME | MX | PTR | SRV | TXT ]</p>
+<p><tt class="docutils literal"><span class="pre">action</span></tt>  [ create | update | delete | detail ]</p>
+</div></blockquote>
+</div>
+<div class="section" id="formating-output">
+<h3>Formating Output<a class="headerlink" href="#formating-output" title="Permalink to this headline">¶</a></h3>
+<p>There are a few ways to format output:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool -h
+usage: invtool [-h] [--json | --silent] ...</pre>
+</div>
+</div></blockquote>
+<p>Formating flags (like <tt class="docutils literal"><span class="pre">--json</span></tt>) come directly after <tt class="docutils literal"><span class="pre">invtool</span></tt>.
+The <tt class="docutils literal"><span class="pre">--silent</span></tt> flag will silence all output and <tt class="docutils literal"><span class="pre">--json</span></tt> will display any
+output in JSON format.</p>
+</div>
+<div class="section" id="return-codes">
+<h3>Return codes<a class="headerlink" href="#return-codes" title="Permalink to this headline">¶</a></h3>
+<p>Every execution of a command returns either <tt class="docutils literal"><span class="pre">0</span></tt> or <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+<p>Things that return <tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<blockquote>
+<div><ul class="simple">
+<li>HTTP 500</li>
+<li>HTTP 200</li>
+<li>Empty search results</li>
+<li>Client errors</li>
+</ul>
+</div></blockquote>
+<p>Everything else returns <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</div>
+<div class="section" id="searching">
+<h3>Searching<a class="headerlink" href="#searching" title="Permalink to this headline">¶</a></h3>
+<p>The search command combined with the <tt class="docutils literal"><span class="pre">-q|--query</span></tt> flag is useful for
+searching and filtering different types of objects.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>invtool search -q "&lt;query string&gt;"</pre>
+</div>
+</div></blockquote>
+<p>Currently, only DNS objects are displayed; to see Systems use the web
+interface&#8217;s search page.</p>
+<p>The following sections are an overview of how to build a <tt class="docutils literal"><span class="pre">query</span> <span class="pre">string</span></tt>.</p>
+</div>
+<div class="section" id="search-patterns">
+<h3>Search Patterns<a class="headerlink" href="#search-patterns" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="docutils">
+<dt>a-zA-Z0-9</dt>
+<dd><p class="first">Filter objects with <em>plain text</em> words. Objects that match all of the
+words are returned.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ foopy scl3 ]
+[ puppet phx1 ]</pre>
+</div>
+</dd>
+<dt>&#8216;/&#8217; (forward slash)</dt>
+<dd><p class="first">A word starting with with <tt class="docutils literal"><span class="pre">/</span></tt> is assumed to be regex pattern.  The
+regular language is that of MySQL.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ /^puppet\d+ ]</pre>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="operators">
+<h3>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="docutils">
+<dt>-</dt>
+<dd><p class="first">The character <tt class="docutils literal"><span class="pre">-</span></tt> can be used to negate any search pattern. It can
+also negate the <tt class="docutils literal"><span class="pre">type</span></tt> directive and parameters in parenthesis.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="p">[</span> <span class="n">hostname</span> <span class="o">-</span><span class="n">hostname1</span> <span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+<dt>OR</dt>
+<dd><p class="first">The binary <tt class="docutils literal"><span class="pre">OR</span></tt> operator will return the results of two seperate
+queries.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ host1 OR host2 ]</pre>
+</div>
+</dd>
+<dt>AND</dt>
+<dd><p class="first">The binary <tt class="docutils literal"><span class="pre">AND</span></tt> operator will return the results of a query that
+matches both of it&#8217;s operands.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ host1 AND domain1 ]</pre>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="directives">
+<h3>Directives<a class="headerlink" href="#directives" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>All directives are in the format <tt class="docutils literal"><span class="pre">&lt;directive&gt;</span></tt>=:<tt class="docutils literal"><span class="pre">&lt;directive-value&gt;</span></tt>.
+Directives are used in query strings.</p>
+<blockquote>
+<div><p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="highlight-python"><pre>invtool search --query "type=:SOA mozilla.com"
+    # This will return all SOA records that contain 'mozilla.com'
+    # in their name.</pre>
+</div>
+</div></blockquote>
+<dl class="docutils">
+<dt>type</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">type</span></tt> directive can be used to target a type of object.
+Values used in the <tt class="docutils literal"><span class="pre">type</span></tt> directive are case insensitive. A search
+query contaning the type directive with no other filter will return all
+objects of that type and might take a while to complete depending on
+how many objects of that type exist.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ type=:CNAME web ]
+    # This returns all CNAMEs that contain the substring 'web'</pre>
+</div>
+</dd>
+<dt>view</dt>
+<dd><p class="first">Filter DNS records by view.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ puppet view=:private ]
+    # This returns all records that contain the substring 'puppet'
+    # and are in the public view</pre>
+</div>
+</dd>
+<dt>zone</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">zone</span></tt> directive filters DNS records by DNS zone.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ zone=:phx1.mozilla.com ]
+    # This returns all records the 'phx1.mozilla.com' zone</pre>
+</div>
+</dd>
+<dt>site</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">site</span></tt> directive can be used to search for objects that have IP
+addresses that fall into one of the networks associated with a
+site (datacenter or business unit).</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ site=:phx1 ]</pre>
+</div>
+</dd>
+<dt>vlan</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">vlan</span></tt> directive can be used to search for objects that have IP
+addresses within one of the networks associated with a specific
+vlan.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ vlan=:db ]</pre>
+</div>
+</dd>
+<dt>network</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">network</span></tt> directive can be used to search for objects that have IP
+addresses within a network.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ network=:192.168.3.0/23 ]</pre>
+</div>
+</dd>
+<dt>range</dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">range</span></tt> directive can be used to search for objects that have IP
+addresses within a specific IP range.</p>
+<p><tt class="docutils literal"><span class="pre">Example</span></tt>:</p>
+<div class="last highlight-python"><pre>[ range=:192.168.3.10,192.168.3.100 ]</pre>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+<p>A search that returns no objects has an exit code of <tt class="docutils literal"><span class="pre">1</span></tt>. A search
+returning objects has an exit code of <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</div>
+<div class="section" id="auditing-ip-space">
+<h3>Auditing IP space<a class="headerlink" href="#auditing-ip-space" title="Permalink to this headline">¶</a></h3>
+<p>Inventory is a source of truth so it can tell you which IP ranges are vacant
+and which IPs are used. To see free IP space between a <tt class="docutils literal"><span class="pre">start</span></tt> and <tt class="docutils literal"><span class="pre">end</span></tt> ip
+use the <tt class="docutils literal"><span class="pre">search</span></tt> command combined with the <tt class="docutils literal"><span class="pre">--range</span></tt> option.</p>
+<p>For example, to see all free IP ranges between <tt class="docutils literal"><span class="pre">10.0.0.0</span></tt> and <tt class="docutils literal"><span class="pre">10.0.0.255</span></tt></p>
+<blockquote>
+<div><div class="highlight-python"><pre>invtool search --range "10.0.0.0,10.0.0.255"</pre>
+</div>
+</div></blockquote>
+<p>To see the objects using IP addresses in this range, use the <tt class="docutils literal"><span class="pre">range</span></tt> directive
+along with the <tt class="docutils literal"><span class="pre">--query</span></tt> option</p>
+<blockquote>
+<div><div class="highlight-python"><pre>invtool search --query "range=:10.0.0.0,10.0.0.255"</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="manipulating-dns-records">
+<h3>Manipulating DNS Records<a class="headerlink" href="#manipulating-dns-records" title="Permalink to this headline">¶</a></h3>
+<p>Before using a command it can be useful to look at the help text of the command</p>
+<blockquote>
+<div><div class="highlight-python"><pre>invtool A create --help</pre>
+</div>
+</div></blockquote>
+<p>Interfacing with records is done per <tt class="docutils literal"><span class="pre">record</span> <span class="pre">class</span></tt>. Each record class
+(<tt class="docutils literal"><span class="pre">A</span></tt>, <tt class="docutils literal"><span class="pre">PTR</span></tt>, <tt class="docutils literal"><span class="pre">CNAME</span></tt>, etc.) has the commands <tt class="docutils literal"><span class="pre">create</span></tt>, <tt class="docutils literal"><span class="pre">update</span></tt>,
+<tt class="docutils literal"><span class="pre">detail</span></tt>, and <tt class="docutils literal"><span class="pre">delete</span></tt>.</p>
+</div>
+<div class="section" id="creating-an-object">
+<h3>Creating an object<a class="headerlink" href="#creating-an-object" title="Permalink to this headline">¶</a></h3>
+<p>To create the <tt class="docutils literal"><span class="pre">A</span></tt> record <tt class="docutils literal"><span class="pre">host1.scl3.mozilla.com</span> <span class="pre">A</span> <span class="pre">10.2.3.4</span></tt>, run the command</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool A create --fqdn host1.scl3.mozilla.com --ip 10.2.3.4
+http_status: 201 (created)
+description:
+domain: scl3.mozilla.com
+views: []
+ttl: 3600
+fqdn: host1.scl3.mozilla.com
+label: host1
+meta: {u'soa': u'SOA for scl3.mozilla.com', u'fqdn': u'host1.scl3.mozilla.com'}
+http_status: 201
+ip_type: 4
+ip_str: 10.2.3.4
+pk: 13033
+resource_uri: /mozdns/api/v1_dns/addressrecord/13033/</pre>
+</div>
+</div></blockquote>
+<p>Whenever you create an object the tool will display information about that
+object.</p>
+</div>
+<div class="section" id="updating-an-object">
+<h3>Updating an object<a class="headerlink" href="#updating-an-object" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">A</span></tt> record just created does not belong to any dns view. To add the
+object to the private view run this command:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool A update --pk 13033 --private
+http_status: 202 (Accepted)
+...
+...</pre>
+</div>
+</div></blockquote>
+<p>(The <tt class="docutils literal"><span class="pre">...</span></tt> represents omitted output, which in this case was details about the
+updated object.)</p>
+<p>The <tt class="docutils literal"><span class="pre">--pk</span></tt> flag tells the api which object you want to update. The <tt class="docutils literal"><span class="pre">pk</span></tt> value
+is returned to you when you first created the object and can be used to update,
+delete, or show details about an object.</p>
+<p>An object&#8217;s <tt class="docutils literal"><span class="pre">pk</span></tt> (primary key) is only unique within it&#8217;s own type. (There is
+an exception to this with  <tt class="docutils literal"><span class="pre">A</span></tt> and <tt class="docutils literal"><span class="pre">AAAA</span></tt> records, which are internally
+stored as the same type of object).</p>
+<p>If you forget an object&#8217;s primary key, you can look the object up using the
+<tt class="docutils literal"><span class="pre">search</span></tt> command. Printed before every object returned by a search is the
+object&#8217;s primary key.  To look up the <tt class="docutils literal"><span class="pre">A</span></tt> record <tt class="docutils literal"><span class="pre">host1.scl3.mozilla.com</span> <span class="pre">A</span>
+<span class="pre">10.2.3.4</span></tt> you could run a command similar to the following.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool search -q "host1.scl"
+13033 host1.scl3.mozilla.com.                  3600 IN  A    10.2.3.4</pre>
+</div>
+</div></blockquote>
+<p>The <tt class="docutils literal"><span class="pre">A</span></tt> record&#8217;s primary key is <tt class="docutils literal"><span class="pre">13033</span></tt>.</p>
+<blockquote>
+<div><div class="highlight-python"><pre># Changing the description of an A record
+
+~/ » invtool A update --pk 13033 --description "This record is fubar"
+http_status: 202 (Accepted)
+...
+...</pre>
+</div>
+</div></blockquote>
+<p>Every call to update is translated into an HTTP <tt class="docutils literal"><span class="pre">PATCH</span></tt> request that is sent
+to Inventory. The request contains the fields and values that should be used to
+patch the object.</p>
+<p>If we wanted to change the <tt class="docutils literal"><span class="pre">ip</span></tt> address of an <tt class="docutils literal"><span class="pre">A</span></tt> record we would use the
+<tt class="docutils literal"><span class="pre">--ip</span></tt> flag and specify a new ip.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool A update --pk 13033 --ip 33.33.33.33
+http_status: 202 (Accepted)
+...
+...</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="details-about-an-object">
+<h3>Details about an object<a class="headerlink" href="#details-about-an-object" title="Permalink to this headline">¶</a></h3>
+<p>You can get a detailed description of an object by using a record class&#8217;s
+<tt class="docutils literal"><span class="pre">detail</span></tt> command.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool A detail --pk 13033
+http_status: 200 (Success)
+...
+...</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="deleteing-an-object">
+<h3>Deleteing an object<a class="headerlink" href="#deleteing-an-object" title="Permalink to this headline">¶</a></h3>
+<p>To delete an object use a record class&#8217;s <tt class="docutils literal"><span class="pre">delete</span></tt> command.</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool A delete --pk 13033
+http_status: 204 (request fulfilled)</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="cook-book">
+<h3>Cook Book<a class="headerlink" href="#cook-book" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="mass-update-or-delete">
+<h3>Mass update or delete<a class="headerlink" href="#mass-update-or-delete" title="Permalink to this headline">¶</a></h3>
+<p>When being displayed by the <tt class="docutils literal"><span class="pre">search</span></tt> command a DNS object is always in the
+format:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>&lt;pk&gt;   &lt;lhs&gt; &lt;rdclass&gt; &lt;ttl&gt; &lt;rdtpe&gt; &lt;rhs&gt;</pre>
+</div>
+</div></blockquote>
+<p>We can exploit this pattern and use a tool like <tt class="docutils literal"><span class="pre">awk</span></tt> to do mass
+updates/deletes.</p>
+<p>For example, one could add all objects that have the string <tt class="docutils literal"><span class="pre">testfqdn</span></tt> in
+their name to the private view and remove them from the public view:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool search -q "testfqdn" | awk '{ print "invtool " $5  " update --pk " $1 " --private --no-public"}'
+
+invtool SRV update --pk 134 --private --no-public
+invtool A update --pk 13052 --private --no-public
+invtool AAAA update --pk 13053 --private --no-public
+invtool PTR update --pk 13483 --private --no-public</pre>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="fetching-details">
+<h3>Fetching details<a class="headerlink" href="#fetching-details" title="Permalink to this headline">¶</a></h3>
+<p>You can look up the details of objects return by search results by using
+something like this...</p>
+<blockquote>
+<div><div class="highlight-python"><pre>~/ » invtool search -q "host-name-pattern" | awk '{ print "invtool "  $5 " detail --pk " $1}' | bash)
+...
+...</pre>
+</div>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Inventory DNS API</a><ul>
+<li><a class="reference internal" href="#invtool">invtool</a></li>
+<li><a class="reference internal" href="#a-command-line-interface-for-poking-at-mozilla-s-inventory-project">A Command Line Interface for poking at Mozilla&#8217;s Inventory project.</a><ul>
+<li><a class="reference internal" href="#synopsis">SYNOPSIS</a></li>
+<li><a class="reference internal" href="#formating-output">Formating Output</a></li>
+<li><a class="reference internal" href="#return-codes">Return codes</a></li>
+<li><a class="reference internal" href="#searching">Searching</a></li>
+<li><a class="reference internal" href="#search-patterns">Search Patterns</a></li>
+<li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#directives">Directives</a></li>
+<li><a class="reference internal" href="#auditing-ip-space">Auditing IP space</a></li>
+<li><a class="reference internal" href="#manipulating-dns-records">Manipulating DNS Records</a></li>
+<li><a class="reference internal" href="#creating-an-object">Creating an object</a></li>
+<li><a class="reference internal" href="#updating-an-object">Updating an object</a></li>
+<li><a class="reference internal" href="#details-about-an-object">Details about an object</a></li>
+<li><a class="reference internal" href="#deleteing-an-object">Deleteing an object</a></li>
+<li><a class="reference internal" href="#cook-book">Cook Book</a></li>
+<li><a class="reference internal" href="#mass-update-or-delete">Mass update or delete</a></li>
+<li><a class="reference internal" href="#fetching-details">Fetching details</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../lib/"
+                        title="previous chapter">Usefull functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../migration/"
+                        title="next chapter">Migration</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../migration/" title="Migration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../lib/" title="Usefull functions"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

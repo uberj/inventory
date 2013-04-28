@@ -1,0 +1,523 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Static Interface &mdash; Mozillas IT source of truth 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Mozillas IT source of truth 0.01 documentation" href="../" />
+    <link rel="next" title="IPAM" href="../core/" />
+    <link rel="prev" title="Welcome to mozinv‘s documentation!" href="../" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../core/" title="IPAM"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../" title="Welcome to mozinv‘s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="static-interface">
+<span id="staticinterface"></span><h1>Static Interface<a class="headerlink" href="#static-interface" title="Permalink to this headline">¶</a></h1>
+<p>A static interface allows a user to easily create an A/AAAA <tt class="xref py py-class docutils literal"><span class="pre">AddressRecord</span></tt> record,
+<tt class="xref py py-class docutils literal"><span class="pre">PTR</span></tt> record, and register the interface in the DHCP configs.</p>
+<div class="figure">
+<img alt="../_images/static_interface.png" src="../_images/static_interface.png" style="width: 80%;" />
+</div>
+<p>A static interface relys on having a <tt class="docutils literal"><span class="pre">hostname</span></tt>, <tt class="docutils literal"><span class="pre">ip</span></tt> and a <tt class="docutils literal"><span class="pre">mac</span></tt> to
+generates DNS and DHCP entries. The DNS entries are an A/AAAA record and a PTR record:</p>
+<div class="highlight-python"><pre>&lt;hostname&gt;      A     &lt;ip&gt;
+&lt;ip&gt;            PTR   &lt;hostname&gt;</pre>
+</div>
+<p>The DHCP entry is a host clause:</p>
+<div class="highlight-python"><pre>host &lt;hostname&gt; {
+    fixed-address &lt;ip&gt;;
+    hardware ethernet &lt;mac&gt;;
+}</pre>
+</div>
+<p>By choosing an <tt class="docutils literal"><span class="pre">ip</span></tt> you are in effect assigning the registration to a <tt class="xref py py-class docutils literal"><span class="pre">Range</span></tt>.</p>
+</div>
+<div class="section" id="bonded-interfaces">
+<h1>Bonded Interfaces<a class="headerlink" href="#bonded-interfaces" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="context">
+<h2>Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">BondedInterface</span></tt> (BI) objects are used to associate additional interfaces
+with a StaticInterface (SI) without causing duplicate DNS data. They are usually
+created when you want multiple DHCP host entries with the same hostname/ip but
+with different MAC addresses.</p>
+<p>As an example, consider a host with the following interfaces:</p>
+<div class="highlight-python"><pre>bond0     Link encap:Ethernet  HWaddr DE:AD:DE:1C:BB:F0
+          inet addr:10.8.70.11  Bcast:10.8.71.255  Mask:255.255.254.0
+          inet6 addr: fe80::1ec1:deff:fe1c:bbf0/64 Scope:Link
+          UP BROADCAST RUNNING MASTER MULTICAST  MTU:1500  Metric:1
+          RX packets:85877116344 errors:5 dropped:15157 overruns:46564 frame:2
+          TX packets:62006487356 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:59849245102449 (54.4 TiB)  TX bytes:82424119956913 (74.9 TiB)
+
+eth0      Link encap:Ethernet  HWaddr DE:AD:DE:1C:BB:F0
+          UP BROADCAST RUNNING SLAVE MULTICAST  MTU:1500  Metric:1
+          RX packets:44237521190 errors:5 dropped:7646 overruns:25957 frame:2
+          TX packets:60693966456 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:30151878107004 (27.4 TiB)  TX bytes:82190328597868 (74.7 TiB)
+          Memory:fbe60000-fbe80000
+
+eth1      Link encap:Ethernet  HWaddr DE:AD:DE:1C:BB:F0
+          UP BROADCAST RUNNING SLAVE MULTICAST  MTU:1500  Metric:1
+          RX packets:41639595154 errors:0 dropped:7511 overruns:20607 frame:0
+          TX packets:1312520900 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:29697366995445 (27.0 TiB)  TX bytes:233791359045 (217.7 GiB)
+          Memory:fbee0000-fbf00000
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:7319571905 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:7319571905 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:67705856863473 (61.5 TiB)  TX bytes:67705856863473 (61.5 TiB)</pre>
+</div>
+<p>Also note the contents of <tt class="docutils literal"><span class="pre">/proc/net/bonding/bond0</span></tt>:</p>
+<div class="highlight-python"><pre>Ethernet Channel Bonding Driver: v3.6.0 (September 26, 2009)
+
+Bonding Mode: IEEE 802.3ad Dynamic link aggregation
+Transmit Hash Policy: layer2 (0)
+MII Status: up
+MII Polling Interval (ms): 100
+Up Delay (ms): 0
+Down Delay (ms): 0
+
+802.3ad info
+LACP rate: slow
+Aggregator selection policy (ad_select): stable
+Active Aggregator Info:
+        Aggregator ID: 1
+        Number of ports: 2
+        Actor Key: 17
+        Partner Key: 10
+        Partner Mac Address: de:ad:1f:db:dc:80
+
+Slave Interface: eth0
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: de:ad:de:1c:bb:f0
+Aggregator ID: 1
+Slave queue ID: 0
+
+Slave Interface: eth1
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: de:ad:de:1c:bb:f1
+Aggregator ID: 1
+Slave queue ID: 0</pre>
+</div>
+<p>From a DNS perspective this host would need one <tt class="docutils literal"><span class="pre">A</span></tt> record and one
+<tt class="docutils literal"><span class="pre">PTR</span></tt> record.  From a DHCP perspective this host would need two nearly
+identical <tt class="docutils literal"><span class="pre">host</span></tt> statements whose only difference would be the mac addresses
+specified by <tt class="docutils literal"><span class="pre">hardware</span> <span class="pre">ethernet</span></tt>.  The near duplicate <tt class="docutils literal"><span class="pre">host</span></tt> statements are
+needed for the situation when <tt class="docutils literal"><span class="pre">eth0</span></tt> fails and <tt class="docutils literal"><span class="pre">bond0</span></tt> begins using
+<tt class="docutils literal"><span class="pre">eth1</span></tt>&#8216;s  mac address.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>In Inventory, the relationship between a BondedInterface (BI) and a
+StaticInterface (SI) is that of a many to one relationship; an SI can have
+multiple BI&#8217;s associated with it, but a BI is associated with exactly one SI.</p>
+<div class="figure">
+<img alt="../_images/bonded.png" src="../_images/bonded.png" style="width: 80%;" />
+</div>
+<p>In our example (shown in the figure above), <tt class="docutils literal"><span class="pre">bond0</span></tt> would be an SI object and
+both <tt class="docutils literal"><span class="pre">eth0</span></tt> and <tt class="docutils literal"><span class="pre">eth1</span></tt> would be BI objects. <tt class="docutils literal"><span class="pre">bond0</span></tt>&#8216;s SI object would be
+the source of DNS information (like fqdn and ip address) and would have it&#8217;s
+mac address set to something like &#8216;virtual&#8217; or &#8216;bonded&#8217;. Two seperate BI
+objects would represent <tt class="docutils literal"><span class="pre">eth0</span></tt> and <tt class="docutils literal"><span class="pre">eth1</span></tt> and would point to <tt class="docutils literal"><span class="pre">bond0</span></tt>. The
+BI&#8217;s would be the source of the two different mac addresses used in the two
+DHCP <tt class="docutils literal"><span class="pre">host</span></tt> statements.</p>
+</div>
+<div class="section" id="going-from-static-to-bonded">
+<h2>Going from Static to Bonded<a class="headerlink" href="#going-from-static-to-bonded" title="Permalink to this headline">¶</a></h2>
+<p>If you need to coerce a normal StaticInterface into an SI that supports
+bonding, you can select that the SI supports BIs via the &#8216;bonded
+interface&#8217; checkbox. When you submit this change a new BI object will be
+created and will automatically be associated with the original SI. Note that
+the original SI <em>will</em> still exist and will continue to serve as the source of
+DNS information.</p>
+</div>
+<div class="section" id="going-from-bonded-to-static">
+<h2>Going from Bonded to Static<a class="headerlink" href="#going-from-bonded-to-static" title="Permalink to this headline">¶</a></h2>
+<p>Start over by deleting all BI objects and then delete the SI object.</p>
+</div>
+</div>
+<div class="section" id="free-ip-addresses">
+<h1>Free IP Addresses<a class="headerlink" href="#free-ip-addresses" title="Permalink to this headline">¶</a></h1>
+<p>Just by looking at an Interface&#8217;s requested hostname we can determine which site
+(datacenter or business unit) and vlan an Interface is in. Using the
+names of the site and vlan we can use information stored in the <a class="reference internal" href="../core/#core"><em>IPAM</em></a>
+of inventory to determine which IP address to choose for the interface.
+For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">webnode1</span><span class="o">.</span><span class="n">webops</span><span class="o">.</span><span class="n">scl3</span><span class="o">.</span><span class="n">mozilla</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+<p>This Interface is in the webops vlan in scl3. Since Inventory tracks both sites
+and vlans, getting these objects is just a matter of querying the database.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">site_scl3</span> <span class="o">=</span> <span class="n">Site</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;scl3&#39;</span><span class="p">)</span>
+<span class="n">vlan_webops</span> <span class="o">=</span> <span class="n">Vlan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;webops&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Networks are associated to vlan&#8217;s:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">webops_networks</span> <span class="o">=</span> <span class="n">vlan_webops</span><span class="o">.</span><span class="n">network_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Since the webops vlan can exist in multiple datacenters, we only want to look
+at networks that are in the webops vlan <em>and</em> are in scl3.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">scl3_webops_networks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">webops_networks</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">site</span> <span class="o">==</span> <span class="n">site_scl3</span><span class="p">:</span>
+        <span class="n">scl3_webops_networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We now look for a free IP in one of the networks in <tt class="docutils literal"><span class="pre">scl3_webops_networks</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In most cases there is only one network associated with a vlan in a particular datacenter.</p>
+</div>
+<p>Getting a free ip is easy.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">network</span> <span class="o">=</span> <span class="n">scl3_webops_networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># Let&#39;s just choose the first network for the sake of example.</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="k">for</span> <span class="nb">range</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">range_set</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="nb">range</span><span class="o">.</span><span class="n">get_next_ip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ip</span><span class="p">:</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+<p>We just found a free ip in vlan webops in scl3.</p>
+</div>
+<div class="section" id="id1">
+<h1>Static Interface<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-core.interface.static_intr.models"></span><dl class="class">
+<dt id="core.interface.static_intr.models.StaticInterface">
+<em class="property">class </em><tt class="descclassname">core.interface.static_intr.models.</tt><tt class="descname">StaticInterface</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>The StaticInterface Class.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">StaticInterface</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">ip_str</span><span class="o">=</span><span class="n">ip_str</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">ip_type</span><span class="o">=</span><span class="n">ip_type</span><span class="p">,</span> <span class="n">dhcp_enabled</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">dns_enabled</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This class is the main interface to DNS and DHCP in mozinv. A static
+interface consists of three key pieces of information: Ip address, Mac
+Address, and Hostname (the hostname is comprised of a label and a domain).
+From these three peices of information, three things are ensured: An A or
+AAAA DNS record, a PTR record, and a <cite>host</cite> statement in the DHCP builds
+that grants the mac address of the interface the correct IP address and
+hostname.</p>
+<p>If you want an A/AAAA, PTR, and a DHCP lease, create on of these objects.</p>
+<p>In terms of DNS, a static interface represents a PTR and A record and must
+adhear to the requirements of those classes. The interface inherits from
+BaseAddressRecord and will call it&#8217;s clean method with
+&#8216;update_reverse_domain&#8217; set to True. This will ensure that it&#8217;s A record is
+valid <em>and</em> that it&#8217;s PTR record is valid.</p>
+<p>Using the &#8216;attrs&#8217; attribute.</p>
+<p>To interface with the Key Value store of an interface use the &#8216;attrs&#8217;
+attribute. This attribute is a direct proxy to the Keys and Values in the
+Key Value store. When you assign an attribute of the &#8216;attrs&#8217; attribute a
+value, a key is create/updated. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">Assume</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">StaticInterface</span> <span class="n">instance</span><span class="o">&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span><span class="o">.</span><span class="n">update_attrs</span><span class="p">()</span>  <span class="c"># This updates the object with keys/values already</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># in the KeyValue store.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">primary</span>
+<span class="go">&#39;0&#39;</span>
+</pre></div>
+</div>
+<p>In the previous line, there was a key called &#8216;primary&#8217; and it&#8217;s value
+would be returned when you accessed the attribute &#8216;primary&#8217;.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">alias</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;attrs&#39; object has no attribute &#39;alias&#39;</span>
+</pre></div>
+</div>
+<p>Here &#8216;attrs&#8217; didn&#8217;t have an attribute &#8216;alias&#8217; which means that there was no
+KeyValue with key &#8216;alias&#8217;. If we wanted to create that key and give it a
+value of &#8216;0&#8217; we would do:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="s">&#39;0&#39;</span>
+</pre></div>
+</div>
+<p>This <em>immediately</em> creates a KeyValue pair with key=&#8217;alias&#8217; and value=&#8216;0&#8217;.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">intr</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="s">&#39;1&#39;</span>
+</pre></div>
+</div>
+<p>This <em>immediately</em> updates the KeyValue object with a value of &#8216;1&#8217;. It is
+not like the Django ORM where you must call the <cite>save()</cite> function for any
+changes to propagate to the database.</p>
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.check_for_cname">
+<tt class="descname">check_for_cname</tt><big>(</big><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.check_for_cname" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#8220;If a CNAME RR is preent at a node, no other data should be
+present; this ensures that the data for a canonical name and its
+aliases cannot be different.&#8221;</p>
+<p>&#8211; <a class="reference external" href="http://tools.ietf.org/html/rfc1034">RFC 1034</a></p>
+<p>Call this function in models that can&#8217;t overlap with an existing
+CNAME.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.check_for_delegation">
+<tt class="descname">check_for_delegation</tt><big>(</big><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.check_for_delegation" title="Permalink to this definition">¶</a></dt>
+<dd><p>If an object&#8217;s domain is delegated it should not be able to
+be changed.  Delegated domains cannot have objects created in
+them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.check_glue_status">
+<tt class="descname">check_glue_status</tt><big>(</big><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.check_glue_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this interface is a &#8216;glue&#8217; record for a Nameserver instance,
+do not allow modifications to this record. The Nameserver will
+need to point to a different record before this record can
+be updated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.clean_ip">
+<tt class="descname">clean_ip</tt><big>(</big><em>update_reverse_domain=True</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.clean_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>The clean method in Ip is different from the rest. It needs
+to be called with the update_reverse_domain flag. Sometimes we
+need to not update the reverse domain of an IP (i.e. when we are
+deleting a reverse_domain).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.clean_views">
+<tt class="descname">clean_views</tt><big>(</big><em>views</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.clean_views" title="Permalink to this definition">¶</a></dt>
+<dd><p>cleaned_data is the data that is going to be called with for
+updating an existing or creating a new object. Classes should implement
+this function according to their specific needs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.get_create_url">
+<tt class="descname">get_create_url</tt><big>(</big><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.get_create_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the create url of the type of object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.validate_delegation_conditions">
+<tt class="descname">validate_delegation_conditions</tt><big>(</big><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.validate_delegation_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>If our domain is delegated then an A record can only have a
+name that is the same as a nameserver in that domain (glue).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticInterface.validate_unique">
+<tt class="descname">validate_unique</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticInterface.validate_unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks unique constraints on the model and raises <tt class="docutils literal"><span class="pre">ValidationError</span></tt>
+if any failed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue">
+<em class="property">class </em><tt class="descclassname">core.interface.static_intr.models.</tt><tt class="descname">StaticIntrKeyValue</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>StaticIntrKeyValue(id, key, value, obj_id)</p>
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue.clean_fields">
+<tt class="descname">clean_fields</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue.clean_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans all fields and raises a ValidationError containing message_dict
+of all validation errors if any occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue.full_clean">
+<tt class="descname">full_clean</tt><big>(</big><em>exclude=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue.full_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls clean_fields, clean, and validate_unique, on the model,
+and raises a <tt class="docutils literal"><span class="pre">ValidationError</span></tt> for any errors that occured.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue.save">
+<tt class="descname">save</tt><big>(</big><em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The &#8216;force_insert&#8217; and &#8216;force_update&#8217; parameters can be used to insist
+that the &#8220;save&#8221; must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue.save_base">
+<tt class="descname">save_base</tt><big>(</big><em>raw=False</em>, <em>cls=None</em>, <em>origin=None</em>, <em>force_insert=False</em>, <em>force_update=False</em>, <em>using=None</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue.save_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the heavy-lifting involved in saving. Subclasses shouldn&#8217;t need to
+override this method. It&#8217;s separate from save() in order to hide the
+need for overrides of save() to pass around internal-only parameters
+(&#8216;raw&#8217;, &#8216;cls&#8217;, and &#8216;origin&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.static_intr.models.StaticIntrKeyValue.serializable_value">
+<tt class="descname">serializable_value</tt><big>(</big><em>field_name</em><big>)</big><a class="headerlink" href="#core.interface.static_intr.models.StaticIntrKeyValue.serializable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the field name for this instance. If the field is
+a foreign key, returns the id value, instead of the object. If there&#8217;s
+no Field object with this name on the model, the model attribute&#8217;s
+value is returned directly.</p>
+<p>Used to serialize a field&#8217;s value (in the serializer, or form output,
+for example). Normally, you would just access the attribute directly
+and not use this method.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Static Interface</a></li>
+<li><a class="reference internal" href="#bonded-interfaces">Bonded Interfaces</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#going-from-static-to-bonded">Going from Static to Bonded</a></li>
+<li><a class="reference internal" href="#going-from-bonded-to-static">Going from Bonded to Static</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#free-ip-addresses">Free IP Addresses</a></li>
+<li><a class="reference internal" href="#id1">Static Interface</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../"
+                        title="previous chapter">Welcome to mozinv&#8216;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../core/"
+                        title="next chapter">IPAM</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/staticinterface.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../core/" title="IPAM"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../" title="Welcome to mozinv‘s documentation!"
+             >previous</a> |</li>
+        <li><a href="../">Mozillas IT source of truth 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright Mozilla Licence.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

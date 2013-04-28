@@ -110,7 +110,7 @@ class DHCPMigrateTest(TestCase):
         b = DHCPHash(self.new_file)
         a_hashed_list = a.get_hash()
         b_hashed_list = b.get_hash()
-        dc = DHCPHashCompare(a_hashed_list, 'KeyValue List', b_hashed_list, 'StaticINTR Generated')
+        dc = DHCPHashCompare(a_hashed_list, 'KeyValue List', b_hashed_list, 'StaticSREG Generated')
         identical, lists = dc.compare_lists(a_hashed_list, b_hashed_list)
         self.assertTrue(identical)
         self.assertEqual(lists[0], lists[1])
@@ -127,7 +127,7 @@ class DHCPMigrateTest(TestCase):
         ## Pick the first object from the hash and give it a new and different value
         a_hashed_list[0]['hardware ethernet'] = '00:00:00:00:00:00'
         a_hashed_list[0]['fixed-address'] = '10.0.0.1'
-        dc = DHCPHashCompare(a_hashed_list, 'KeyValue List', b_hashed_list, 'StaticINTR Generated')
+        dc = DHCPHashCompare(a_hashed_list, 'KeyValue List', b_hashed_list, 'StaticSREG Generated')
         identical, lists = dc.compare_lists(a_hashed_list, b_hashed_list)
         self.assertFalse(identical)
         msg = dc.analyze()

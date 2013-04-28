@@ -21,6 +21,7 @@ class DHCPHelper(object):
             for kv in keyvalue:
                 tmp_dict[kv.key] = kv.value
             tmp_dict['hostname'] = row.system.hostname
+            tmp_dict['sysobj'] = row.system
             appendable = True
             for the_items in tmp_list:
                 if 'hostname' not in the_items:
@@ -73,5 +74,11 @@ class DHCPHelper(object):
                 dhcp_domain_name = tmp_dict['nic.%s.dhcp_domain_name.0' % a]
             if 'nic.%s.dhcp_domain_name_servers.0' % a in tmp_dict:
                 dhcp_domain_name_servers = tmp_dict['nic.%s.dhcp_domain_name_servers.0' % a]
-            final_list.append({'system_hostname':system.hostname, 'ipv4_address':ipv4_address,  'adapter_name':adapter_name, 'mac_address':mac_address, 'option_hostname': dhcp_hostname, 'dhcp_hostname':dhcp_hostname, 'dhcp_filename':dhcp_filename, 'dhcp_domain_name':dhcp_domain_name, 'dhcp_domain_name_servers':dhcp_domain_name_servers})
+            final_list.append({'system_hostname':system.hostname,
+                'ipv4_address':ipv4_address,  'adapter_name':adapter_name,
+                'mac_address':mac_address, 'option_hostname': dhcp_hostname,
+                'dhcp_hostname':dhcp_hostname, 'dhcp_filename':dhcp_filename,
+                'dhcp_domain_name':dhcp_domain_name,
+                'dhcp_domain_name_servers':dhcp_domain_name_servers,
+            })
         return final_list

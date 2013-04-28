@@ -61,9 +61,10 @@ class BaseForm(ModelForm):
         if commit:
             # if we are committing, save the instance and the m2m data
             # immediately.
-            rollback = False
             if not instance.pk:
                 rollback = True
+            else:
+                rollback = False
             instance.save()
             try:
                 save_m2m(instance)

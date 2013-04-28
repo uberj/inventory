@@ -1,0 +1,35 @@
+.interface-display {
+}
+
+.interface-display a {
+    font-weight:bold;
+    text-decoration:none;
+}
+
+
+.interface-table tbody tr {
+    text-align: right;
+}
+
+.field-name {
+    text-align: right;
+}
+
+.field-value {
+    text-align: left;
+}
+
+.field-blank td {
+    border-top: 0px;
+    border-bottom: 0px;
+}
+
+.interface-table tbody tr > td:first-child {
+    width: 35%;
+    text-align: center;
+}
+
+#interface-divide {
+    border-top: 1px;
+    border-top-width: 1px;
+}
