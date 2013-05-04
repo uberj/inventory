@@ -24,7 +24,7 @@ class KVApiTests(TestCase):
 
         self.test_objs = (
             ('groupkeyvalue', g),
-            ('staticintrkeyvalue', sreg),
+            ('staticregkeyvalue', sreg),
         )
 
     def testCRUD(self):
@@ -37,7 +37,7 @@ class KVApiTests(TestCase):
         create = '/en-US/core/keyvalue/api/{kv_class}/{obj_pk}/create/'.format(
             kv_class=obj_class, obj_pk=o.pk
         )
-        detail = '/en-US/core/keyvalue/api/{kv_class}/{obj_pk}/detail/'.format(
+        detail = '/en-US/core/keyvalue/api/{kv_class}/{obj_pk}/list/'.format(
             kv_class=obj_class, obj_pk=o.pk
         )
 
@@ -47,10 +47,10 @@ class KVApiTests(TestCase):
         resp2 = self.c.post(create, {'key': key, 'value': value})
         self.assertEqual(resp2.status_code, 400)
 
-        resp3 = self.c.post(detail, {'key': key, 'value': value})
+        resp3 = self.c.get(detail)
         self.assertEqual(resp3.status_code, 200)
 
-        resp4 = self.c.post(detail, {'key': key, 'value': value})
+        resp4 = self.c.get(detail)
         self.assertEqual(resp4.status_code, 200)
 
         self.assertTrue(1, len(o.keyvalue_set.all()))

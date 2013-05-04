@@ -134,4 +134,4 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 people:
-	ssh admin1a.private.scl3.mozilla.com -A -t ssh -A -t boris.mozilla.com -A -t ssh people.mozilla.com -A -t scp -r toolsdev1.dmz.scl3.mozilla.com:~/inventory_dev/inventory/docs/_build/ ~/public_html/public/docs/
+	ssh admin1a.private.scl3.mozilla.com -A -t ssh -A -t boris.mozilla.com -A -t ssh people.mozilla.com -A -t scp -r toolsdev1.dmz.scl3.mozilla.com:~/inventory_dev/inventory/docs/_build/ ~/public_html/public/docs/ && ssh admin1a.private.scl3.mozilla.com -A -t ssh -A -t boris.mozilla.com -A -t ssh people.mozilla.com -A -t /home/juber/public_html/public/docs/fix_perms.sh

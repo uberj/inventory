@@ -54,8 +54,8 @@ class PTRStaticRegTests(TestCase):
         )
         return ptr
 
-    def test1_conflict_add_intr_first(self):
-        # PTRdd an intr and make sure PTR can't exist.
+    def test1_conflict_add_sreg_first(self):
+        # PTRdd an sreg and make sure PTR can't exist.
         label = "foo4"
         domain = self.f_c
         ip_str = "10.0.0.2"
@@ -66,7 +66,7 @@ class PTRStaticRegTests(TestCase):
         self.assertRaises(ValidationError, self.do_add_ptr, **kwargs)
 
     def test1_conflict_add_PTR_first(self):
-        # Add an PTR and make sure an intr can't exist.
+        # Add an PTR and make sure an sreg can't exist.
         label = "foo5"
         domain = self.f_c
         ip_str = "10.0.0.2"
@@ -75,8 +75,8 @@ class PTRStaticRegTests(TestCase):
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         self.assertRaises(ValidationError, self.do_add_sreg, **kwargs)
 
-    def test2_conflict_add_intr_first(self):
-        # Add an intr and update an existing PTR to conflict. Test for
+    def test2_conflict_add_sreg_first(self):
+        # Add an sreg and update an existing PTR to conflict. Test for
         # exception.
         label = "fo99"
         domain = self.f_c
@@ -91,7 +91,7 @@ class PTRStaticRegTests(TestCase):
         self.assertRaises(ValidationError, ptr.clean)
 
     def test2_conflict_add_A_first(self):
-        # Add an PTR and update and existing intr to conflict. Test for
+        # Add an PTR and update and existing sreg to conflict. Test for
         # exception.
         label = "foo98"
         domain = self.f_c
@@ -100,12 +100,12 @@ class PTRStaticRegTests(TestCase):
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         self.do_add_ptr(**kwargs)
 
-        # Add Intr with diff IP
+        # Add StaticReg with diff IP
         ip_str = "10.0.0.3"
         kwargs = {'label': label, 'domain': domain,
                   'ip_str': ip_str}
-        intr = self.do_add_sreg(**kwargs)
+        sreg = self.do_add_sreg(**kwargs)
 
-        # Conflict the IP on the intr
-        intr.ip_str = "10.0.0.2"
-        self.assertRaises(ValidationError, intr.save)
+        # Conflict the IP on the sreg
+        sreg.ip_str = "10.0.0.2"
+        self.assertRaises(ValidationError, sreg.save)

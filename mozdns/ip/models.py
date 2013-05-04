@@ -10,7 +10,7 @@ class Ip(models.Model, RangeProperty):
     """An :class:`Ip` instance represents either an IPv4 or IPv6 address.
 
     :class:`Ip` instances are used in the :ref:`address_record` (A and AAAA
-    records), :ref:`ptr`, and the :ref:`staticinterface` classes.
+    records), :ref:`ptr`, and the :ref:`staticreg` classes.
 
     :class:`Ip` instances in a :ref:`ptr` record must be mapped back to a
     Reverse :ref:`domain` object. A :class:`ValidationError` is raised if an
@@ -41,7 +41,7 @@ class Ip(models.Model, RangeProperty):
     class but do not need their :class:`Ip`'s to be tied back to a reverse
     domain.
 
-    :ref:`staticinterface` objects need to have their ip tied back to reverse
+    :ref:`staticreg` objects need to have their ip tied back to reverse
     domain because they represent a :ref:`PTR` record as well as an
     :ref:`address_record`.
 
@@ -80,6 +80,11 @@ class Ip(models.Model, RangeProperty):
     class Meta:
         abstract = True
 
+    def __int__(self):
+        if self.ip_type == '4':
+            return self.ip_lower
+        return (self.ip_upper * (2 ** 64)) + self.ip_lower
+
     def clean_ip(self):
         """
         Set IP info
@@ -101,11 +106,6 @@ class Ip(models.Model, RangeProperty):
             self.ip_upper, self.ip_lower = 0, int(ip)
         else:  # We already gaurded again't a non '6' ip_type
             self.ip_upper, self.ip_lower = ipv6_to_longs(int(ip))
-
-    def __int__(self):
-        if self.ip_type == '4':
-            return self.ip_lower
-        return (self.ip_upper * (2 ** 64)) + self.ip_lower
 
     def validate_ip_str(self):
         if not isinstance(self.ip_str, basestring):

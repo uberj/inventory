@@ -59,18 +59,18 @@ class AuxAttrTests(TestCase):
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        intr.update_attrs()
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
 
         def bad_get():
-            intr.attrs.primary
+            sreg.attrs.primary
         self.assertRaises(AttributeError, bad_get)
-        x = StaticRegKeyValue.objects.filter(key='primary', obj=intr)
+        x = StaticRegKeyValue.objects.filter(key='primary', obj=sreg)
         self.assertFalse(x)
-        intr.attrs.primary = '1'
-        self.assertEqual(intr.attrs.cache['primary'], '1')
-        self.assertEqual(intr.attrs.primary, '1')
-        x = StaticRegKeyValue.objects.filter(key='primary', obj=intr)
+        sreg.attrs.primary = '1'
+        self.assertEqual(sreg.attrs.cache['primary'], '1')
+        self.assertEqual(sreg.attrs.primary, '1')
+        x = StaticRegKeyValue.objects.filter(key='primary', obj=sreg)
         self.assertEqual(x[0].value, '1')
 
     def test6_create(self):
@@ -78,50 +78,50 @@ class AuxAttrTests(TestCase):
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        intr.update_attrs()
-        intr.update_attrs()
-        intr.update_attrs()
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
+        sreg.update_attrs()
+        sreg.update_attrs()
 
         def bad_get():
-            intr.attrs.primary
+            sreg.attrs.primary
         self.assertRaises(AttributeError, bad_get)
-        intr.attrs.primary = '1'
-        self.assertEqual(intr.attrs.primary, '1')
-        self.assertEqual(intr.attrs.cache['primary'], '1')
+        sreg.attrs.primary = '1'
+        self.assertEqual(sreg.attrs.primary, '1')
+        self.assertEqual(sreg.attrs.cache['primary'], '1')
 
     def test2_create(self):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        intr.update_attrs()
-        intr.attrs.primary = '2'
-        self.assertEqual(intr.attrs.primary, '2')
-        self.assertEqual(intr.attrs.cache['primary'], '2')
-        del intr.attrs.primary
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
+        sreg.attrs.primary = '2'
+        self.assertEqual(sreg.attrs.primary, '2')
+        self.assertEqual(sreg.attrs.cache['primary'], '2')
+        del sreg.attrs.primary
 
         def bad_get():
-            intr.attrs.primary
+            sreg.attrs.primary
         self.assertRaises(AttributeError, bad_get)
-        intr.attrs.primary = '3'
-        self.assertEqual(intr.attrs.primary, '3')
-        self.assertEqual(intr.attrs.cache['primary'], '3')
+        sreg.attrs.primary = '3'
+        self.assertEqual(sreg.attrs.primary, '3')
+        self.assertEqual(sreg.attrs.cache['primary'], '3')
 
     def test1_del(self):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        intr.update_attrs()
-        intr.attrs.primary = '88'
-        self.assertEqual(intr.attrs.primary, '88')
-        del intr.attrs.primary
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
+        sreg.attrs.primary = '88'
+        self.assertEqual(sreg.attrs.primary, '88')
+        del sreg.attrs.primary
 
         def bad_get():
-            intr.attrs.primary
+            sreg.attrs.primary
         self.assertRaises(AttributeError, bad_get)
 
     def test3_create(self):
@@ -129,23 +129,23 @@ class AuxAttrTests(TestCase):
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        intr.update_attrs()
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
 
     def test1_existing_attrs(self):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add(**kwargs)
-        StaticRegKeyValue(key="foo", value="bar", obj=intr).save()
+        sreg = self.do_add(**kwargs)
+        StaticRegKeyValue(key="foo", value="bar", obj=sreg).save()
         StaticRegKeyValue(
-            key="interface_type", value="eth0", obj=intr).save()
-        StaticRegKeyValue(key="alias", value="5", obj=intr).save()
-        intr.update_attrs()
-        self.assertEqual(intr.attrs.alias, '5')
-        self.assertEqual(intr.attrs.cache['alias'], '5')
-        self.assertEqual(intr.attrs.interface_type, 'eth0')
-        self.assertEqual(intr.attrs.cache['interface_type'], 'eth0')
-        self.assertEqual(intr.attrs.foo, 'bar')
-        self.assertEqual(intr.attrs.cache['foo'], 'bar')
+            key="interface_type", value="eth0", obj=sreg).save()
+        StaticRegKeyValue(key="alias", value="5", obj=sreg).save()
+        sreg.update_attrs()
+        self.assertEqual(sreg.attrs.alias, '5')
+        self.assertEqual(sreg.attrs.cache['alias'], '5')
+        self.assertEqual(sreg.attrs.interface_type, 'eth0')
+        self.assertEqual(sreg.attrs.cache['interface_type'], 'eth0')
+        self.assertEqual(sreg.attrs.foo, 'bar')
+        self.assertEqual(sreg.attrs.cache['foo'], 'bar')

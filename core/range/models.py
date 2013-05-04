@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from core.network.models import Network
 from core.utils import IPFilter, four_to_two
 from core.mixins import ObjectUrlMixin
-from core.keyvalue.base_option import CommonOption
+from core.keyvalue.base_option import CommonOption, DHCPKeyValue
 from core.registration.static_reg.models import StaticReg
 from mozdns.ip.models import ipv6_to_longs
 from mozdns.address_record.models import AddressRecord
@@ -288,7 +288,7 @@ def find_free_ip(start, end, ip_type='4'):
         raise NotImplemented()
 
 
-class RangeKeyValue(CommonOption):
+class RangeKeyValue(DHCPKeyValue, CommonOption):
     obj = models.ForeignKey(Range, related_name='keyvalue_set', null=False)
 
     class Meta:

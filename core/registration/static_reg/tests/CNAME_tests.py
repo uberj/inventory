@@ -38,7 +38,7 @@ class CNAMEStaticRegTests(TestCase):
         self.n.clean()
         self.n.save()
 
-    def do_add_intr(self, label, domain, ip_str, ip_type='4'):
+    def do_add_sreg(self, label, domain, ip_str, ip_type='4'):
         r = StaticReg(
             label=label, domain=domain, ip_str=ip_str,
             ip_type=ip_type, system=self.n
@@ -54,7 +54,7 @@ class CNAMEStaticRegTests(TestCase):
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain,
                   'ip_str': ip_str}
-        i = self.do_add_intr(**kwargs)
+        i = self.do_add_sreg(**kwargs)
         cn, _ = CNAME.objects.get_or_create(label='foo', domain=domain,
                                             target=label + "." + domain.name)
         self.assertRaises(ValidationError, i.delete)
@@ -65,7 +65,7 @@ class CNAMEStaticRegTests(TestCase):
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain,
                   'ip_str': ip_str}
-        i = self.do_add_intr(**kwargs)
+        i = self.do_add_sreg(**kwargs)
         cn, _ = CNAME.objects.get_or_create(label='food', domain=domain,
                                             target=label + "." + domain.name)
         i.delete(check_cname=False)

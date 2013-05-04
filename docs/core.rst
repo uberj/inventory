@@ -48,7 +48,7 @@ Ranges
 Range objects belong inside of a network; a range's start number is greater than or equal to the
 network address and the range's end number is less than the broadcast address. Ranges are used to
 help determine where free IP's lay within a network, which is useful when creating a
-:ref:`staticinterface`.
+:ref:`staticreg`.
 
 Here is a beautiful depiction of a range and a network::
 
@@ -61,9 +61,9 @@ Here is a beautiful depiction of a range and a network::
                 192.168.0.10                                      192.168.0.254
 
 
-Ranges can be used as a pool of allocatable IP addresses. When a new :ref:`staticinterface`
-(seriously, read about these things) is created it needs an IP address and a range is where the
-interface will look if the interface is to have it's IP address assigned automatically.
+Ranges can be used as a pool of allocatable IP addresses. When a new :ref:`staticreg`
+is created it needs an IP address and a range is where the registration will look
+if the registration is to have it's IP address assigned automatically.
 
 Other Purposes
 ++++++++++++++
@@ -78,16 +78,3 @@ that contains an ``allow`` clause. In DNS a dynamic range will usually have a lo
 names statically created for every ip in the range; for example ``GENERATE 4-100
 dynamic-$.vlan.mozilla.com``. When you flag a range as 'dynamic' the DNS build scripts will
 automatically print these records when DNS zone files are generated.
-
-
-
-
-
-
-
-
-
-
-
-
-

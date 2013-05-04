@@ -1,9 +1,0 @@
-** Message: applet now removed from the notification area
-** Message: using fallback from indicator to GtkStatusIcon
-
-(nm-applet:23801): GdkPixbuf-CRITICAL **: gdk_pixbuf_scale_simple: assertion `dest_width > 0' failed
-** Message: applet now embedded in the notification area
-** Message: PID 0 (we are 23801) sent signal 2, shutting down...
-** Message: moving back from GtkStatusIcon to indicator
-
-(nm-applet:23801): Gtk-CRITICAL **: gtk_status_icon_set_visible: assertion `GTK_IS_STATUS_ICON (status_icon)' failed

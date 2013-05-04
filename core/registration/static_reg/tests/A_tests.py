@@ -38,7 +38,7 @@ class AStaticRegTests(TestCase):
         self.n.clean()
         self.n.save()
 
-    def do_add_intr(self, label, domain, ip_str, ip_type='4'):
+    def do_add_sreg(self, label, domain, ip_str, ip_type='4'):
         r = StaticReg(
             label=label, domain=domain, ip_str=ip_str,
             ip_type=ip_type, system=self.n
@@ -62,33 +62,33 @@ class AStaticRegTests(TestCase):
         self.assertFalse(
             AddressRecord.objects.filter(ip_str=ip_str, fqdn=fqdn))
 
-    def test1_conflict_add_intr_first(self):
-        # Add an intr and make sure A can't exist.
+    def test1_conflict_add_sreg_first(self):
+        # Add an sreg and make sure A can't exist.
         label = "foo4"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        self.do_add_intr(**kwargs)
+        self.do_add_sreg(**kwargs)
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         self.assertRaises(ValidationError, self.do_add_a, **kwargs)
 
     def test1_conflict_add_A_first(self):
-        # Add an A and make sure an intr can't exist.
+        # Add an A and make sure an sreg can't exist.
         label = "foo5"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         self.do_add_a(**kwargs)
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        self.assertRaises(ValidationError, self.do_add_intr, **kwargs)
+        self.assertRaises(ValidationError, self.do_add_sreg, **kwargs)
 
-    def test2_conflict_add_intr_first(self):
-        # Add an intr and update an existing A to conflict. Test for exception.
+    def test2_conflict_add_sreg_first(self):
+        # Add an sreg and update an existing A to conflict. Test for exception.
         label = "fo99"
         domain = self.f_c
         ip_str = "10.0.0.2"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        self.do_add_intr(**kwargs)
+        self.do_add_sreg(**kwargs)
         ip_str = "10.0.0.3"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         a = self.do_add_a(**kwargs)
@@ -96,7 +96,7 @@ class AStaticRegTests(TestCase):
         self.assertRaises(ValidationError, a.save)
 
     def test2_conflict_add_A_first(self):
-        # Add an A and update and existing intr to conflict. Test for
+        # Add an A and update and existing sreg to conflict. Test for
         # exception.
         label = "foo98"
         domain = self.f_c
@@ -105,11 +105,11 @@ class AStaticRegTests(TestCase):
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         self.do_add_a(**kwargs)
 
-        # Add Intr with diff IP
+        # Add StaticReg with diff IP
         ip_str = "10.0.0.3"
         kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
-        intr = self.do_add_intr(**kwargs)
+        sreg = self.do_add_sreg(**kwargs)
 
-        # Conflict the IP on the intr
-        intr.ip_str = "10.0.0.2"
-        self.assertRaises(ValidationError, intr.save)
+        # Conflict the IP on the sreg
+        sreg.ip_str = "10.0.0.2"
+        self.assertRaises(ValidationError, sreg.save)

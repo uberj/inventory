@@ -1,3 +1,12 @@
+from tastypie.test import ResourceTestCase
+
+
+from mozdns.tests.utils import create_fake_zone, random_label
+from core.registration.static_reg.models import StaticReg
+from core.hwadapter.models import HardwareAdapter
+from core.group.models import Group
+from systems.models import System
+
 import simplejson as json
 
 API_VERSION = '1'
@@ -91,7 +100,7 @@ class CoreAPITests(TestCaseUtils):
         # Check how many are there first.
         obj_count = self.test_type.objects.count()
         create_url = self.object_list_url.format(
-            API_VERSION, str(self.test_type.__name__).lower())
+            API_VERSION, str(self.test_name).lower())
         resp = self.api_client.post(create_url, format='json', data=post_data)
         if assertResponse:
             assertResponse(resp)
@@ -116,3 +125,33 @@ class CoreAPITests(TestCaseUtils):
         )
         updated_obj_data = json.loads(new_resp.content)
         self.compare_data(post_data, updated_obj_data)
+
+
+class HWAdapterTest(CoreAPITests, ResourceTestCase):
+    test_type = HardwareAdapter
+    test_name = 'hwadapter'
+
+    def setUp(self):
+        create_fake_zone('2.ip6.arpa', suffix="")
+        self.domain = create_fake_zone('foo.mozilla.com', suffix='')
+        self.s = System.objects.create(hostname='foo.mozilla.com')
+        self.sreg = StaticReg.objects.create(
+            label='', domain=self.domain, ip_str='2222:123::', ip_type='6',
+            system=self.s
+        )
+        self.s = System.objects.create(hostname='foobar.mozilla.com')
+        self.g = Group.objects.create(name='foobar')
+        super(HWAdapterTest, self).setUp()
+
+    def compare_data(self, old_data, new_obj_data):
+        for key in old_data.keys():
+            if key in ('sreg', 'group'):
+                continue
+            self.assertEqual(old_data[key], new_obj_data[key])
+
+    def post_data(self):
+        return {
+            'description': random_label(),
+            'name': 'eth0',
+            'sreg': self.sreg.pk
+        }

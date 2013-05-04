@@ -46,7 +46,7 @@ It is important that data that is considered 'internal' not be allowed into any 
 facing data. RFC 1918 says that certain ip's should not be allowed into public DNS space. |project|
 enforces these restrictions.
 
-If an :ref:`address_record`/:ref:`staticinterface` record points to an IP that is in a network
+If an :ref:`address_record`/:ref:`staticreg` record points to an IP that is in a network
 specified in RFC 1918, it is not allowed to be part of a public view.
 
 If a :ref:`ptr` record points to an IP that is in a network specified in RFC 1918, it is not allowed
@@ -59,7 +59,7 @@ to be part of a public view.
     leek if a CNAME resolves to a missing record.
 
 If a :ref:`CNAME`, :ref:`SRV`, or :ref:`MX` has a canonical name that has the type :class:`A`,
-:class:`PTR`, or :class:`StaticInterface` and has an IP within one of the networks specified in RFC
+:class:`PTR`, or :class:`StaticReg` and has an IP within one of the networks specified in RFC
 1918, it is not allowed to be part of a public view::
 
     foo CNAME bar                                   bar A 10.0.0.1

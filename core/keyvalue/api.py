@@ -23,6 +23,7 @@ def kv_detail(request, kv_class, kv_pk):
 
     Returns a single KV instance.
     """
+    import pdb;pdb.set_trace()
     Klass = resolve_class(kv_class)
     KVKlass = Klass.keyvalue_set.related.model
     try:
@@ -158,7 +159,7 @@ def kv_delete(request, kv_class, kv_pk):
     /core/keyvalue/api/<kv_class>/<kv_pk>/delete/
     Status Codes:
         * 204 - Requests Fulfilled
-        * 400 - Issues during  delete
+        * 400 - Issues during delete
     """
     Klass = resolve_class(kv_class)
     KVKlass = Klass.keyvalue_set.related.model

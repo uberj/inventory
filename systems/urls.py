@@ -30,6 +30,10 @@ urlpatterns = patterns('systems',
     (r'^system_auto_complete_ajax[/]$', 'views.system_auto_complete_ajax'),
     (r'^ajax_check_dupe_nic_name/(?P<system_id>\d+)/(?P<adapter_name>.*)[/]$', 'views.check_dupe_nic_name'),
 
+    # Registrations and HardwareAdapters
+    (r'^create_static_registration/(?P<system_pk>\d+)[/]$', 'views.ajax_create_static_reg'),
+
+
     # TODO, Depricate these
     url(r'^oncall/$', oncall),
     url(r'^getoncall[/](?P<oncall_type>.*)[/]$', getoncall),

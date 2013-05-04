@@ -8,7 +8,7 @@ from core.utils import IPFilter, one_to_two, to_a
 from core.vlan.models import Vlan
 from core.site.models import Site
 from core.mixins import ObjectUrlMixin
-from core.keyvalue.base_option import CommonOption
+from core.keyvalue.base_option import CommonOption, DHCPKeyValue
 
 import ipaddr
 
@@ -149,7 +149,7 @@ class Network(models.Model, ObjectUrlMixin):
         return "<Network {0}>".format(str(self))
 
 
-class NetworkKeyValue(CommonOption):
+class NetworkKeyValue(DHCPKeyValue, CommonOption):
     obj = models.ForeignKey(Network, related_name='keyvalue_set', null=False)
     aux_attrs = (
         ('description', 'A description of the site'),

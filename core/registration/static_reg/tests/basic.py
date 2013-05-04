@@ -11,7 +11,7 @@ from mozdns.view.models import View
 from mozdns.ip.utils import ip_to_domain_name
 
 
-class StaticInterTests(TestCase):
+class StaticRegTests(TestCase):
     def create_domain(self, name, ip_type=None, delegated=False):
         if ip_type is None:
             ip_type = '4'
@@ -136,7 +136,7 @@ class StaticInterTests(TestCase):
         self.assertRaises(ValidationError, self.do_add, **kwargs)
 
     def test1_bad_add_for_a_ptr(self):
-        # Intr exists, then try ptr and A
+        # sreg exists, then try ptr and A
         label = "9988food"
         domain = self.c
         ip_str = "10.0.0.1"
@@ -149,12 +149,12 @@ class StaticInterTests(TestCase):
         i.save()
         a = AddressRecord(label=label, domain=domain, ip_str=ip_str,
                           ip_type=ip_type)
-        self.assertRaises(ValidationError, a.clean)
+        self.assertRaises(ValidationError, a.save)
         ptr = PTR(ip_str=ip_str, ip_type=ip_type, name=i.fqdn)
-        self.assertRaises(ValidationError, ptr.clean)
+        self.assertRaises(ValidationError, ptr.save)
 
     def test2_bad_add_for_a_ptr(self):
-        # PTR and A exist, then try add intr
+        # PTR and A exist, then try add sreg
         label = "9988fdfood"
         domain = self.c
         ip_str = "10.0.0.1"
@@ -177,7 +177,7 @@ class StaticInterTests(TestCase):
         }
         i = self.do_add(**kwargs)
         i.ip_str = "9.0.0.1"
-        self.assertRaises(ValidationError, i.clean)
+        self.assertRaises(ValidationError, i.save)
 
     def test1_no_system(self):
         label = "8888foo"
@@ -188,4 +188,4 @@ class StaticInterTests(TestCase):
             label=label, domain=domain, ip_str=ip_str, ip_type=ip_type,
             system=None
         )
-        self.assertRaises(ValidationError, r.clean)
+        self.assertRaises(ValidationError, r.save)

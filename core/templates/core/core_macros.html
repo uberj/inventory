@@ -118,9 +118,6 @@
     {% if draw_row %}
         <tr>
     {% endif %}
-    {% if not top_row %}
-        <td class='field-blank'></td>
-    {% endif %}
     <td class='field-name' align='right'>
         {% if obj %}
             <a class='field-link' href='{{ obj.get_absolute_url() }}'>{{ field_name }}</a>
@@ -137,21 +134,17 @@
 {%- endmacro %}
 
 {% macro display_sreg(sreg) -%}
-    <tr class='interface-divide'>
-        <td><a class='field-link' href='{{ sreg.get_absolute_url() }}'>{{ sreg.fqdn }}</a>
-        </td>
-    </tr>
-    {{ display_obj_field(sreg, 'fqdn', sreg.fqdn) }}
+    {{ display_obj_field(sreg, 'fqdn', sreg.fqdn, top_row=True) }}
     {{ display_obj_field(sreg, 'inet4 addr' if sreg.ip_type == '4' else 'inet6 addr', sreg.ip_str) }}
     {{ display_obj_field(sreg.range, 'range', sreg.range or 'N/A') }}
     {{ display_obj_field(sreg.range.network, 'network', sreg.range.network or 'N/A') }}
     {{ display_obj_kv(sreg) }}
+    {{ display_hwadapters(sreg.hwadapter_set.all()) }}
 {%- endmacro %}
 
-{% macro display_kv(obj) -%}
+{% macro display_obj_kv(obj) -%}
     {% for kv in obj.keyvalue_set.all().order_by('key') %}
         <tr>
-            <td> </td>
             <td class='field-name'>
                 <a class='field-link' href='{{obj.get_kv_url()}}'>{{kv.key}}</a>(kv)
             </td>
@@ -162,12 +155,25 @@
     {% endfor %}
 {%- endmacro %}
 
+{% macro display_hwadapters(hwadapters) -%}
+    <div class='registration-display'>
+    {% for hw in hwadapters %}
+        <table class="tablesorter">
+            {{ display_obj_field(hw, 'mac', hw.mac, top_row=True) }}
+            {{ display_obj_field(hw, 'name', hw.name) }}
+            {{ display_obj_field(hw, 'group', hw.group or 'None') }}
+        </table>
+    {% endfor %}
+    </div>
+{%- endmacro %}
+
 {% macro display_sregs(sregs) -%}
-    <link href="/static/stylesheets/interface_display.css" rel="stylesheet" type="text/css">
+    <link href="/static/stylesheets/registration_display.css" rel="stylesheet" type="text/css">
     <br />
-    <div class='interface-display'>
+    <div class='registration-display'>
     {% for sreg in sregs %}
-        <table class="interface-table tablesorter">
+        <table class="registration-table tablesorter">
+            <caption>StaticRegistration {{loop.index}}</caption>
             {{ display_sreg(sreg) }}
         </table>
     {% endfor %}

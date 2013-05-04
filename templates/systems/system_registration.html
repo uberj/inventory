@@ -1,0 +1,127 @@
+{# The JS for this is in static/javascripts/system_show.js #}
+<style>
+    span.helptext {
+        margin-left: 5px;
+    }
+    input[readonly] {
+        color: #888888;
+        background-image: none;
+    }
+    #hwadapter-tables caption {
+        margin-bottom: 1em;
+    }
+    .hwadapter-table caption {
+        width: 80%;
+        background: #D0D0D0;
+    }
+    .hwadapter-table {
+        margin-left: 2em;
+    }
+    .remove-hwadapter {
+        float: right;
+        margin-right: 1em;
+    }
+    #btnMore {
+        float: right;
+        margin-right: 1em;
+    }
+    #id_sreg_fqdn {
+        width: 400px;
+    }
+</style>
+<div id="add-sreg-dialog" title="Create New Static Registration" style='display: none; width: 700px;'>
+    <form id='sreg-form' name='sreg-form'>
+    <table>
+        <caption>Step 1. Configure Registration IP</caption>
+        <tr><td colspan="2">Range: <select id='id_sreg_range'></select></td></tr>
+        <tr>
+            <td>
+                <label for='id_show_all_ranges'>Show all ranges
+                    <input type='checkbox' id='id_show_all_ranges' style='width: 159px;'>
+                </label>
+            </td>
+            <td>
+                <label for='id_auto_assign_ip'>Auto Assign IP
+                    <input type='checkbox' id='id_auto_assign_ip' style='width: 159px;' checked='checked'>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label for='id_sreg_ip_address'> IP Address: {{sreg_form.sreg_ip_address}}
+                </label>
+                <span class='helptext'>IP Address of Registration</span>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <caption>Step 2. Configure Registration DNS Name</caption>
+        <tr>
+            <td>
+                <label for='id_override_fqdn'>Specify FQDN
+                    <input type='checkbox' name='override_fqdn' id='id_override_fqdn' checked="">
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">FQDN: {{sreg_form.sreg_fqdn}}
+                <span class='helptext'>FQDN</span>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <caption>Step 3. DNS Options</caption>
+        <tr><td colspan="2">DNS Views: {{sreg_form.sreg_views}}</td></tr>
+    </table>
+    </form>
+    <table>
+        <caption>Step 4. Registration Name (Optional)</caption>
+        <tr><td colspan="2">Registration Name: <input type='text' name='kv_sreg_name' id='kv_sreg_name' style='width: 159px;' value=''><span class='helptext'>eg eth0 or mgmt1 or nic8</span></td></tr>
+    </table>
+    <form id='hw-adapter-form' name='hw-adapter-form'>
+    <table id='hwadapter-tables'>
+        <caption>Step 5. Register Hardware Adapters <input type='button' id='btnMore' value='Add another Hardware Adapter'></caption>
+        <tr>
+            <td>
+            <table class='hwadapter-table'>
+                <caption>New Adapter<input class='remove-hwadapter' type='button' value='Remove'></caption>
+                <tr>
+                    <td colspan="2">
+                        <span id='option_hostname'>Adapter Name: </span>
+                    </td>
+                    <td colspan="2">
+                         {{hw_formset[0].name}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span id='mac'>Mac Address(es): </span>
+                    </td>
+                    <td colspan="2">
+                        {{hw_formset[0].mac}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span id='option_hostname'>Option Hostname: </span>
+                    </td>
+                    <td colspan="2">
+                        <input class='hw_option_hostname' type='text'
+                         name='hw_option_hostname_0' style='width: 25em;'
+                         value=''>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span id='group'>DHCP Group: </span>
+                    </td>
+                    <td>
+                        {{hw_formset[0].group}}
+                    </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>

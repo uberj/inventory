@@ -2,7 +2,7 @@ from django.db import models
 
 from core.mixins import ObjectUrlMixin
 
-from core.keyvalue.models import KeyValue
+from core.keyvalue.base_option import DHCPKeyValue, CommonOption
 
 
 class Group(models.Model, ObjectUrlMixin):
@@ -30,7 +30,7 @@ class Group(models.Model, ObjectUrlMixin):
         return ['name']
 
 
-class GroupKeyValue(KeyValue):
+class GroupKeyValue(DHCPKeyValue, CommonOption):
     obj = models.ForeignKey(Group, related_name='keyvalue_set', null=False)
 
     class Meta:

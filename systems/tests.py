@@ -7,7 +7,6 @@ except:
     import simplejson as json
 
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import Client
 
@@ -15,7 +14,6 @@ from models import System
 from mozdns.domain.models import Domain
 from mozdns.view.models import View
 from mozdns.tests.utils import create_fake_zone
-from core.registration.static_reg.models import StaticReg
 from core.range.models import Range
 from core.network.models import Network
 from core.vlan.models import Vlan
@@ -144,10 +142,6 @@ class BlankTest(TestCase):
         self.assertEqual(system.check_for_adapter_name('nic1'), True)
         self.assertEqual(system.check_for_adapter_name('nic0'), True)
         self.assertEqual(system.check_for_adapter_name('nic2'), False)
-
-    def test_next_adapter_number(self):
-        system = System.objects.get(id=1)
-        self.assertEqual(system.get_next_interface_name_number(), 2)
 
     def test_adapter_count(self):
         system = System.objects.get(id=1)

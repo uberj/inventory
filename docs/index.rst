@@ -36,7 +36,7 @@ Core
 .. toctree::
    :maxdepth: 2
 
-   staticinterface
+   staticreg
    core
    site
    vlan

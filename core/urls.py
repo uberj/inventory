@@ -8,7 +8,6 @@ from core.api.v1.api import v1_core_api
 
 urlpatterns = patterns('',
    url(r'^$', csrf_exempt(search), name='core-index'),
-   url(r'^interface/', include('core.interface.urls')),
    url(r'^vlan/', include('core.vlan.urls')),
    url(r'^network/', include('core.network.urls')),
    url(r'^site/', include('core.site.urls')),

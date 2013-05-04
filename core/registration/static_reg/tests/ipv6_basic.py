@@ -10,7 +10,7 @@ from mozdns.ptr.models import PTR
 from mozdns.ip.utils import ip_to_domain_name
 
 
-class V6StaticInterTests(TestCase):
+class V6StaticStaticRegTests(TestCase):
     def create_domain(self, name, ip_type=None, delegated=False):
         if ip_type is None:
             ip_type = '4'
@@ -109,7 +109,7 @@ class V6StaticInterTests(TestCase):
         self.assertRaises(ValidationError, self.do_add, **kwargs)
 
     def test1_bad_add_for_a_ptr(self):
-        # Intr exists, then try ptr and A
+        # StaticReg exists, then try ptr and A
         label = "9988fooddfdf"
         domain = self.c
         ip_str = "111::11:22:33:44:55:6e"
@@ -126,7 +126,7 @@ class V6StaticInterTests(TestCase):
         self.assertRaises(ValidationError, ptr.clean)
 
     def test2_bad_add_for_a_ptr(self):
-        # PTR and A exist, then try add intr
+        # PTR and A exist, then try add sreg
         label = "9988fdfood"
         domain = self.c
         ip_str = "1112::11:22:33:44:55:66"
@@ -150,7 +150,7 @@ class V6StaticInterTests(TestCase):
                   'ip_str': ip_str}
         i = self.do_add(**kwargs)
         i.ip_str = "9111::"
-        self.assertRaises(ValidationError, i.clean)
+        self.assertRaises(ValidationError, i.save)
 
     def test1_no_system(self):
         label = "8888foo"

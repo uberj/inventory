@@ -9,7 +9,7 @@ from mozdns.view.models import View
 from mozdns.ip.utils import ip_to_domain_name
 
 
-class DeleteStaticInterTests(TestCase):
+class DeleteStaticStaticRegTests(TestCase):
     def create_domain(self, name, ip_type=None, delegated=False):
         if ip_type is None:
             ip_type = '4'

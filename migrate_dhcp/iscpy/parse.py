@@ -130,6 +130,10 @@ class ISCGrammar(parsley.makeGrammar(grammar, {}, unwrap=True)):
             elif hasattr(thing, 'master_group'):
                 thing.group = g
                 thing.save()
+            elif hasattr(thing, 'hwadapter_set'):
+                for hwadapter in thing.hwadapter_set.all():
+                    hwadapter.group = g
+                    hwadapter.save()
         self.process_opts_params(stmts, Group.keyvalue_set.related.model, g)
 
 

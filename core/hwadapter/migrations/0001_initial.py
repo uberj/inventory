@@ -3,78 +3,53 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Remove StaticInterface
-        db.delete_table('static_interface')
-        db.delete_table('static_inter_key_value')
-        db.delete_table('static_interface_views')
-        for content_type in ContentType.objects.filter(app_label='static_intr'):
-            content_type.delete()
-        # Adding model 'StaticReg'
-        db.create_table('static_reg', (
-            ('domain', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['domain.Domain'])),
-            ('label', self.gf('django.db.models.fields.CharField')(max_length=63, null=True, blank=True)),
-            ('fqdn', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
-            ('ttl', self.gf('django.db.models.fields.PositiveIntegerField')(default=3600, null=True, blank=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, blank=True)),
-            ('ip_str', self.gf('django.db.models.fields.CharField')(max_length=39)),
-            ('ip_upper', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('ip_lower', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('ip_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
+        # Adding model 'HardwareAdapter'
+        db.create_table('hwadapter', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('reverse_domain', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='staticregdomain_set', null=True, to=orm['domain.Domain'])),
-            ('system', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['systems.System'], null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=255)),
+            ('mac', self.gf('django.db.models.fields.CharField')(max_length=17)),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['group.Group'], null=True, blank=True)),
+            ('sreg', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['static_reg.StaticReg'], null=True, blank=True)),
         ))
-        db.send_create_signal('static_reg', ['StaticReg'])
+        db.send_create_signal('hwadapter', ['HardwareAdapter'])
 
-        # Adding unique constraint on 'StaticReg', fields ['ip_upper', 'ip_lower', 'label', 'domain']
-        db.create_unique('static_reg', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
+        # Adding unique constraint on 'HardwareAdapter', fields ['mac', 'sreg']
+        db.create_unique('hwadapter', ['mac', 'sreg_id'])
 
-        # Adding M2M table for field views on 'StaticReg'
-        m2m_table_name = db.shorten_name('static_reg_views')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('staticreg', models.ForeignKey(orm['static_reg.staticreg'], null=False)),
-            ('view', models.ForeignKey(orm['view.view'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['staticreg_id', 'view_id'])
-
-        # Adding model 'StaticRegKeyValue'
-        db.create_table('static_reg_key_value', (
+        # Adding model 'HardwareAdapterKV'
+        db.create_table('hwadapter_key_value', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('value', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('is_option', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('is_statement', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('has_validator', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['static_reg.StaticReg'])),
+            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['hwadapter.HardwareAdapter'])),
         ))
-        db.send_create_signal('static_reg', ['StaticRegKeyValue'])
+        db.send_create_signal('hwadapter', ['HardwareAdapterKV'])
 
-        # Adding unique constraint on 'StaticRegKeyValue', fields ['key', 'value', 'obj']
-        db.create_unique('static_reg_key_value', ['key', 'value', 'obj_id'])
+        # Adding unique constraint on 'HardwareAdapterKV', fields ['key', 'value']
+        db.create_unique('hwadapter_key_value', ['key', 'value'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'StaticRegKeyValue', fields ['key', 'value', 'obj']
-        db.delete_unique('static_reg_key_value', ['key', 'value', 'obj_id'])
+        # Removing unique constraint on 'HardwareAdapterKV', fields ['key', 'value']
+        db.delete_unique('hwadapter_key_value', ['key', 'value'])
 
-        # Removing unique constraint on 'StaticReg', fields ['ip_upper', 'ip_lower', 'label', 'domain']
-        db.delete_unique('static_reg', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
+        # Removing unique constraint on 'HardwareAdapter', fields ['mac', 'sreg']
+        db.delete_unique('hwadapter', ['mac', 'sreg_id'])
 
-        # Deleting model 'StaticReg'
-        db.delete_table('static_reg')
+        # Deleting model 'HardwareAdapter'
+        db.delete_table('hwadapter')
 
-        # Removing M2M table for field views on 'StaticReg'
-        db.delete_table(db.shorten_name('static_reg_views'))
-
-        # Deleting model 'StaticRegKeyValue'
-        db.delete_table('static_reg_key_value')
+        # Deleting model 'HardwareAdapterKV'
+        db.delete_table('hwadapter_key_value')
 
 
     models = {
@@ -89,6 +64,30 @@ class Migration(SchemaMigration):
             'purgeable': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'soa': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['soa.SOA']", 'null': 'True', 'blank': 'True'})
         },
+        'group.group': {
+            'Meta': {'unique_together': "(('name',),)", 'object_name': 'Group', 'db_table': "'group'"},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
+        'hwadapter.hardwareadapter': {
+            'Meta': {'unique_together': "(('mac', 'sreg'),)", 'object_name': 'HardwareAdapter', 'db_table': "'hwadapter'"},
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['group.Group']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'mac': ('django.db.models.fields.CharField', [], {'max_length': '17'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
+            'sreg': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['static_reg.StaticReg']", 'null': 'True', 'blank': 'True'})
+        },
+        'hwadapter.hardwareadapterkv': {
+            'Meta': {'unique_together': "(('key', 'value'),)", 'object_name': 'HardwareAdapterKV', 'db_table': "'hwadapter_key_value'"},
+            'has_validator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_option': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_statement': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['hwadapter.HardwareAdapter']"}),
+            'value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
+        },
         'soa.soa': {
             'Meta': {'unique_together': "(('primary', 'contact', 'description'),)", 'object_name': 'SOA', 'db_table': "'soa'"},
             'contact': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -101,7 +100,7 @@ class Migration(SchemaMigration):
             'primary': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'refresh': ('django.db.models.fields.PositiveIntegerField', [], {'default': '180'}),
             'retry': ('django.db.models.fields.PositiveIntegerField', [], {'default': '86400'}),
-            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1367110401'}),
+            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1367216001'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'})
         },
         'static_reg.staticreg': {
@@ -115,20 +114,10 @@ class Migration(SchemaMigration):
             'ip_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'ip_upper': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '63', 'null': 'True', 'blank': 'True'}),
-            'reverse_domain': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'staticregdomain_set'", 'null': 'True', 'to': "orm['domain.Domain']"}),
+            'reverse_domain': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'reverse_staticreg_set'", 'null': 'True', 'to': "orm['domain.Domain']"}),
             'system': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['systems.System']", 'null': 'True', 'blank': 'True'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'}),
             'views': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['view.View']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'static_reg.staticregkeyvalue': {
-            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'StaticRegKeyValue', 'db_table': "'static_reg_key_value'"},
-            'has_validator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_option': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_statement': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['static_reg.StaticReg']"}),
-            'value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'systems.allocation': {
             'Meta': {'ordering': "['name']", 'object_name': 'Allocation', 'db_table': "u'allocations'"},
@@ -214,4 +203,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['static_reg']
+    complete_apps = ['hwadapter']

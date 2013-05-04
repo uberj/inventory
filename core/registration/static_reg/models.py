@@ -26,10 +26,10 @@ class StaticReg(BaseAddressRecord, BasePTR, KVUrlMixin):
     and associate a mac address with it.
 
     In terms of DNS, a static registration represents a PTR and A record and
-    must adhear to the requirements of those classes. The registration inherits
-    from BaseAddressRecord and will call it's clean method with
-    'update_reverse_domain' set to True. This will ensure that it's A record is
-    valid *and* that it's PTR record is valid.
+    must adhear to the requirements of those classes. StaticReg inherits
+    from BaseAddressRecord and will call it's clean and save method. StaticReg
+    also inherits from BasePTR and will call :func:`clean_reverse` which
+    essentially calls the :class:`PTR` classes :func:`clean` method.
 
 
     Using the 'attrs' attribute.
@@ -78,7 +78,7 @@ class StaticReg(BaseAddressRecord, BasePTR, KVUrlMixin):
 
     attrs = None
 
-    search_fields = ('mac', 'ip_str', 'fqdn')
+    search_fields = ('ip_str', 'fqdn')
 
     class Meta:
         db_table = 'static_reg'

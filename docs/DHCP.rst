@@ -1,27 +1,27 @@
 .. _dhcp:
-.. |intr_ref| replace:: :ref:`StaticInterface`
-.. |intr| replace:: :class:`StaticInterface`
+.. |sreg_ref| replace:: :ref:`StaticReg`
+.. |sreg| replace:: :class:`StaticReg`
 .. |range| replace:: :class:`Range`
 
 DHCP
 ====
 
 .. warning::
-    DHCP is implemented for |intr_ref| objects with IPv4 addresses. |intr|'s with IPv6 addresses
+    DHCP is implemented for |sreg_ref| objects with IPv4 addresses. |sreg|'s with IPv6 addresses
     will not be included in the build output.
 
 The core function of the DHCP build system is the :func:`build_subnet` function which accecpts a
 :ref:`Network` instance as it's only input. Using the ``network``'s network address
-(``network_start``) and network broadcast (``network_end``) every |intr| with an IPv4 address
+(``network_start``) and network broadcast (``network_end``) every |sreg| with an IPv4 address
 greater than ``network_start`` less than ``network_end`` is used to generate a ``host`` statement::
 
-    host {{ intr.dhcp_name() }} {
-        hardware ethernet {{ intr.mac }};
-        fixed-address {{ intr.ip_str }};
+    host {{ sreg.dhcp_name() }} {
+        hardware ethernet {{ sreg.mac }};
+        fixed-address {{ sreg.ip_str }};
     }
 
 The above example is a ``host`` statement where jinja2 syntax is used to show how data from the
-|intr| is used to fill in data. The |intr| member function :func:`dhcp_name` is used as a way to
+|sreg| is used to fill in data. The |sreg| member function :func:`dhcp_name` is used as a way to
 make sure no two ``host`` statements have the same ``hostname``.
 
 .. note::
@@ -47,7 +47,3 @@ DHCP Options and Statements
 Both ranges and networks have ways of controlling what options and statements go into their
 respective ``subnet`` and ``pool`` statements. These options and statements are stored in the
 :class:`NetworkKeyValue` and :class:`RangeKeyValue` tables as Key Value pairs.
-
-
-.. autofunction:: core.build.subnet.build_subnet
-.. autofunction:: core.build.subnet.build_pool

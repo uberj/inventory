@@ -140,7 +140,7 @@ class NSTestsModels(TestCase):
         self.assertRaises(ValidationError, glue.clean)
 
     def test_disallow_delete_of_glue_sreg(self):
-        # Interface glue records should not be allowed to be deleted.
+        # StaticRegistration glue records should not be allowed to be deleted.
         glue = StaticReg.objects.create(
             label='ns24', domain=self.f_r, ip_str='128.193.99.10',
             ip_type='4', system=self.s
@@ -188,7 +188,7 @@ class NSTestsModels(TestCase):
         glue.delete()
 
     def test_add_ns_in_domain_sreg(self):
-        # Use an Interface as a glue record.
+        # Use an StaticRegistration as a glue record.
         glue = StaticReg.objects.create(
             label='ns232', domain=self.r, ip_str='128.193.99.10', ip_type='4',
             system=self.s

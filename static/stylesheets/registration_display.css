@@ -1,13 +1,13 @@
-.interface-display {
+.registration-display {
 }
 
-.interface-display a {
+.registration-display a {
     font-weight:bold;
     text-decoration:none;
 }
 
 
-.interface-table tbody tr {
+.registration-table tbody tr {
     text-align: right;
 }
 
@@ -24,12 +24,12 @@
     border-bottom: 0px;
 }
 
-.interface-table tbody tr > td:first-child {
+.registration-table tbody tr > td:first-child {
     width: 35%;
     text-align: center;
 }
 
-#interface-divide {
+#registration-divide {
     border-top: 1px;
     border-top-width: 1px;
 }
