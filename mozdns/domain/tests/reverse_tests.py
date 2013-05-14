@@ -9,7 +9,7 @@ from mozdns.ip.utils import ip_to_domain_name, nibbilize
 from mozdns.domain.models import Domain, boot_strap_ipv6_reverse_domain
 from mozdns.soa.models import SOA
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 from systems.models import System
 

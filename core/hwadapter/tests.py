@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from core.registration.static_reg.models import StaticReg
-from core.hwadapter.models import HardwareAdapter
+from core.registration.static.models import StaticReg
+from core.hwadapter.models import HWAdapter
 from systems.models import System
 from mozdns.tests.utils import create_fake_zone
 
@@ -17,7 +17,7 @@ class HWAdapterTests(TestCase):
         )
 
     def test_create(self):
-        h = HardwareAdapter.objects.create(
+        h = HWAdapter.objects.create(
             mac='11:22:33:44:55:66', sreg=self.sreg, name='foo'
         )
         repr(h)

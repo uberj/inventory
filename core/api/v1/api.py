@@ -4,8 +4,8 @@ from tastypie.api import Api
 from tastypie import fields
 
 from core.group.models import Group
-from core.hwadapter.models import HardwareAdapter
-from core.registration.static_reg.models import StaticReg
+from core.hwadapter.models import HWAdapter
+from core.registration.static.models import StaticReg
 
 from mozdns.api.v1.api import StaticRegResource
 
@@ -45,8 +45,8 @@ class HWAdapterResource(ModelResource):
 
     class Meta:
         always_return_data = True
-        queryset = HardwareAdapter.objects.all()
-        fields = HardwareAdapter.get_api_fields() + ['sreg', 'group']
+        queryset = HWAdapter.objects.all()
+        fields = HWAdapter.get_api_fields() + ['sreg', 'group']
         authorization = Authorization()
         allowed_methods = ['get', 'post', 'patch', 'delete']
 

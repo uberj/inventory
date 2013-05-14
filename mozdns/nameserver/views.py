@@ -12,7 +12,7 @@ from mozdns.views import (MozdnsDeleteView, MozdnsDetailView, MozdnsListView,
 
 from mozdns.address_record.models import AddressRecord
 from mozdns.domain.models import Domain
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 
 class NSView(object):

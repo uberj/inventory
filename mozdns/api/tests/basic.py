@@ -2,7 +2,7 @@ from gettext import gettext as gt
 from tastypie.test import ResourceTestCase
 
 from systems.models import System
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.cname.models import CNAME
 from mozdns.address_record.models import AddressRecord
 from mozdns.domain.models import Domain

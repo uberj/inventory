@@ -1,1 +1,1 @@
-from core.registration.static_reg.tests.all import *
+from core.registration.static.tests.all import *

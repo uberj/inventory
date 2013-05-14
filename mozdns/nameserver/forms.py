@@ -3,7 +3,7 @@ from django import forms
 from mozdns.forms import BaseForm
 from mozdns.nameserver.models import Nameserver
 from mozdns.address_record.models import AddressRecord
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 
 class NameserverForm(BaseForm):

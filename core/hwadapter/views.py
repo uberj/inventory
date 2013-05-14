@@ -1,40 +1,17 @@
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.http import HttpResponse
 
-from core.group.models import Group
-from core.group.forms import GroupForm
+from core.hwadapter.forms import HWAdapterForm
 
-from core.views import (
-    CoreDeleteView, CoreListView, CoreCreateView, CoreUpdateView
-)
+import simplejson as json
 
-
-class GroupView(object):
-    model = Group
-    queryset = Group.objects.all()
-    form_class = GroupForm
-
-
-class GroupDeleteView(GroupView, CoreDeleteView):
-    pass
-
-
-class GroupListView(GroupView, CoreListView):
-    template_name = "core/core_list.html"
-
-
-class GroupCreateView(GroupView, CoreCreateView):
-    template_name = "core/core_form.html"
-
-
-class GroupUpdateView(GroupView, CoreUpdateView):
-    template_name = "group/group_edit.html"
-
-
-def group_detail(request, group_pk):
-    group = get_object_or_404(Group, pk=group_pk)
-    attrs = group.keyvalue_set.all()
-    return render(request, "group/group_detail.html", {
-        "group": group,
-        "attrs": attrs
-    })
+def ajax_hw_adapter_create(request):
+    if not request.POST:
+        return HttpResponse('Hi')
+    form = HWAdapterForm(request.POST, prefix='add-hw')
+    if form.is_valid():
+        form.save()
+        return HttpResponse(json.dumps({'success': True}))
+    return HttpResponse(json.dumps({
+        'success': False,
+        'form': str(form.as_p())
+    }))

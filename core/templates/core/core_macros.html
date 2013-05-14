@@ -156,15 +156,23 @@
 {%- endmacro %}
 
 {% macro display_hwadapters(hwadapters) -%}
-    <div class='registration-display'>
     {% for hw in hwadapters %}
-        <table class="tablesorter">
+        <table class="hwadapter tablesorter">
+            <caption>
+                {% if hw.name %}
+                    Hardware Adapter {{hw.name}}
+                {% else %}
+                    Hardware Adapter {{loop.index}}
+                {% endif %}
+                <span class='hwadapter-action'>
+                    <a class='edit-hwadapter' data-hwadapter-pk='{{hw.pk}}' href='{{hw.get_edit_url()}}'>Edit</a>
+                </span>
+            </caption>
             {{ display_obj_field(hw, 'mac', hw.mac, top_row=True) }}
             {{ display_obj_field(hw, 'name', hw.name) }}
             {{ display_obj_field(hw, 'group', hw.group or 'None') }}
         </table>
     {% endfor %}
-    </div>
 {%- endmacro %}
 
 {% macro display_sregs(sregs) -%}
@@ -173,7 +181,17 @@
     <div class='registration-display'>
     {% for sreg in sregs %}
         <table class="registration-table tablesorter">
-            <caption>StaticRegistration {{loop.index}}</caption>
+            <caption>
+                {% if sreg.name %}
+                    StaticRegistration {{ sreg.name }}
+                {% else %}
+                    StaticRegistration {{ loop.index }}
+                {% endif %}
+                <span class='sreg-action'>
+                    <a class='add-hwadapter' data-sreg-pk='{{sreg.pk}}'>Add Hardware Adapter</a> |
+                    <a href='{{sreg.get_edit_url()}}'>Edit</a>
+                </span>
+            </caption>
             {{ display_sreg(sreg) }}
         </table>
     {% endfor %}

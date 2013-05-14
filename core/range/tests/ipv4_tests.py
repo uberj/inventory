@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from mozdns.domain.models import Domain
 from core.network.models import Network
 from core.range.models import Range
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from systems.models import System
 
 

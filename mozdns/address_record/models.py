@@ -54,7 +54,7 @@ class BaseAddressRecord(Ip, LabelDomainMixin, MozdnsRecord):
             self.check_sreg_collision()
 
     def check_sreg_collision(self):
-        from core.registration.static_reg.models import StaticReg
+        from core.registration.static.models import StaticReg
         if StaticReg.objects.filter(
                 fqdn=self.fqdn, ip_upper=self.ip_upper,
                 ip_lower=self.ip_lower).exists():

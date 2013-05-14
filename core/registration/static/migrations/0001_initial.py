@@ -10,13 +10,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Remove StaticInterface
-        db.delete_table('static_interface')
-        db.delete_table('static_inter_key_value')
-        db.delete_table('static_interface_views')
-        for content_type in ContentType.objects.filter(app_label='static_intr'):
-            content_type.delete()
+        # XXX PLEASE uncomment this in production
+        #db.delete_table('static_interface')
+        #db.delete_table('static_inter_key_value')
+        #db.delete_table('static_interface_views')
+        #for content_type in ContentType.objects.filter(app_label='static_intr'):
+        #    content_type.delete()
         # Adding model 'StaticReg'
-        db.create_table('static_reg', (
+        db.create_table('static', (
             ('domain', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['domain.Domain'])),
             ('label', self.gf('django.db.models.fields.CharField')(max_length=63, null=True, blank=True)),
             ('fqdn', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, null=True, blank=True)),
@@ -30,51 +31,51 @@ class Migration(SchemaMigration):
             ('reverse_domain', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='staticregdomain_set', null=True, to=orm['domain.Domain'])),
             ('system', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['systems.System'], null=True, blank=True)),
         ))
-        db.send_create_signal('static_reg', ['StaticReg'])
+        db.send_create_signal('static', ['StaticReg'])
 
         # Adding unique constraint on 'StaticReg', fields ['ip_upper', 'ip_lower', 'label', 'domain']
-        db.create_unique('static_reg', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
+        db.create_unique('static', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
 
         # Adding M2M table for field views on 'StaticReg'
-        m2m_table_name = db.shorten_name('static_reg_views')
+        m2m_table_name = db.shorten_name('static_views')
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('staticreg', models.ForeignKey(orm['static_reg.staticreg'], null=False)),
+            ('staticreg', models.ForeignKey(orm['static.staticreg'], null=False)),
             ('view', models.ForeignKey(orm['view.view'], null=False))
         ))
         db.create_unique(m2m_table_name, ['staticreg_id', 'view_id'])
 
         # Adding model 'StaticRegKeyValue'
-        db.create_table('static_reg_key_value', (
+        db.create_table('static_key_value', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('value', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('is_option', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('is_statement', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('has_validator', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['static_reg.StaticReg'])),
+            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['static.StaticReg'])),
         ))
-        db.send_create_signal('static_reg', ['StaticRegKeyValue'])
+        db.send_create_signal('static', ['StaticRegKeyValue'])
 
         # Adding unique constraint on 'StaticRegKeyValue', fields ['key', 'value', 'obj']
-        db.create_unique('static_reg_key_value', ['key', 'value', 'obj_id'])
+        db.create_unique('static_key_value', ['key', 'value', 'obj_id'])
 
 
     def backwards(self, orm):
         # Removing unique constraint on 'StaticRegKeyValue', fields ['key', 'value', 'obj']
-        db.delete_unique('static_reg_key_value', ['key', 'value', 'obj_id'])
+        db.delete_unique('static_key_value', ['key', 'value', 'obj_id'])
 
         # Removing unique constraint on 'StaticReg', fields ['ip_upper', 'ip_lower', 'label', 'domain']
-        db.delete_unique('static_reg', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
+        db.delete_unique('static', ['ip_upper', 'ip_lower', 'label', 'domain_id'])
 
         # Deleting model 'StaticReg'
-        db.delete_table('static_reg')
+        db.delete_table('static')
 
         # Removing M2M table for field views on 'StaticReg'
-        db.delete_table(db.shorten_name('static_reg_views'))
+        db.delete_table(db.shorten_name('static_views'))
 
         # Deleting model 'StaticRegKeyValue'
-        db.delete_table('static_reg_key_value')
+        db.delete_table('static_key_value')
 
 
     models = {
@@ -104,8 +105,8 @@ class Migration(SchemaMigration):
             'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1367110401'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'})
         },
-        'static_reg.staticreg': {
-            'Meta': {'unique_together': "(('ip_upper', 'ip_lower', 'label', 'domain'),)", 'object_name': 'StaticReg', 'db_table': "'static_reg'"},
+        'static.staticreg': {
+            'Meta': {'unique_together': "(('ip_upper', 'ip_lower', 'label', 'domain'),)", 'object_name': 'StaticReg', 'db_table': "'static'"},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
             'domain': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['domain.Domain']"}),
             'fqdn': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -120,14 +121,14 @@ class Migration(SchemaMigration):
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'}),
             'views': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['view.View']", 'symmetrical': 'False', 'blank': 'True'})
         },
-        'static_reg.staticregkeyvalue': {
-            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'StaticRegKeyValue', 'db_table': "'static_reg_key_value'"},
+        'static.staticregkeyvalue': {
+            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'StaticRegKeyValue', 'db_table': "'static_key_value'"},
             'has_validator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_option': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_statement': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['static_reg.StaticReg']"}),
+            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['static.StaticReg']"}),
             'value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'systems.allocation': {
@@ -214,4 +215,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['static_reg']
+    complete_apps = ['static']

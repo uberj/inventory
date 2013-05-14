@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from systems.models import System
 from mozdns.address_record.models import AddressRecord
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.cname.models import CNAME
 from mozdns.txt.models import TXT
 from mozdns.mx.models import MX

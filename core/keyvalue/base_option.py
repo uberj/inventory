@@ -22,7 +22,7 @@ class DHCPKeyValue(KeyValue):
         return value
 
 
-class HardwareAdapterMixin(object):
+class HWAdapterMixin(object):
     # Make sure you mix this in with a class that inherits from DHCPKeyValue
     def _aa_host_name(self):
         """

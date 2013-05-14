@@ -10,7 +10,7 @@ from mozdns.address_record.models import AddressRecord
 from mozdns.nameserver.models import Nameserver
 from mozdns.tests.utils import create_fake_zone
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 from systems.models import System
 from core.task.models import Task

@@ -1,4 +1,4 @@
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 import hashlib
 

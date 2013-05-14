@@ -11,7 +11,7 @@ from core.network.models import NetworkKeyValue
 from core.range.models import RangeKeyValue
 from core.site.models import SiteKeyValue
 from mozdns.soa.models import SOAKeyValue
-from core.registration.static_reg.models import StaticRegKeyValue
+from core.registration.static.models import StaticRegKeyValue
 from core.vlan.models import VlanKeyValue
 from core.group.models import GroupKeyValue
 

@@ -6,7 +6,7 @@ from core.network.models import Network
 from core.utils import IPFilter, four_to_two
 from core.mixins import ObjectUrlMixin
 from core.keyvalue.base_option import CommonOption, DHCPKeyValue
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.ip.models import ipv6_to_longs
 from mozdns.address_record.models import AddressRecord
 from mozdns.ptr.models import PTR

@@ -4,11 +4,11 @@ from django.core.exceptions import ValidationError
 from core.group.models import Group
 from core.keyvalue.base_option import DHCPKeyValue, CommonOption
 from core.mixins import ObjectUrlMixin
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from core.validation import validate_mac
 
 
-class HardwareAdapter(models.Model, ObjectUrlMixin):
+class HWAdapter(models.Model, ObjectUrlMixin):
     id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255, null=False, default='')
@@ -43,12 +43,12 @@ class HardwareAdapter(models.Model, ObjectUrlMixin):
                 "Hardware Adapters need to be associated with a static IP "
                 "registration"
             )
-        super(HardwareAdapter, self).save(*args, **kwargs)
+        super(HWAdapter, self).save(*args, **kwargs)
 
 
-class HardwareAdapterKV(DHCPKeyValue, CommonOption):
+class HWAdapterKV(DHCPKeyValue, CommonOption):
     obj = models.ForeignKey(
-        HardwareAdapter, related_name='keyvalue_set', null=False
+        HWAdapter, related_name='keyvalue_set', null=False
     )
 
     class Meta:

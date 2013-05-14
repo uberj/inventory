@@ -5,7 +5,7 @@ from django.db import transaction
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect, QueryDict
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import  redirect, get_object_or_404, render
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -33,9 +33,8 @@ from mozdns.view.models import View
 from forms import SystemForm
 
 from core.group.models import Group
-from core.registration.static_reg.models import StaticReg
-from core.registration.static_reg.forms import StaticRegAutoForm
-
+from core.registration.static.models import StaticReg
+from core.registration.static.forms import StaticRegAutoForm
 from core.hwadapter.forms import HWAdapterForm
 from core.range.utils import ip_to_range
 
@@ -44,14 +43,6 @@ from core.range.utils import ip_to_range
 from api_v2.dhcp_handler import DHCPHandler
 from api_v2.keyvalue_handler import KeyValueHandler
 
-
-def ajax_create_static_reg(request, system_pk):
-    print request.POST
-    qd_hwadapters = QueryDict(request.POST['hw_adapter_forms'])
-    qd_sreg = QueryDict(request.POST['sreg_form'])
-    import pdb;pdb.set_trace()
-    system = get_object_or_404(models.System, pk=system_pk)
-    import pdb;pdb.set_trace()
 
 
 
@@ -528,15 +519,17 @@ def system_show(request, id):
 
     sregs = StaticReg.objects.filter(system = system)
     groups = Group.objects.all()
-    sreg_form = StaticRegAutoForm()
+    sreg_form = StaticRegAutoForm(prefix='sreg', initial={'system':system})
+    blank_hw_form = HWAdapterForm(prefix='add-hw')  # Used for ui dialog for creation
     HWAdapterFormset = formset_factory(HWAdapterForm)
-    hw_formset = HWAdapterFormset()
+    hw_formset = HWAdapterFormset(prefix='hwadapters')
 
     return render(request, 'systems/system_show.html', {
         'system': system,
         'sregs': sregs,
         'sreg_form': sreg_form,
         'hw_formset': hw_formset,
+        'blank_hw_form': blank_hw_form,
         'groups': groups,
         'ip_to_range': ip_to_range,
         'adapters': adapters,

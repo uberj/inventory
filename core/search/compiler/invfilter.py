@@ -18,7 +18,7 @@ from mozdns.sshfp.models import SSHFP
 from mozdns.txt.models import TXT
 from mozdns.view.models import View
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from core.site.models import Site
 from core.utils import IPFilter, one_to_two
 from core.vlan.models import Vlan

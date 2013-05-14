@@ -10,7 +10,7 @@ from mozdns.ptr.models import PTR
 from mozdns.cname.models import CNAME
 from mozdns.address_record.models import AddressRecord
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.ip.utils import ip_to_domain_name
 
 from systems.models import System

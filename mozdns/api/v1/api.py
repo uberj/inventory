@@ -8,7 +8,7 @@ from tastypie.api import Api
 from systems.models import System
 from api_v3.system_api import SystemResource
 from core.utils import locked_function
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.utils import ensure_label_domain, prune_tree
 from mozdns.domain.models import Domain
 from mozdns.address_record.models import AddressRecord

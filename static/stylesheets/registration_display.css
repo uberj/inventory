@@ -1,6 +1,18 @@
-.registration-display {
+table.hwadapter {
+    margin-left: 10em;
+    width: 75%;
 }
 
+.sreg-action {
+    float: right;
+}
+
+.hwadapter-action {
+    float: right;
+}
+.add-hwadapter {
+    cursor: pointer;
+}
 .registration-display a {
     font-weight:bold;
     text-decoration:none;

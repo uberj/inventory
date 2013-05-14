@@ -9,7 +9,7 @@ from mozdns.cname.models import CNAME
 from mozdns.soa.models import SOA
 from mozdns.ip.utils import ip_to_domain_name
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from systems.models import System
 
 from mozdns.tests.utils import create_fake_zone

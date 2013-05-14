@@ -3,7 +3,7 @@ from core.utils import (
     start_end_filter, two_to_one, resolve_ip_type, one_to_two, ip_to_int
 )
 from core.range.models import Range
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from mozdns.address_record.models import AddressRecord
 from mozdns.ptr.models import PTR
 

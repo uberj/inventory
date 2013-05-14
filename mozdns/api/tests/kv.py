@@ -1,6 +1,6 @@
 from tastypie.test import ResourceTestCase
 
-from core.registration.static_reg.models import StaticRegKeyValue
+from core.registration.static.models import StaticRegKeyValue
 
 import simplejson as json
 from mozdns.tests.utils import random_label

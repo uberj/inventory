@@ -9,7 +9,7 @@ from tastypie.serializers import Serializer
 from tastypie.authorization import Authorization
 
 import systems.models as system_model
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 import json
 

@@ -1,9 +1,9 @@
 from mozdns.address_record.models import AddressRecord
 from mozdns.ptr.models import PTR
 from mozdns.utils import ensure_label_domain, prune_tree
-from core.hwadapter.models import HardwareAdapter
-from core.registration.static_reg.models import StaticReg
-from core.registration.static_reg.models import StaticRegKeyValue
+from core.hwadapter.models import HWAdapter
+from core.registration.static.models import StaticReg
+from core.registration.static.models import StaticRegKeyValue
 from core.vlan.models import Vlan
 from core.network.models import Network
 from settings import DHCP_CONFIG_OUTPUT_DIRECTORY
@@ -148,9 +148,9 @@ def migrate_interface(system, a, ptr, ip_str, mac, interface_name, fqdn):
     # 2) There is an SR with this ip, fqdn, i_n and mac
     #   * Already migrated
     # 3) There is an SR with this ip, fqdn, i_n but different mac
-    #   * Add HardwareAdapter
+    #   * Add HWAdapter
     # 4) There is an SR with this ip, fqdn, but different i_n/mac
-    #   * Add HardwareAdapter
+    #   * Add HWAdapter
     # HWAdapter Logic (a SR 'sreg' has already been created):
     #   There is a BI with this mac, i_in
     #       * Migration has already happened
@@ -193,7 +193,7 @@ def migrate_interface(system, a, ptr, ip_str, mac, interface_name, fqdn):
             if sreg.hwadapter_set.filter(mac=mac).exists():
                 return sreg
             else:
-                HardwareAdapter.objects.create(
+                HWAdapter.objects.create(
                     mac=mac, name=interface_name, sreg=sreg
                 )
     except:

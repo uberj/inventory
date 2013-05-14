@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from systems.models import System
 from mozdns.domain.models import Domain
 from mozdns.address_record.models import AddressRecord

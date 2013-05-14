@@ -2,8 +2,8 @@ from tastypie.test import ResourceTestCase
 
 
 from mozdns.tests.utils import create_fake_zone, random_label
-from core.registration.static_reg.models import StaticReg
-from core.hwadapter.models import HardwareAdapter
+from core.registration.static.models import StaticReg
+from core.hwadapter.models import HWAdapter
 from core.group.models import Group
 from systems.models import System
 
@@ -128,7 +128,7 @@ class CoreAPITests(TestCaseUtils):
 
 
 class HWAdapterTest(CoreAPITests, ResourceTestCase):
-    test_type = HardwareAdapter
+    test_type = HWAdapter
     test_name = 'hwadapter'
 
     def setUp(self):

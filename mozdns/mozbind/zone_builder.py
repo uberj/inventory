@@ -9,7 +9,7 @@ from mozdns.srv.models import SRV
 from mozdns.txt.models import TXT
 from mozdns.sshfp.models import SSHFP
 from mozdns.view.models import View
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 from gettext import gettext as _
 from core.utils import fail_mail

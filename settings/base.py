@@ -58,7 +58,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'core.dhcp',
     'core.group',
     'core.registration',
-    'core.registration.static_reg',
+    'core.registration.static',
     'core.hwadapter',
     'core.search',
     'core.keyvalue',

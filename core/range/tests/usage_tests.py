@@ -6,7 +6,7 @@ from mozdns.address_record.models import AddressRecord
 
 from systems.models import System
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from core.range.utils import start_end_filter, range_usage, ip_to_range
 from core.range.models import Range
 from core.network.models import Network

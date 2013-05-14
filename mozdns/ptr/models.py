@@ -131,7 +131,7 @@ class PTR(BasePTR, Ip, ViewMixin, ObjectUrlMixin, DisplayMixin):
         self.clean_ip()
         # We need to check if there is a registration using our ip and name
         # because that registration will generate a ptr record.
-        from core.registration.static_reg.models import StaticReg
+        from core.registration.static.models import StaticReg
         if (StaticReg.objects.filter(
                 fqdn=self.name, ip_upper=self.ip_upper,
                 ip_lower=self.ip_lower).exists()):

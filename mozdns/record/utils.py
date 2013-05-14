@@ -32,9 +32,9 @@ from mozdns.nameserver.models import Nameserver
 from mozdns.nameserver.forms import NameserverForm
 from mozdns.utils import ensure_label_domain, prune_tree
 
-from core.registration.static_reg.models import StaticReg
-from core.registration.static_reg.forms import StaticRegFQDNForm
-from core.registration.static_reg.forms import StaticRegForm
+from core.registration.static.models import StaticReg
+from core.registration.static.forms import StaticRegFQDNForm
+from core.registration.static.forms import StaticRegForm
 
 
 class RecordView(object):

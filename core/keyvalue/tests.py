@@ -3,7 +3,7 @@ from django.test.client import Client
 from core.group.models import Group
 
 from mozdns.tests.utils import create_fake_zone
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from systems.models import System
 
 

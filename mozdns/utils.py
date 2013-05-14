@@ -11,7 +11,7 @@ from mozdns.srv.models import SRV
 from mozdns.address_record.models import AddressRecord
 from mozdns.cname.models import CNAME
 from mozdns.view.models import View
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 from copy import deepcopy
 import pdb

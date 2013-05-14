@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 from systems.models import System
 from mozdns.domain.models import Domain
 from mozdns.cname.models import CNAME

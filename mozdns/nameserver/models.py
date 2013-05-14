@@ -7,7 +7,7 @@ from mozdns.validation import validate_label, validate_name
 from mozdns.models import MozdnsRecord
 from mozdns.view.models import View
 
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 import reversion
 

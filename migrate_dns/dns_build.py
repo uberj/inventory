@@ -4,7 +4,7 @@ from migrate_dns.build_nics import *
 from migrate_dns.utils import *
 import ipaddr
 from systems.models import ScheduledTask
-from core.registration.static_reg.models import StaticReg
+from core.registration.static.models import StaticReg
 
 from mozdns.address_record.models import AddressRecord
 from mozdns.ptr.models import PTR

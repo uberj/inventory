@@ -81,7 +81,7 @@ class StaticReg(BaseAddressRecord, BasePTR, KVUrlMixin):
     search_fields = ('ip_str', 'fqdn')
 
     class Meta:
-        db_table = 'static_reg'
+        db_table = 'static'
         unique_together = ('ip_upper', 'ip_lower', 'label', 'domain')
 
     def __repr__(self):
@@ -126,8 +126,10 @@ class StaticReg(BaseAddressRecord, BasePTR, KVUrlMixin):
     def clean(self, validate_glue=True):
         if not self.system:
             raise ValidationError(
-                "An registartion means nothing without it's system."
+                "A registartion means nothing without it's system."
             )
+        if not hasattr(self, 'domain'):
+            raise ValidationError("A domain has not been set")
         self.check_A_PTR_collision()
         super(StaticReg, self).clean(  # BaseAddressRecord
             validate_glue=validate_glue, ignore_sreg=True
@@ -186,5 +188,5 @@ class StaticRegKeyValue(DHCPKeyValue):
     )
 
     class Meta:
-        db_table = 'static_reg_key_value'
+        db_table = 'static_key_value'
         unique_together = ('key', 'value', 'obj')

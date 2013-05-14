@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Nameserver.sreg_glue'
         db.add_column('nameserver', 'sreg_glue',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sregnameserver_set', null=True, to=orm['static_reg.StaticReg']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='sregnameserver_set', null=True, to=orm['static.StaticReg']),
                       keep_default=False)
 
 
@@ -60,7 +60,7 @@ class Migration(SchemaMigration):
             'domain': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['domain.Domain']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'server': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'sreg_glue': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'sregnameserver_set'", 'null': 'True', 'to': "orm['static_reg.StaticReg']"}),
+            'sreg_glue': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'sregnameserver_set'", 'null': 'True', 'to': "orm['static.StaticReg']"}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'}),
             'views': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['view.View']", 'symmetrical': 'False', 'blank': 'True'})
         },
@@ -79,8 +79,8 @@ class Migration(SchemaMigration):
             'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1367110550'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'})
         },
-        'static_reg.staticreg': {
-            'Meta': {'unique_together': "(('ip_upper', 'ip_lower', 'label', 'domain'),)", 'object_name': 'StaticReg', 'db_table': "'static_reg'"},
+        'static.staticreg': {
+            'Meta': {'unique_together': "(('ip_upper', 'ip_lower', 'label', 'domain'),)", 'object_name': 'StaticReg', 'db_table': "'static'"},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
             'domain': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['domain.Domain']"}),
             'fqdn': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'null': 'True', 'blank': 'True'}),

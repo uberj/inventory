@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from core.registration.static_reg.models import StaticReg
-from core.registration.static_reg.models import StaticRegKeyValue
+from core.registration.static.models import StaticReg
+from core.registration.static.models import StaticRegKeyValue
 from systems.models import System
 from mozdns.domain.models import Domain
 from mozdns.address_record.models import AddressRecord
@@ -9,7 +9,7 @@ from mozdns.address_record.models import AddressRecord
 from mozdns.ip.utils import ip_to_domain_name
 
 
-class SystemIntegrationTests(TestCase):
+class AuxAttrTests(TestCase):
     def create_domain(self, name, ip_type=None, delegated=False):
         if ip_type is None:
             ip_type = '4'
@@ -40,12 +40,10 @@ class SystemIntegrationTests(TestCase):
 
     def do_add(self, label, domain, ip_str, ip_type='4'):
         self.n = System(hostname="foo.mozilla.com")
-        r = StaticReg(
-            label=label, domain=domain, ip_str=ip_str, ip_type=ip_type,
-            system=self.n
+        r = StaticReg.objects.create(
+            label=label, domain=domain, ip_str=ip_str,
+            ip_type=ip_type, system=self.n
         )
-        r.clean()
-        r.save()
         repr(r)
         return r
 
@@ -60,8 +58,7 @@ class SystemIntegrationTests(TestCase):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
-        kwargs = {'label': label, 'domain': domain,
-                  'ip_str': ip_str}
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         sreg = self.do_add(**kwargs)
         sreg.update_attrs()
 
@@ -71,6 +68,7 @@ class SystemIntegrationTests(TestCase):
         x = StaticRegKeyValue.objects.filter(key='primary', obj=sreg)
         self.assertFalse(x)
         sreg.attrs.primary = '1'
+        self.assertEqual(sreg.attrs.cache['primary'], '1')
         self.assertEqual(sreg.attrs.primary, '1')
         x = StaticRegKeyValue.objects.filter(key='primary', obj=sreg)
         self.assertEqual(x[0].value, '1')
@@ -79,8 +77,7 @@ class SystemIntegrationTests(TestCase):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
-        kwargs = {'label': label, 'domain': domain,
-                  'ip_str': ip_str}
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         sreg = self.do_add(**kwargs)
         sreg.update_attrs()
         sreg.update_attrs()
@@ -91,17 +88,18 @@ class SystemIntegrationTests(TestCase):
         self.assertRaises(AttributeError, bad_get)
         sreg.attrs.primary = '1'
         self.assertEqual(sreg.attrs.primary, '1')
+        self.assertEqual(sreg.attrs.cache['primary'], '1')
 
     def test2_create(self):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
-        kwargs = {'label': label, 'domain': domain,
-                  'ip_str': ip_str}
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         sreg = self.do_add(**kwargs)
         sreg.update_attrs()
         sreg.attrs.primary = '2'
         self.assertEqual(sreg.attrs.primary, '2')
+        self.assertEqual(sreg.attrs.cache['primary'], '2')
         del sreg.attrs.primary
 
         def bad_get():
@@ -109,13 +107,13 @@ class SystemIntegrationTests(TestCase):
         self.assertRaises(AttributeError, bad_get)
         sreg.attrs.primary = '3'
         self.assertEqual(sreg.attrs.primary, '3')
+        self.assertEqual(sreg.attrs.cache['primary'], '3')
 
     def test1_del(self):
         label = "foo"
         domain = self.f_c
         ip_str = "10.0.0.2"
-        kwargs = {'label': label, 'domain': domain,
-                  'ip_str': ip_str}
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
         sreg = self.do_add(**kwargs)
         sreg.update_attrs()
         sreg.attrs.primary = '88'
@@ -125,3 +123,29 @@ class SystemIntegrationTests(TestCase):
         def bad_get():
             sreg.attrs.primary
         self.assertRaises(AttributeError, bad_get)
+
+    def test3_create(self):
+        label = "foo"
+        domain = self.f_c
+        ip_str = "10.0.0.2"
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
+        sreg = self.do_add(**kwargs)
+        sreg.update_attrs()
+
+    def test1_existing_attrs(self):
+        label = "foo"
+        domain = self.f_c
+        ip_str = "10.0.0.2"
+        kwargs = {'label': label, 'domain': domain, 'ip_str': ip_str}
+        sreg = self.do_add(**kwargs)
+        StaticRegKeyValue(key="foo", value="bar", obj=sreg).save()
+        StaticRegKeyValue(
+            key="interface_type", value="eth0", obj=sreg).save()
+        StaticRegKeyValue(key="alias", value="5", obj=sreg).save()
+        sreg.update_attrs()
+        self.assertEqual(sreg.attrs.alias, '5')
+        self.assertEqual(sreg.attrs.cache['alias'], '5')
+        self.assertEqual(sreg.attrs.interface_type, 'eth0')
+        self.assertEqual(sreg.attrs.cache['interface_type'], 'eth0')
+        self.assertEqual(sreg.attrs.foo, 'bar')
+        self.assertEqual(sreg.attrs.cache['foo'], 'bar')

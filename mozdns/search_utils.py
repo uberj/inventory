@@ -88,7 +88,7 @@ def _build_label_domain_queries(label, domain, mx=True, sr=True, tx=True,
             **{'label': label, 'domain': domain})
         qsets.append(('AddressRecord', ars))
     if sreg:
-        StaticReg = core.registration.static_reg.models.StaticReg
+        StaticReg = core.registration.static.models.StaticReg
         sregs = StaticReg.objects.filter(
             **{'label': label, 'domain': domain})
         qsets.append(('AddressRecord', sregs))
@@ -140,7 +140,7 @@ def _build_queries(fqdn, dn=True, mx=True, sr=True, tx=True,
                       Q(**{'name{0}'.format(search_operator): fqdn}) |
                       Q(**{'ip_str{0}'.format(search_operator): ip})))
     if sreg:
-        StaticReg = core.registration.static_reg.models.StaticReg
+        StaticReg = core.registration.static.models.StaticReg
         qsets.append(('StaticReg', StaticReg.objects.filter(
             Q(**{'fqdn{0}'.format(search_operator): fqdn}) |
             Q(**{'ip_str{0}'.format(search_operator): ip}))))
