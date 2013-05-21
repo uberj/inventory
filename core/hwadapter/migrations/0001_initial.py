@@ -12,17 +12,18 @@ class Migration(SchemaMigration):
         db.create_table('hwadapter', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('enable_dhcp', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=255)),
             ('mac', self.gf('django.db.models.fields.CharField')(max_length=17)),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['group.Group'], null=True, blank=True)),
-            ('sreg', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['static.StaticReg'], null=True, blank=True)),
+            ('sreg', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='hwadapter_set', null=True, to=orm['static.StaticReg'])),
         ))
         db.send_create_signal('hwadapter', ['HWAdapter'])
 
         # Adding unique constraint on 'HWAdapter', fields ['mac', 'sreg']
         db.create_unique('hwadapter', ['mac', 'sreg_id'])
 
-        # Adding model 'HWAdapterKV'
+        # Adding model 'HWAdapterKeyValue'
         db.create_table('hwadapter_key_value', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
@@ -32,14 +33,14 @@ class Migration(SchemaMigration):
             ('has_validator', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['hwadapter.HWAdapter'])),
         ))
-        db.send_create_signal('hwadapter', ['HWAdapterKV'])
+        db.send_create_signal('hwadapter', ['HWAdapterKeyValue'])
 
-        # Adding unique constraint on 'HWAdapterKV', fields ['key', 'value']
+        # Adding unique constraint on 'HWAdapterKeyValue', fields ['key', 'value']
         db.create_unique('hwadapter_key_value', ['key', 'value'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'HWAdapterKV', fields ['key', 'value']
+        # Removing unique constraint on 'HWAdapterKeyValue', fields ['key', 'value']
         db.delete_unique('hwadapter_key_value', ['key', 'value'])
 
         # Removing unique constraint on 'HWAdapter', fields ['mac', 'sreg']
@@ -48,7 +49,7 @@ class Migration(SchemaMigration):
         # Deleting model 'HWAdapter'
         db.delete_table('hwadapter')
 
-        # Deleting model 'HWAdapterKV'
+        # Deleting model 'HWAdapterKeyValue'
         db.delete_table('hwadapter_key_value')
 
 
@@ -69,17 +70,18 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
-        'hwadapter.hardwareadapter': {
+        'hwadapter.hwadapter': {
             'Meta': {'unique_together': "(('mac', 'sreg'),)", 'object_name': 'HWAdapter', 'db_table': "'hwadapter'"},
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'enable_dhcp': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['group.Group']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mac': ('django.db.models.fields.CharField', [], {'max_length': '17'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255'}),
-            'sreg': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['static.StaticReg']", 'null': 'True', 'blank': 'True'})
+            'sreg': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'hwadapter_set'", 'null': 'True', 'to': "orm['static.StaticReg']"})
         },
-        'hwadapter.hardwareadapterkv': {
-            'Meta': {'unique_together': "(('key', 'value'),)", 'object_name': 'HWAdapterKV', 'db_table': "'hwadapter_key_value'"},
+        'hwadapter.hwadapterkeyvalue': {
+            'Meta': {'unique_together': "(('key', 'value'),)", 'object_name': 'HWAdapterKeyValue', 'db_table': "'hwadapter_key_value'"},
             'has_validator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_option': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -100,7 +102,7 @@ class Migration(SchemaMigration):
             'primary': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'refresh': ('django.db.models.fields.PositiveIntegerField', [], {'default': '180'}),
             'retry': ('django.db.models.fields.PositiveIntegerField', [], {'default': '86400'}),
-            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1367216001'}),
+            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2013051901'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'})
         },
         'static.staticreg': {
@@ -175,8 +177,8 @@ class Migration(SchemaMigration):
             'system_status': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['systems.SystemStatus']", 'null': 'True', 'blank': 'True'}),
             'system_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['systems.SystemType']", 'null': 'True', 'blank': 'True'}),
             'updated_on': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'warranty_end': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'warranty_start': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'})
+            'warranty_end': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'warranty_start': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'})
         },
         'systems.systemrack': {
             'Meta': {'ordering': "['name']", 'object_name': 'SystemRack', 'db_table': "u'system_racks'"},

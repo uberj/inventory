@@ -31,10 +31,13 @@ def _render_kv(kvs, type_='', tabs=1):
 def render_host(fqdn, ip_str, mac, i_n, options, statements, tabs=2):
     m = hashlib.md5()
     m.update(fqdn + ip_str + mac + i_n)
-    digest = m.hexdigest()
+    unique_identifier = m.hexdigest()
+    # XXX Better way to generate unique_identifier ?
 
     build_str = ''
-    build_str += "{0}host {1}-{2} {{\n".format('\t' * (tabs - 1), fqdn, digest)
+    build_str += "{0}host {1}-{2} {{\n".format(
+        '\t' * (tabs - 1), fqdn, unique_identifier
+    )
     build_str += "{0}hardware ethernet {1};\n".format('\t' * tabs, mac)
     build_str += "{0}fixed-address {1};\n".format('\t' * tabs, ip_str)
     build_str += render_statements(statements, tabs=tabs)
@@ -43,54 +46,46 @@ def render_host(fqdn, ip_str, mac, i_n, options, statements, tabs=2):
     return build_str
 
 
-def render_intr(intr, tabs=2):
+def render_sreg(sreg, hw, tabs=2):
     build_str = ''
-    bis = intr.bondedintr_set.all()
-    if bis.exists():
-        for bi in bis:
-            options = bi.keyvalue_set.filter(is_option=True)
-            statements = bi.keyvalue_set.filter(is_statement=True)
-            build_str += render_host(
-                intr.fqdn, intr.ip_str, bi.mac, bi.interface_name, options,
-                statements, tabs=tabs
-            )
-    else:
-        if intr.mac == 'virtual':
-            build_str += "# Mac was virtual"
-            print "Bad!"
-        else:
-            options = intr.keyvalue_set.filter(is_option=True)
-            statements = intr.keyvalue_set.filter(is_statement=True)
-            build_str += render_host(
-                intr.fqdn, intr.ip_str, intr.mac, intr.interface_name,
-                options, statements, tabs=tabs
-            )
+    options = hw.keyvalue_set.filter(is_option=True)
+    statements = hw.keyvalue_set.filter(is_statement=True)
+    build_str += render_host(
+        sreg.fqdn, sreg.ip_str, hw.mac, hw.name, options,
+        statements, tabs=tabs
+    )
     return build_str
 
 
-def render_intrs(intrs):
+def render_sregs(sregs):
     build_str = ''
     groups = {}
-    for intr in intrs:
-        if intr.group:
-            # If this host belongs to a group we will render it, and any other
-            # interface in the group, at a latter time.
-            groups.setdefault(
-                intr.group.name, (intr.group, [])
-            )[1].append(intr)
-        else:
-            build_str += render_intr(intr)
+    for sreg in sregs:
+        hws = sreg.hwadapter_set.filter(enable_dhcp=True)
+        for hw in hws:
+            if hw.group:
+                # If this host belongs to a group we will render it, and any
+                # other adapters in the group, at a latter time.
+                groups.setdefault(
+                    hw.group.name, (hw.group, [])
+                )[1].append((sreg, hw))
+            else:
+                build_str += render_sreg(sreg, hw)
     if groups:
-        for group_name, (group, intrs) in groups.iteritems():
+        for group_name, (group, bundle) in groups.iteritems():
             build_str += "\tgroup {{  # group {0}\n\n".format(group_name)
-            for intr in intrs:
-                build_str += render_intr(intr, tabs=3)
+            group_options = group.keyvalue_set.filter(is_option=True)
+            group_statements = group.keyvalue_set.filter(is_statement=True)
+            build_str += render_statements(group_statements, tabs=2)
+            build_str += render_options(group_options, tabs=2)
+            for sreg, hw in bundle:
+                build_str += render_sreg(sreg, hw, tabs=3)
             build_str += "\t}\n\n"
 
     return build_str
 
 
-def build_subnet(network):
+def render_subnet(network):
     """
     The core function of building DHCP files.
 
@@ -101,19 +96,19 @@ def build_subnet(network):
     network_options = network.keyvalue_set.filter(is_option=True)
     network_statements = network.keyvalue_set.filter(is_statement=True)
     network_raw_include = network.dhcpd_raw_include
-    # All interface objects that are within this network and have dhcp_enabled.
+    # All interface objects that are within this network and have enable_dhcp.
     # TODO, make this work with IPv6
     if network.ip_type == '6':
         raise NotImplemented()
     network.update_network()
     ip_lower_start = int(network.network.network)
     ip_lower_end = int(network.network.broadcast) - 1
-    intrs = StaticReg.objects.filter(
+    sregs = StaticReg.objects.filter(
         ip_upper=0,
         ip_lower__gte=ip_lower_start,
         ip_lower__lte=ip_lower_end,
-        dhcp_enabled=True, ip_type='4'
-    )
+        ip_type='4'
+    ).select_related()
     ranges = network.range_set.all()
 
     # Let's assume all options need a ';' appended.
@@ -133,7 +128,7 @@ def build_subnet(network):
     for mrange in ranges:
         build_str += render_pool(mrange)
 
-    build_str += render_intrs(intrs)
+    build_str += render_sregs(sregs)
 
     build_str += "}"
     return build_str

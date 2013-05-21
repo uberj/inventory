@@ -14,6 +14,7 @@ from mozdns.soa.models import SOAKeyValue
 from core.registration.static.models import StaticRegKeyValue
 from core.vlan.models import VlanKeyValue
 from core.group.models import GroupKeyValue
+from core.hwadapter.models import HWAdapterKeyValue
 
 #from systems.models import KeyValue as SystemKeyValue
 
@@ -26,6 +27,7 @@ klasses = (
     #SystemKeyValue,
     StaticRegKeyValue,
     GroupKeyValue,
+    HWAdapterKeyValue
 )
 kv_users = {}
 for klass in klasses:

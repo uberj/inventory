@@ -11,6 +11,7 @@ from core.validation import validate_mac
 class HWAdapter(models.Model, ObjectUrlMixin):
     id = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255, blank=True, null=True)
+    enable_dhcp = models.BooleanField(blank=False, null=False, default=True)
     name = models.CharField(max_length=255, null=False, default='')
     mac = models.CharField(
         max_length=17, validators=[validate_mac],
@@ -33,10 +34,6 @@ class HWAdapter(models.Model, ObjectUrlMixin):
     def __repr__(self):
         return '<HWAdapter: {0}>'.format(self)
 
-    @classmethod
-    def get_api_fields(cls):
-        return ['mac', 'name', 'description']
-
     def save(self, *args, **kwargs):
         if not self.sreg:
             raise ValidationError(
@@ -45,8 +42,15 @@ class HWAdapter(models.Model, ObjectUrlMixin):
             )
         super(HWAdapter, self).save(*args, **kwargs)
 
+    @classmethod
+    def get_api_fields(cls):
+        return ['mac', 'name', 'description']
 
-class HWAdapterKV(DHCPKeyValue, CommonOption):
+    def get_absolute_url(self):
+        return self.sreg.system.get_absolute_url()
+
+
+class HWAdapterKeyValue(DHCPKeyValue, CommonOption):
     obj = models.ForeignKey(
         HWAdapter, related_name='keyvalue_set', null=False
     )

@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 {% block head %}
-    <script type="text/javascript" src="/static/js/jquery-ui-1.8.11.custom.min.js"></script>
-    <link rel="stylesheet" href="/static/css/smoothness/jquery-ui-1.8.11.custom.css" type="text/css" />
+<script type="text/javascript" src="/static/javascripts/master_form_utils.js"></script>
+<script type="text/javascript" src="/static/javascripts/system_show.js"></script>
 {% endblock %}
 
 {% block subtitle %} - {{ system.hostname }} - show{% endblock %}
 {% block content %}
-<script type="text/javascript" src="/static/javascripts/master_form_utils.js"></script>
-<script type="text/javascript" src="/static/javascripts/system_show.js"></script>
 
 <div id='meta-data' data-system-id='{{system.id}}'></div>
 
