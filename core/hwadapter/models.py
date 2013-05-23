@@ -44,7 +44,7 @@ class HWAdapter(models.Model, ObjectUrlMixin):
 
     @classmethod
     def get_api_fields(cls):
-        return ['mac', 'name', 'description']
+        return ['mac', 'name', 'description', 'enable_dhcp']
 
     def get_absolute_url(self):
         return self.sreg.system.get_absolute_url()
@@ -57,4 +57,4 @@ class HWAdapterKeyValue(DHCPKeyValue, CommonOption):
 
     class Meta:
         db_table = 'hwadapter_key_value'
-        unique_together = ('key', 'value')
+        unique_together = ('key', 'value', 'obj')

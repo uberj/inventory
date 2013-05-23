@@ -7,6 +7,7 @@ from tastypie.api import Api
 
 from systems.models import System
 from api_v3.system_api import SystemResource
+import core
 from core.utils import locked_function
 from core.registration.static.models import StaticReg
 from mozdns.utils import ensure_label_domain, prune_tree
@@ -75,7 +76,8 @@ class CommonDNSResource(ModelResource):
         return bundle
 
     def obj_update(self, bundle, request=None, skip_errors=False, **kwargs):
-        """When an object is being updated it is possible to update the label
+        """
+        When an object is being updated it is possible to update the label
         and domain of a resource with the 'fqdn' keyword.  During hydrate, the
         correct label and domain will be chosen so the object ends up with a
         matching fqdn. By default, tastypie will populate bundle.data with an
@@ -395,6 +397,9 @@ v1_dns_api.register(PTRResource())
 class StaticRegResource(CommonDNSResource, ObjectListMixin,
                         ModelResource):
     system = fields.ToOneField(SystemResource, 'system', null=False, full=True)
+    # Injecting here because of cyclical imports :(
+    hwadapter_set = fields.ToManyField('core.api.v1.api.HWAdapterResource',
+                                       'hwadapter_set', full=True, readonly=True)
 
     def hydrate(self, bundle):
         if 'system_hostname' in bundle.data and 'system' in bundle.data:

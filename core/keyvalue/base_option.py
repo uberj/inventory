@@ -67,7 +67,8 @@ class HWAdapterMixin(object):
             raise ValidationError("Filename Required")
 
     def _aa_hostname(self):
-        """DHCP option hostname
+        """
+        DHCP option hostname
         """
         if not self.value:
             raise ValidationError("Hostname Required")

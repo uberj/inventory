@@ -305,11 +305,14 @@ $(document).ready(function() {
     nextFree = parseInt($('#id_hwadapters-TOTAL_FORMS').val());
     blocks = hwtable.find('.hwadapter-table');
     newBlock = $(blocks.last()).clone();
+
     $(newBlock).find('input').each(function(i, el) {
-      console.log('NF - 1: ' + (nextFree - 1));
-      console.log('NF: ' + nextFree);
-      $(el).attr('name', $(el).attr('name').replace(nextFree - 1, nextFree));
-      $(el).attr('id', $(el).attr('id').replace(nextFree - 1, nextFree));
+      if ($(el).attr('name')) {
+        $(el).attr('name', $(el).attr('name').replace(nextFree - 1, nextFree));
+      }
+      if ($(el).attr('id')) {
+        $(el).attr('id', $(el).attr('id').replace(nextFree - 1, nextFree));
+      }
     });
     // Django starts at 0 when it numbers the forms, so we need to update
     // afterwards to fend off the off-by-one daemons
@@ -321,8 +324,7 @@ $(document).ready(function() {
     $(removeButton).css('visibility', 'visible');
     removeButton.click(function() {
       $(this).closest('table').remove();
-      var numUsed = $('#id_hwadapters-TOTAL_FORMS').val();
-      $('#id_hwadapters-TOTAL_FORMS').val(numUsed - 1);
+      // Do *NOT* decrement id_hwadapters-TOTAL_FORMS.
     });
     newBlock.insertAfter(blocks.last());
   });

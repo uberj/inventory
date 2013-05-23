@@ -35,13 +35,13 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('hwadapter', ['HWAdapterKeyValue'])
 
-        # Adding unique constraint on 'HWAdapterKeyValue', fields ['key', 'value']
-        db.create_unique('hwadapter_key_value', ['key', 'value'])
+        # Adding unique constraint on 'HWAdapterKeyValue', fields ['key', 'value', 'obj']
+        db.create_unique('hwadapter_key_value', ['key', 'value', 'obj_id'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'HWAdapterKeyValue', fields ['key', 'value']
-        db.delete_unique('hwadapter_key_value', ['key', 'value'])
+        # Removing unique constraint on 'HWAdapterKeyValue', fields ['key', 'value', 'obj']
+        db.delete_unique('hwadapter_key_value', ['key', 'value', 'obj_id'])
 
         # Removing unique constraint on 'HWAdapter', fields ['mac', 'sreg']
         db.delete_unique('hwadapter', ['mac', 'sreg_id'])
@@ -81,7 +81,7 @@ class Migration(SchemaMigration):
             'sreg': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'hwadapter_set'", 'null': 'True', 'to': "orm['static.StaticReg']"})
         },
         'hwadapter.hwadapterkeyvalue': {
-            'Meta': {'unique_together': "(('key', 'value'),)", 'object_name': 'HWAdapterKeyValue', 'db_table': "'hwadapter_key_value'"},
+            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'HWAdapterKeyValue', 'db_table': "'hwadapter_key_value'"},
             'has_validator': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_option': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -102,7 +102,7 @@ class Migration(SchemaMigration):
             'primary': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'refresh': ('django.db.models.fields.PositiveIntegerField', [], {'default': '180'}),
             'retry': ('django.db.models.fields.PositiveIntegerField', [], {'default': '86400'}),
-            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2013051901'}),
+            'serial': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2013052201'}),
             'ttl': ('django.db.models.fields.PositiveIntegerField', [], {'default': '3600', 'null': 'True', 'blank': 'True'})
         },
         'static.staticreg': {
