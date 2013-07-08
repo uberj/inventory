@@ -54,13 +54,14 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
     """
 
     id = models.AutoField(primary_key=True)
-    ttl = models.PositiveIntegerField(default=3600, blank=True, null=True,
-                                      validators=[validate_ttl],
-                                      help_text="Time to Live of this record")
+    ttl = models.PositiveIntegerField(
+        default=3600, blank=True, null=True, validators=[validate_ttl],
+        help_text='Time to Live of this record'
+    )
     primary = models.CharField(max_length=100, validators=[validate_name])
     contact = models.CharField(max_length=100, validators=[validate_name])
     serial = models.PositiveIntegerField(
-        null=False, default=int(datetime.datetime.now().strftime("%Y%m%d01"))
+        null=False, default=int(datetime.datetime.now().strftime('%Y%m%d01'))
     )
     # Indicates when the zone data is no longer authoritative. Used by slave.
     expire = models.PositiveIntegerField(null=False, default=DEFAULT_EXPIRE)
@@ -81,21 +82,35 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
 
     attrs = None
 
-    def bind_render_record(self):
-        template = Template(self.template).substitute(**self.justs)
-        return template.format(root_domain=self.root_domain,
-                               rdtype=self.rdtype, rdclass='IN',
-                               **self.__dict__)
-
-    def update_attrs(self):
-        self.attrs = AuxAttr(SOAKeyValue, self, 'soa')
-
     class Meta:
         db_table = 'soa'
         # We are using the description field here to stop the same SOA from
         # being assigned to multiple zones. See the documentation in the
         # Domain models.py file for more info.
         unique_together = ('primary', 'contact', 'description')
+
+    @property
+    def rdtype(self):
+        return 'SOA'
+
+    @property
+    def root_domain(self):
+        try:
+            return self.domain_set.get(
+                ~Q(master_domain__soa=F('soa')), soa__isnull=False
+            )
+        except ObjectDoesNotExist:
+            return None
+
+    def bind_render_record(self):
+        template = Template(self.template).substitute(**self.justs)
+        return template.format(
+            root_domain=self.root_domain, rdtype=self.rdtype, rdclass='IN',
+            **self.__dict__
+        )
+
+    def update_attrs(self):
+        self.attrs = AuxAttr(SOAKeyValue, self, 'soa')
 
     def details(self):
         return (
@@ -108,20 +123,8 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
             ('Description', self.description),
         )
 
-    @property
-    def rdtype(self):
-        return 'SOA'
-
-    @property
-    def root_domain(self):
-        try:
-            return self.domain_set.get(~Q(master_domain__soa=F('soa')),
-                                       soa__isnull=False)
-        except ObjectDoesNotExist:
-            return None
-
     def get_debug_build_url(self):
-        return MOZDNS_BASE_URL + "/bind/build_debug/{0}/".format(self.pk)
+        return MOZDNS_BASE_URL + '/bind/build_debug/{0}/'.format(self.pk)
 
     def get_fancy_edit_url(self):
         return '/mozdns/soa/{0}/update'.format(self.pk)
@@ -173,10 +176,10 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
             self.schedule_rebuild(commit=False)
 
     def __str__(self):
-        return "{0}".format(str(self.description))
+        return self.description
 
     def __repr__(self):
-        return "<'{0}'>".format(str(self))
+        return "<SOA '{0}'>".format(self)
 
 
 reversion.register(SOA)
