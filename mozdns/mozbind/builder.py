@@ -758,12 +758,13 @@ class DNSBuilder(SVNBuilderMixin):
                     ), root_domain=root_domain
                 )
 
+                next_serial = soa.get_incremented_serial()
                 if force_rebuild:
                     # Bypass save so we don't have to save a possible stale
                     # 'dirty' value to the db.
-                    SOA.objects.filter(pk=soa.pk).update(serial=soa.serial + 1)
+                    SOA.objects.filter(pk=soa.pk).update(serial=next_serial)
                     self.log('Zone will be rebuilt at serial {0}'
-                             .format(soa.serial + 1), root_domain=root_domain)
+                             .format(next_serial), root_domain=root_domain)
                 else:
                     self.log('Zone is stable at serial {0}'
                              .format(soa.serial), root_domain=root_domain)
@@ -794,7 +795,7 @@ class DNSBuilder(SVNBuilderMixin):
                         prod_fname = self.build_zone(
                             view, file_meta,
                             # Lazy string evaluation
-                            view_data.format(serial=soa.serial + 1),
+                            view_data.format(serial=next_serial),
                             root_domain
                         )
                         assert prod_fname == file_meta['prod_fname']

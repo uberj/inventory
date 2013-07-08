@@ -17,6 +17,7 @@ import reversion
 from gettext import gettext as _
 from string import Template
 import datetime
+import re
 
 
 # TODO, put these defaults in a config file.
@@ -89,6 +90,32 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
         # Domain models.py file for more info.
         unique_together = ('primary', 'contact', 'description')
 
+    serial_date_format = re.compile('^\d{8}$')  # YYYYMMDD
+
+    @classmethod
+    def calc_serial(cls, cur_serial, now_date_stamp):
+        """
+        Calculate the correct serial given that today is YYYYMMDD and the
+        current serial is a 10 digit number.
+
+        Cases:
+            cur_serial > now_date_stamp -> +1 serial. Never go backwards.
+            cur_serial == now_date_stamp -> +1 serial
+            cur_serial < now_date_stamp -> now_date_stamp + '00'
+
+        Everything comes in as string and leaves as an int
+        """
+        assert cls.serial_date_format.match(now_date_stamp)
+        assert len(cur_serial) == 10
+        current_date_stamp, daily_offset = cur_serial[:-2], cur_serial[-2:]
+        assert daily_offset.isdigit()
+        assert cls.serial_date_format.match(current_date_stamp)
+
+        if int(current_date_stamp) < int(now_date_stamp):
+            return int(now_date_stamp + '00')
+        else:
+            return int(cur_serial) + 1
+
     @property
     def rdtype(self):
         return 'SOA'
@@ -101,6 +128,11 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
             )
         except ObjectDoesNotExist:
             return None
+
+    def get_incremented_serial(self):
+        return self.__class__.calc_serial(
+            str(self.serial), datetime.datetime.now().strftime('%Y%m%d')
+        )
 
     def bind_render_record(self):
         template = Template(self.template).substitute(**self.justs)
