@@ -95,6 +95,17 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
     @classmethod
     def calc_serial(cls, cur_serial, now_date_stamp):
         """
+            "The convention is to use a date based sn (serial) value to
+            simplify the task of incrementing the sn - the most popular
+            convention being yyyymmddss where yyyy = year, mm = month and dd =
+            day ss = a sequence number in case you update it more than once in
+            the day!  Using this date format convention the value 2005021002
+            indicates the last update was on the 10th February 2005 and it was
+            the third update that day. The date format is just a convention,
+            not a requirement, so BIND (or any other DNS software) will not
+            validate the contents of this field."
+                -- http://www.zytrax.com/books/dns/ch8/soa.html
+
         Calculate the correct serial given that today is YYYYMMDD and the
         current serial is a 10 digit number.
 
