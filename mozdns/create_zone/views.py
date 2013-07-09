@@ -1,6 +1,5 @@
 from gettext import gettext as gt
 import simplejson as json
-import time
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render
@@ -70,8 +69,10 @@ def create_zone_ajax(request):
     domain = ensure_domain(
         root_domain, purgeable=True, inherit_soa=False, force=True)
 
-    soa = SOA(primary=primary, contact=contact, serial=int(time.time()),
-              description="SOA for {0}".format(root_domain))
+    soa = SOA(
+        primary=primary, contact=contact,
+        description="SOA for {0}".format(root_domain)
+    )
     try:
         soa.save()
     except ValidationError, e:
