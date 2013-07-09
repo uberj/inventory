@@ -112,7 +112,7 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
         assert cls.serial_date_format.match(current_date_stamp)
 
         if int(current_date_stamp) < int(now_date_stamp):
-            return int(now_date_stamp + '00')
+            return int(now_date_stamp.ljust(10, '0'))
         else:
             return int(cur_serial) + 1
 
