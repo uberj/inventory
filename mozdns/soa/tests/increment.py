@@ -1,41 +1,38 @@
 from django.test import TestCase
 
 from mozdns.soa.models import SOA
+import datetime
 
 
 class SOAIncrementTests(TestCase):
+
+    def to_date(self, date):
+        year, month, day = map(lambda s: int(s), (
+            date[:4], date[4:6], date[6:]
+        ))
+        return datetime.date(year, month, day)
+
     def test_serial_equal_date(self):
         # Case ==
-        serial = '1111223344'
-        date = '11112233'
+        serial = '2111111111'
+        date = self.to_date('21111111')
         new_serial = SOA.calc_serial(serial, date)
         self.assertEqual(int(serial) + 1, new_serial)
 
     def test_serial_less_than_date(self):
         # Case serial < date
-        serial = '1111223244'
-        date = '11112233'
+        serial = '2111101111'
+        date_str = '21111111'
+        date = self.to_date(date_str)
         new_serial = SOA.calc_serial(serial, date)
-        self.assertEqual(int(date + '00'), new_serial)
+        self.assertEqual(int(date_str + '00'), new_serial)
 
     def test_serial_greater_than_date(self):
         # Case serial > date
-        serial = '1111223444'
-        date = '11112233'
+        serial = '2111111111'
+        date = self.to_date('21111011')
         new_serial = SOA.calc_serial(serial, date)
         self.assertEqual(int(serial) + 1, new_serial)
-
-    def test_malformed_serial(self):
-        # bad serial
-        serial = '11111223444'
-        date = '11112233'
-        self.assertRaises(AssertionError, SOA.calc_serial, *(serial, date))
-
-    def test_malformed_date(self):
-        # bad date
-        serial = '1111223444'
-        date = '113112233'
-        self.assertRaises(AssertionError, SOA.calc_serial, *(serial, date))
 
     def test_incremented_serial(self):
         soa = SOA.objects.create(

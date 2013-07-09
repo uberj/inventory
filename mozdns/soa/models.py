@@ -2,9 +2,8 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q, F
 
-from mozdns.validation import validate_name
 from mozdns.mixins import ObjectUrlMixin, DisplayMixin
-from mozdns.validation import validate_ttl
+from mozdns.validation import validate_ttl, validate_soa_serial, validate_name
 
 from settings import MOZDNS_BASE_URL
 from core.keyvalue.models import KeyValue
@@ -62,7 +61,8 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
     primary = models.CharField(max_length=100, validators=[validate_name])
     contact = models.CharField(max_length=100, validators=[validate_name])
     serial = models.PositiveIntegerField(
-        null=False, default=int(datetime.datetime.now().strftime('%Y%m%d01'))
+        null=False, default=int(datetime.datetime.now().strftime('%Y%m%d01')),
+        validators=[validate_soa_serial]
     )
     # Indicates when the zone data is no longer authoritative. Used by slave.
     expire = models.PositiveIntegerField(null=False, default=DEFAULT_EXPIRE)
@@ -93,7 +93,7 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
     serial_date_format = re.compile('^\d{8}$')  # YYYYMMDD
 
     @classmethod
-    def calc_serial(cls, cur_serial, now_date_stamp):
+    def calc_serial(cls, cur_serial, date):
         """
             "The convention is to use a date based sn (serial) value to
             simplify the task of incrementing the sn - the most popular
@@ -110,19 +110,28 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
         current serial is a 10 digit number.
 
         Cases:
-            cur_serial > now_date_stamp -> +1 serial. Never go backwards.
-            cur_serial == now_date_stamp -> +1 serial
-            cur_serial < now_date_stamp -> now_date_stamp + '00'
+            cur_serial > date -> +1 serial. Never go backwards.
+            cur_serial == date -> +1 serial
+            cur_serial < date -> now_date_stamp + '00'
 
         Everything comes in as string and leaves as an int
-        """
-        assert cls.serial_date_format.match(now_date_stamp)
-        assert len(cur_serial) == 10
-        current_date_stamp, daily_offset = cur_serial[:-2], cur_serial[-2:]
-        assert daily_offset.isdigit()
-        assert cls.serial_date_format.match(current_date_stamp)
 
-        if int(current_date_stamp) < int(now_date_stamp):
+        :param date: A date
+        :type date: datetime.date object
+        :param cur_serial: The current 10 digit serial number
+        :type cur_serial: str
+        """
+
+        # The SOA serial validator should ensure this is always in the correct
+        # format
+        year, month, day = map(lambda s: int(s), (
+            cur_serial[:4], cur_serial[4:6], cur_serial[6:8]
+        ))
+
+        serial_date = datetime.date(year, month, day)
+
+        if serial_date < date:
+            now_date_stamp = date.strftime('%Y%m%d')
             return int(now_date_stamp.ljust(10, '0'))
         else:
             return int(cur_serial) + 1
@@ -142,7 +151,7 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
 
     def get_incremented_serial(self):
         return self.__class__.calc_serial(
-            str(self.serial), datetime.datetime.now().strftime('%Y%m%d')
+            str(self.serial), datetime.date.today()
         )
 
     def bind_render_record(self):
