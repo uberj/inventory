@@ -610,10 +610,10 @@ class DNSBuilder(SVNBuilderMixin):
         return zone_stmt
 
     def verify_previous_build(self, file_meta, view, root_domain, soa):
-        force_rebuild, new_serial = False, None
+        force_rebuild, safe_serial = False, None
         serial = get_serial(os.path.join(file_meta['prod_fname']))
         if not serial.isdigit():
-            new_serial = soa.serial or int(
+            safe_serial = soa.serial or int(
                 datetime.datetime.now().strftime("%Y%m%d01")
             )
             force_rebuild = True
@@ -621,7 +621,7 @@ class DNSBuilder(SVNBuilderMixin):
             self.log(
                 'LOG_NOTICE', "{0} appears to be a new zone. Building {1} "
                 "with initial serial {2}".format(soa, file_meta['prod_fname'],
-                                                 new_serial),
+                                                 safe_serial),
                 root_domain=root_domain)
         elif int(serial) != soa.serial:
             # Looks like someone made some changes... let's nuke them.
@@ -635,9 +635,9 @@ class DNSBuilder(SVNBuilderMixin):
             force_rebuild = True
             # Choose the highest serial so any slave nameservers don't get
             # confused.
-            new_serial = max(int(serial), soa.serial)
+            safe_serial = max(int(serial), soa.serial)
 
-        return force_rebuild, new_serial
+        return force_rebuild, safe_serial
 
     def get_file_meta(self, view, root_domain, soa):
         """
@@ -740,12 +740,12 @@ class DNSBuilder(SVNBuilderMixin):
                              'config.'.format(view.name),
                              root_domain=root_domain)
                     file_meta = self.get_file_meta(view, root_domain, soa)
-                    was_bad_prev, new_serial = self.verify_previous_build(
+                    was_bad_prev, safe_serial = self.verify_previous_build(
                         file_meta, view, root_domain, soa
                     )
 
                     if was_bad_prev:
-                        soa.serial = new_serial
+                        soa.serial = safe_serial
                         force_rebuild = True
 
                     views_to_build.append(
