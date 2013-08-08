@@ -6,7 +6,11 @@ from django.http import HttpResponse
 from core.utils import int_to_ip, resolve_ip_type
 from core.range.forms import RangeForm
 from core.range.utils import range_usage
+from core.range.ip_choosing_utils import calculate_filters, label_value_maker
 from core.range.models import Range
+from core.site.models import Site
+from core.vlan.models import Vlan
+from core.network.models import Network
 from mozdns.ip.models import ipv6_to_longs
 from core.views import CoreDeleteView, CoreDetailView
 from core.views import CoreCreateView, CoreUpdateView, CoreListView
@@ -194,10 +198,116 @@ def get_all_ranges_ajax(request):
         else:
             vlan_name = ''
 
-        ret_list.append({'id': r.pk,
-                         'display': r.choice_display(),
-                         'vlan': vlan_name,
-                         'site': site_name,
-                         'relevant': relevant
-                         })
+        ret_list.append({
+            'id': r.pk,
+            'display': r.choice_display(),
+            'vlan': vlan_name,
+            'site': site_name,
+            'relevant': relevant
+        })
     return HttpResponse(json.dumps(ret_list))
+
+
+def find_related(request):
+    """
+    Given a list of site, vlan, and network primary keys, help a user make
+    choices about where to put an IP address
+
+    A user can select from choices:
+        Networks
+        Vlans
+        Sites
+
+    The goal of the UI is to help a user choose a range -- which for this
+    function can be seen as filtering down to exactly 1 network.
+
+    When a user selects a site, this can limit which networks and in turn which
+    vlans are displayed.
+
+    When a user selects a vlan, this can limit which networks are displayed
+    which in turn can limit which sites are displayed
+
+
+    When a user selects a network, this will limit both networks and vlans to
+    at most one object.
+
+    input::
+        {
+            'choice': [<type>, <pk>],
+            'sites': [1, ...],
+            'vlans': [1, ...],
+            'networks': [1, ...],
+        }
+
+    The value of '<type>' is a string that is either 'site', 'vlan', or
+    'network'. The value of '<pk>' is a number.
+
+    output:
+        Same as input but with things filtered plus a new list of 'range'
+        information. E.x.:
+        {
+            'sites': [<pks>],
+            'vlans': [<pks>],
+            'networks': [<pks>],
+            'range': [
+                {'name': ...
+                 'ip_start': ...
+                 'ip_end': ...
+                 'reserved': ...
+                },
+                ...
+                ...
+                ...
+                {'name': ...
+                 'ip_start': ...
+                 'ip_end': ...
+                 'reserved': ...
+                }
+            ]
+        }
+
+    This function will key off of 'choice' to determine how to slim down a
+    users choice of objects.
+    """
+    state = json.loads(request.raw_post_data)
+
+    if not state:
+        raise Exception("No state?")
+
+    if 'choice' not in state:
+        raise Exception("No choice?")
+
+    try:
+        choice_type, choice_pk = state['choice']
+    except ValueError:
+        raise Exception(
+            "Choice was '{0}'. This is wrong".format(state['choice'])
+        )
+
+    filter_network, filter_site, filter_vlan = calculate_filters(
+        choice_type, choice_pk
+    )
+    format_network, format_site, format_vlan = label_value_maker()
+
+    new_state = {
+        'sites': format_site(filter_site(state['sites'])),
+        'vlans': format_vlan(filter_vlan(state['vlans'])),
+    }
+
+    # Network are special. If there is only one, we need to add some range
+    # info. If there are zero or more than one, don't add any range objects
+    networks = filter_network(state['networks'])
+    if len(networks) == 1:
+        pass
+    # TODO
+    new_state['networks'] = format_network(networks)
+
+    return HttpResponse(json.dumps(new_state))
+
+
+def ajax_find_related(request):
+    return render(request, 'range/ip_chooser.html', {
+        'sites': Site.objects.all(),
+        'vlans': Vlan.objects.all(),
+        'networks': Network.objects.all(),
+    })

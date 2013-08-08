@@ -18,6 +18,11 @@
                 );
             });
         }
+        $.get('/core/range/ajax_find_related/', function (data){
+            $('#choose-ip').html(data);
+            chosen_init('#id_ip_str', "/en-US{{ 'find-related' | url() }}" ); // This function was pulled into existance by this
+            // ajax request
+        });
         var possible_input_ids = [
             '#id_ip_str',
             '#id_target',
@@ -41,6 +46,8 @@
     <label>Start: <input id='range_start' type='text'></label>
     <label>End: <input id='range_end' type='text'></label>
     <div id='free-ip-result'></div>
+</div>
+<div id='choose-ip'>
 </div>
 
 <div id='form-message' class='form-message'>
