@@ -1,6 +1,6 @@
-table.hwadapter {
-    margin-left: 10em;
+.hwadapter {
     width: 75%;
+    float: right;
 }
 
 .sreg-action {

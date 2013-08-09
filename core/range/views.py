@@ -6,7 +6,9 @@ from django.http import HttpResponse
 from core.utils import int_to_ip, resolve_ip_type
 from core.range.forms import RangeForm
 from core.range.utils import range_usage
-from core.range.ip_choosing_utils import calculate_filters, label_value_maker
+from core.range.ip_choosing_utils import (
+    calculate_filters, label_value_maker, calc_ranges
+)
 from core.range.models import Range
 from core.site.models import Site
 from core.vlan.models import Vlan
@@ -298,8 +300,7 @@ def find_related(request):
     # info. If there are zero or more than one, don't add any range objects
     networks = filter_network(state['networks'])
     if len(networks) == 1:
-        pass
-    # TODO
+        new_state['ranges'] = calc_ranges(networks[0])
     new_state['networks'] = format_network(networks)
 
     return HttpResponse(json.dumps(new_state))

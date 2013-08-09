@@ -103,3 +103,88 @@ def label_value_maker():
             for v in vlans
         )
     return format_network, format_site, format_vlan
+
+
+def calc_ranges(network):
+    """
+    Given a network, return the range information for that network. These
+    ranges will be used by the user to decide where to request an IP address.
+    This function will not actually find that ip address, it will mearly
+    suggest which ranges a user might want to check in.
+
+    Ranges will be constructed by two methods:
+
+        1. A base template calculated from the netmask (number of addresses) in
+        a network
+
+        2. Inspecting the :class:`Range` objects associated with the network.
+
+    This function should be allocation policy that netops controls.
+    """
+    # See https://mana.mozilla.org/wiki/display/NOC/Node+deployment for
+    # allocation templates
+
+    network.update_network()
+    nbase = network.network.network
+    name_fragment = calc_name_fragment(network)
+
+    if network.prefixlen == 24:
+        return [
+            {
+                'name': 'generic',
+                'rtype': 'special purpose',
+                'start': str(nbase + 1),
+                'end': str(nbase + 15),
+                'name_fragment': name_fragment
+            },
+            {
+                'name': 'generic',
+                'rtype': 'multi-host pools',
+                'start': str(nbase + 16),
+                'end': str(nbase + 127),
+                'name_fragment': name_fragment
+            },
+            {
+                'name': 'generic',
+                'rtype': '/32 allocations',
+                'start': str(nbase + 128),
+                'end': str(nbase + 207),
+                'name_fragment': name_fragment
+            },
+            {
+                'name': 'generic',
+                'rtype': 'load balancers',
+                'start': str(nbase + 208),
+                'end': str(nbase + 223),
+                'name_fragment': name_fragment
+            },
+            {
+                'name': 'generic',
+                'rtype': 'dynamic',
+                'start': str(nbase + 224),
+                'end': str(nbase + 247),
+                'name_fragment': name_fragment
+            },
+            {
+                'name': 'generic',
+                'rtype': 'dynamic',
+                'start': str(nbase + 248),
+                'end': str(nbase + 255),
+                'name_fragment': name_fragment
+            }
+        ]
+    else:
+        return []
+
+
+def calc_name_fragment(network, base_name=''):
+    """
+    Suggest some names given a network
+    """
+    if network.site:
+        base_name = network.site.full_name
+
+    if network.vlan:
+        base_name = '.'.join([network.vlan.name, base_name])
+
+    return base_name

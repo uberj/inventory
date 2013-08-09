@@ -203,7 +203,7 @@ class Range(models.Model, ObjectUrlMixin):
         if not self.network.site:
             site_name = "No Site"
         else:
-            site_name = self.network.site.name.upper()
+            site_name = self.network.site.full_name.upper()
 
         if not self.network.vlan:
             vlan_name = "No Vlan"
