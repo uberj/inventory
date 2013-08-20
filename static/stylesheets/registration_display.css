@@ -1,6 +1,5 @@
-.hwadapter {
-    width: 75%;
-    float: right;
+.hwadapter-display {
+    padding-left: 40%;
 }
 
 .sreg-action {

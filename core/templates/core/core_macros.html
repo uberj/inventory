@@ -188,29 +188,29 @@
     {% for sreg in sregs %}
         <div>
             <div>
-            <table class="registration-table tablesorter">
-                <caption>
-                    {% if sreg.name %}
-                        StaticRegistration {{ sreg.name }}
-                    {% else %}
-                        StaticRegistration {{ loop.index }}
-                    {% endif %}
-                    <span class='sreg-action'>
-                        <a class='add-hwadapter' data-sreg-pk='{{sreg.pk}}'>Add Hardware Adapter</a> |
-                        <a href='{{sreg.get_edit_url()}}'>Edit</a> |
-                        <a href='/core/keyvalue/{{sreg.__class__.keyvalue_set.related.model.__name__.lower()}}/{{sreg.pk}}/'>Key Value</a>
-                    </span>
-                </caption>
-                <thead>
-                </thead>
-                <tbody>
-                {{ display_sreg(sreg) }}
-                </tbody>
-            </table>
+                <table class="registration-table tablesorter">
+                    <caption>
+                        {% if sreg.name %}
+                            StaticRegistration {{ sreg.name }}
+                        {% else %}
+                            StaticRegistration {{ loop.index }}
+                        {% endif %}
+                        <span class='sreg-action'>
+                            <a class='add-hwadapter' data-sreg-pk='{{sreg.pk}}'>Add Hardware Adapter</a> |
+                            <a href='{{sreg.get_edit_url()}}'>Edit</a> |
+                            <a href='/core/keyvalue/{{sreg.__class__.keyvalue_set.related.model.__name__.lower()}}/{{sreg.pk}}/'>Key Value</a>
+                        </span>
+                    </caption>
+                    <thead>
+                    </thead>
+                    <tbody>
+                    {{ display_sreg(sreg) }}
+                    </tbody>
+                </table>
             </div>
-          <div>
-          {{ display_hwadapters(sreg.hwadapter_set.all()) }}
-          </div>
+            <div class='hwadapter-display'>
+                {{ display_hwadapters(sreg.hwadapter_set.all()) }}
+            </div>
         </div>
     {% endfor %}
 {%- endmacro %}
