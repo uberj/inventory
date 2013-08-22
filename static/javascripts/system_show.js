@@ -202,7 +202,7 @@ $(document).ready(function() {
     blocks = hwtable.find('.hwadapter-table');
     newBlock = $(blocks.last()).clone();
 
-    $(newBlock).find('input').each(function(i, el) {
+    $(newBlock).find('input, select').each(function(i, el) {
       if ($(el).attr('name')) {
         $(el).attr('name', $(el).attr('name').replace(nextFree - 1, nextFree));
       }
