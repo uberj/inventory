@@ -6,8 +6,68 @@ from core.range.models import Range
 from core.network.models import Network
 from core.site.models import Site
 from core.vlan.models import Vlan
+from core.range.ip_choosing_utils import (
+    calc_template_ranges, integrate_real_ranges
+)
 
+import ipaddr
 import simplejson as json
+
+
+class ChooserOverlapTests(TestCase):
+    def setUp(self):
+        self.n1 = Network.objects.create(
+            network_str='10.8.0.0/24', ip_type='4'
+        )
+
+    def test_contained_in_template(self):
+        # 1 to 15 is templated to be special purpose
+        r1 = Range.objects.create(
+            start_str='10.8.0.2', end_str='10.8.0.14', network=self.n1
+        )
+        trs = calc_template_ranges(self.n1)
+        rs = integrate_real_ranges(self.n1, trs)
+        self.assertEqual(len(rs), len(trs))
+        rs = sorted(rs, key=lambda r: int(ipaddr.IPv4Address(r['start'])))
+
+        self.assertEqual(r1.start_str, rs[0]['start'])
+        self.assertEqual(r1.end_str, rs[0]['end'])
+        self.assertEqual(r1.pk, rs[0]['pk'])
+
+    def test_not_in_template(self):
+        # 1 to 15 is templated to be special purpose
+        r1 = Range.objects.create(
+            start_str='10.8.0.2', end_str='10.8.0.14', network=self.n1
+        )
+        trs = calc_template_ranges(self.n1)
+        trs = sorted(trs, key=lambda r: int(ipaddr.IPv4Address(r['start'])))
+
+        # remove the first range that would have conflicted
+        trs.pop(0)
+
+        rs = integrate_real_ranges(self.n1, trs)
+        rs = sorted(rs, key=lambda r: int(ipaddr.IPv4Address(r['start'])))
+
+        self.assertEqual(r1.start_str, rs[0]['start'])
+        self.assertEqual(r1.end_str, rs[0]['end'])
+        self.assertEqual(r1.pk, rs[0]['pk'])
+
+    def test_overlaps_two_ranges(self):
+        # 1 to 15 is templated to be special purpose
+        # 16 to 127 is templated to be multi-host pools
+        r1 = Range.objects.create(
+            start_str='10.8.0.10', end_str='10.8.0.100', network=self.n1
+        )
+
+        trs = calc_template_ranges(self.n1)
+        rs = integrate_real_ranges(self.n1, trs)
+        # We should have lost one range
+        self.assertEqual(len(trs) - 1, len(rs))
+        rs = sorted(rs, key=lambda r: int(ipaddr.IPv4Address(r['start'])))
+
+        self.assertEqual(r1.start_str, rs[0]['start'])
+        self.assertEqual(r1.end_str, rs[0]['end'])
+        self.assertEqual(r1.pk, rs[0]['pk'])
 
 
 class ChooserTests(TestCase):

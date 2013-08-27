@@ -39,10 +39,9 @@
         <thead>
             <tr>
                     <th>Network</th>
-                    <th>Type</th>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Usage</th>
+                    <th>Name</th>
             </tr>
         </thead>
 
@@ -50,10 +49,9 @@
             {% for r in ranges %}
             <tr>
                 <td><a href='{{r.network.get_absolute_url()}}'}}>{{ r.network }}</a></td>
-                <td>{{ r.get_rtype_display() }}</td>
                 <td><a href='{{ r.get_absolute_url() }}'>{{ r.start_str }}</a></td>
                 <td><a href='{{ r.get_absolute_url() }}'>{{ r.end_str }}</a></td>
-                <td>{{ r.range_usage()['precent_used'] }}</td>
+                <td>{{ r.name }}</td>
             {% endfor %}
             </tr>
         </tbody>

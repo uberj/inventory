@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from core.site.models import Site
 from core.vlan.models import Vlan
 from core.network.models import Network
+from core.utils import overlap
 
 
 def pks_to_objs(pks, Klass):
@@ -105,21 +106,14 @@ def label_value_maker():
     return format_network, format_site, format_vlan
 
 
-def calc_ranges(network):
+def calc_template_ranges(network):
     """
     Given a network, return the range information for that network. These
     ranges will be used by the user to decide where to request an IP address.
     This function will not actually find that ip address, it will mearly
     suggest which ranges a user might want to check in.
 
-    Ranges will be constructed by two methods:
-
-        1. A base template calculated from the netmask (number of addresses) in
-        a network
-
-        2. Inspecting the :class:`Range` objects associated with the network.
-
-    This function should be allocation policy that netops controls.
+    This function should contain allocation policy that netops controls.
     """
     # See https://mana.mozilla.org/wiki/display/NOC/Node+deployment for
     # allocation templates
@@ -175,6 +169,96 @@ def calc_ranges(network):
         ]
     else:
         return []
+
+
+def integrate_real_ranges(network, template_ranges):
+    """
+    Say we have a network::
+
+        10.8.0.0                                                     10.8.0.255
+        |------------------------------------------------------....--|
+
+
+    For every network there is (or should be) a range template. This breaks up
+    the range into reservations that the user can then select from when finding
+    a free ip address::
+
+        10.8.0.0                                                     10.8.0.255
+        |------------------------------------------------------....--|
+         |--template--|             |------template-----|
+         10.8.0.1     10.8.0.10     10.8.0.50           10.8.0.100
+
+
+    "Template" ranges are not real objects in the database; they do not have
+    detail pages, they do not show up in search, and they do not have primary
+    keys. They are a simple *default* overlay onto a network's ip space.
+
+    There is, however, a real version of a range that is stored in Inventory's
+    database; it has a detail page, shows up in searches, and has a primary
+    key. These range objects have a ``start`` and ``end`` ip address and have a
+    foreign key back to a specific Inventory network object. They serve the
+    same purpose as a template range except they are defined by the user via
+    the GUI or invtool. Inventory makes sure that these real range objects are
+    always within the bounds of their parent network and that no two ranges
+    overlap.
+
+    What happens to the template ranges when a real range is defined inside an
+    Inventory network?
+
+    For example::
+
+        10.8.0.0                                                     10.8.0.255
+        |------------------------------------------------------....--|
+         |-- template --|           |----- user defined range -----|
+         10.8.0.1     10.8.0.10     10.8.0.50                      10.8.0.100
+
+
+    In this case both the template range and the user defined range is
+    returned.
+
+    Another example::
+
+        10.8.0.0                                                     10.8.0.255
+        |------------------------------------------------------....--|
+                            |----- template ------|
+                            10.8.0.15            10.8.0.60
+         |-- template --|           |----- user defined range ----|
+         10.8.0.1     10.8.0.10     10.8.0.50                      10.8.0.100
+
+    In this case the overlapping template range is filtered out.
+
+
+    This function looks at the ranges in the db and removed template ranges
+    that overlap with real ranges. This function also injects the real ranges
+    in with the template ranges.
+
+    The return format is the same as :func:`calc_ranges`.
+    """
+    real_ranges = network.range_set.all()
+    if not real_ranges:
+        return template_ranges
+
+    name_fragment = calc_name_fragment(network)
+    filtered_ranges = []
+
+    for r in real_ranges:
+        for tr in template_ranges:
+            ol = overlap(
+                (r.start_str, r.end_str), (tr['start'], tr['end']),
+                ip_type=network.ip_type, cast_to_int=True
+            )
+            if not ol:
+                filtered_ranges.append(tr)
+        filtered_ranges.append({
+            'name': r.name,
+            'rtype': r.name,
+            'start': r.start_str,
+            'end': r.end_str,
+            'name_fragment': name_fragment,
+            'pk': r.pk
+        })
+
+    return filtered_ranges
 
 
 def calc_name_fragment(network, base_name=''):

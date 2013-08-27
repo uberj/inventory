@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -7,7 +7,8 @@ from core.utils import int_to_ip, resolve_ip_type
 from core.range.forms import RangeForm
 from core.range.utils import range_usage
 from core.range.ip_choosing_utils import (
-    calculate_filters, label_value_maker, calc_ranges
+    calculate_filters, label_value_maker, calc_template_ranges,
+    integrate_real_ranges
 )
 from core.range.models import Range
 from core.site.models import Site
@@ -32,7 +33,13 @@ class RangeDeleteView(RangeView, CoreDeleteView):
 
 
 class RangeCreateView(RangeView, CoreCreateView):
-    pass
+    def get_form(self, form_class):
+        if not self.request.POST:
+            initial = {}
+            initial.update(dict(self.request.GET.items()))
+            return form_class(initial=initial)
+        else:
+            return super(RangeCreateView, self).get_form(form_class)
 
 
 class RangeUpdateView(RangeView, CoreUpdateView):
@@ -170,46 +177,6 @@ def get_next_available_ip_by_range(request, range_id):
     return HttpResponse(json.dumps(ret))
 
 
-def get_all_ranges_ajax(request):
-    system_pk = request.GET.get('system_pk', '-1')
-    location = None
-    system = None
-    ret_list = []
-    from systems.models import System
-    try:
-        system = System.objects.get(pk=system_pk)
-    except ObjectDoesNotExist:
-        pass
-    if system:
-        try:
-            location = system.system_rack.location.name.title()
-        except AttributeError:
-            pass
-
-    for r in Range.objects.all().order_by('network__site'):
-        relevant = False
-        if r.network.site:
-            site_name = r.network.site.get_site_path()
-            if location and location == r.network.site.name.title():
-                relevant = True
-        else:
-            site_name = ''
-
-        if r.network.vlan:
-            vlan_name = r.network.vlan.name
-        else:
-            vlan_name = ''
-
-        ret_list.append({
-            'id': r.pk,
-            'display': r.choice_display(),
-            'vlan': vlan_name,
-            'site': site_name,
-            'relevant': relevant
-        })
-    return HttpResponse(json.dumps(ret_list))
-
-
 def find_related(request):
     """
     Given a list of site, vlan, and network primary keys, help a user make
@@ -300,7 +267,9 @@ def find_related(request):
     # info. If there are zero or more than one, don't add any range objects
     networks = filter_network(state['networks'])
     if len(networks) == 1:
-        new_state['ranges'] = calc_ranges(networks[0])
+        new_state['ranges'] = integrate_real_ranges(
+            networks[0], calc_template_ranges(networks[0])
+        )
     new_state['networks'] = format_network(networks)
 
     return HttpResponse(json.dumps(new_state))
@@ -310,5 +279,17 @@ def ajax_find_related(request):
     return render(request, 'range/ip_chooser.html', {
         'sites': Site.objects.all(),
         'vlans': Vlan.objects.all(),
+        'networks': Network.objects.all(),
+    })
+
+
+def debug_show_ranges(request):
+    """
+    List all networks and show their range templates and also include range
+    objects. These ranges and templates will show up in the FFIP interface.
+    This is a good place to see all of these ranges in one place.
+    """
+    return render(request, 'range/debug_show_ranges.html', {
+        'calc_template_ranges': calc_template_ranges,
         'networks': Network.objects.all(),
     })
