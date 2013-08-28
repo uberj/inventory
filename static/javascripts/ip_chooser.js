@@ -155,7 +155,7 @@ function chosen_init(ctx){
       $('#choose-ip-display-ranges-area').css('height', '0%');
       $('#choose-ip-display-ranges-area').empty();
 
-      $('choose-ip-errors').empty();
+      $('#choose-ip-errors').empty();
 
       ctx.reset_callback();
   });
