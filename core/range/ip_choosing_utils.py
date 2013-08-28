@@ -11,6 +11,16 @@ def pks_to_objs(pks, Klass):
     return map(lambda pk: get_object_or_404(Klass, pk=pk), pks)
 
 
+# Only certain networks should be displayed to users for allocating into.
+# * For ipv4, only networks with a netmask larger than or equal to 20
+#   should be displayed
+# * For ipv6, only /64 networks should be displayed
+UN = (  # user networks
+    (Q(ip_type='4') & Q(prefixlen__gte=20)) |
+    (Q(ip_type='6') & Q(prefixlen=64))
+)
+
+
 def calculate_filters(choice_type, choice_pk):
     """
     Write three functions that given a list of present primary keys
@@ -24,6 +34,7 @@ def calculate_filters(choice_type, choice_pk):
     The 'present_pks' value is a list of integers that represent primary
     keys of the type of objects the function returns.
     """
+
     if choice_type == 'network':
         network = get_object_or_404(Network, pk=choice_pk)
 
@@ -43,7 +54,7 @@ def calculate_filters(choice_type, choice_pk):
             """
             site_network_pks = get_object_or_404(
                 Site, pk=choice_pk
-            ).network_set.all().values_list('pk', flat=True)
+            ).network_set.filter(UN).values_list('pk', flat=True)
             net_pks = set(present_pks).intersection(set(site_network_pks))
             return pks_to_objs(net_pks, Network)
 
@@ -54,7 +65,8 @@ def calculate_filters(choice_type, choice_pk):
             vlans = pks_to_objs(present_pks, Vlan)
 
             def is_in_site(vlan):
-                return vlan.network_set.filter(site__pk=choice_pk).exists()
+                return vlan.network_set.filter(
+                    site__pk=choice_pk).filter(UN).exists()
 
             return filter(is_in_site, vlans)
 
@@ -62,12 +74,12 @@ def calculate_filters(choice_type, choice_pk):
         vlan = get_object_or_404(Vlan, pk=choice_pk)
 
         def filter_network(present_pks):
-            net_pks = vlan.network_set.all().values_list('pk', flat=True)
+            net_pks = vlan.network_set.filter(UN).values_list('pk', flat=True)
             net_pks = set(present_pks).intersection(set(net_pks))
             return pks_to_objs(net_pks, Network)
 
         def filter_site(present_pks):
-            networks = vlan.network_set.filter(~Q(site=None))
+            networks = vlan.network_set.filter(UN).filter(~Q(site=None))
             network_site_pks = networks.values_list('site', flat=True)
             site_pks = set(present_pks).intersection(set(network_site_pks))
             return pks_to_objs(site_pks, Site)
@@ -122,48 +134,99 @@ def calc_template_ranges(network):
     nbase = network.network.network
     name_fragment = calc_name_fragment(network)
 
-    if network.prefixlen == 24:
+    if network.ip_type == '4':
+        # if it's in between a /24 or and /20 use this template
+        if network.prefixlen <= 24 and network.prefixlen >= 20:
+            template_ranges = [
+                {
+                    'name': 'template',
+                    'rtype': 'special purpose',
+                    'start': str(nbase + 1),
+                    'end': str(nbase + 15),
+                    'name_fragment': name_fragment
+                },
+                {
+                    'name': 'template',
+                    'rtype': 'multi-host pools',
+                    'start': str(nbase + 16),
+                    'end': str(nbase + 127),
+                    'name_fragment': name_fragment
+                },
+                {
+                    'name': 'template',
+                    'rtype': '/32 allocations',
+                    'start': str(nbase + 128),
+                    'end': str(nbase + 207),
+                    'name_fragment': name_fragment
+                },
+                {
+                    'name': 'template',
+                    'rtype': 'load balancers',
+                    'start': str(nbase + 208),
+                    'end': str(nbase + 223),
+                    'name_fragment': name_fragment
+                },
+                {
+                    'name': 'template',
+                    'rtype': 'dynamic',
+                    'start': str(nbase + 224),
+                    'end': str(nbase + 247),
+                    'name_fragment': name_fragment
+                },
+                {
+                    'name': 'template',
+                    'rtype': 'reserved',
+                    'start': str(nbase + 248),
+                    'end': str(nbase + 255),
+                    'name_fragment': name_fragment
+                }
+            ]
+            if network.prefixlen < 24:
+                template_ranges.append({
+                    'name': 'template',
+                    'rtype': 'general purpose',
+                    'start': str(nbase + 256),
+                    'end': str(network.network.broadcast - 1),
+                    'name_fragment': name_fragment
+                })
+        elif network.prefixlen > 24 and network.prefixlen < 31:
+            # for subnets smaller than /24, reserve first /30
+            template_ranges = [{
+                'name': 'template',
+                'rtype': 'reserved',
+                'start': str(nbase + 0),
+                'end': str(nbase + 3),
+                'name_fragment': name_fragment
+            }]
+
+            if network.prefixlen > 30:
+                template_ranges.append({
+                    'name': 'template',
+                    'rtype': 'general purpose',
+                    'start': str(nbase + 5),
+                    'end': str(network.network.broadcast - 1),
+                    'name_fragment': name_fragment
+                })
+        return template_ranges
+    elif network.ip_type == '6' and network.prefixlen == 64:
+        # Only do /64s for IPv6
+        # reserve the first /112 for human created IPs, the rest is unallocated
+        # in the /64
+
+        # /112 is the first :ffff addresses
         return [
             {
-                'name': 'generic',
-                'rtype': 'special purpose',
+                'name': 'template',
+                'rtype': 'reserved',
                 'start': str(nbase + 1),
-                'end': str(nbase + 15),
+                'end': str(nbase + int('ffff', 16)),
                 'name_fragment': name_fragment
             },
             {
-                'name': 'generic',
+                'name': 'template',
                 'rtype': 'multi-host pools',
-                'start': str(nbase + 16),
-                'end': str(nbase + 127),
-                'name_fragment': name_fragment
-            },
-            {
-                'name': 'generic',
-                'rtype': '/32 allocations',
-                'start': str(nbase + 128),
-                'end': str(nbase + 207),
-                'name_fragment': name_fragment
-            },
-            {
-                'name': 'generic',
-                'rtype': 'load balancers',
-                'start': str(nbase + 208),
-                'end': str(nbase + 223),
-                'name_fragment': name_fragment
-            },
-            {
-                'name': 'generic',
-                'rtype': 'dynamic',
-                'start': str(nbase + 224),
-                'end': str(nbase + 247),
-                'name_fragment': name_fragment
-            },
-            {
-                'name': 'generic',
-                'rtype': 'dynamic',
-                'start': str(nbase + 248),
-                'end': str(nbase + 255),
+                'start': str(nbase + int('10000', 16)),
+                'end': str(network.network.broadcast - 1),
                 'name_fragment': name_fragment
             }
         ]

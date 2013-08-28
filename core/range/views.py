@@ -8,7 +8,7 @@ from core.range.forms import RangeForm
 from core.range.utils import range_usage
 from core.range.ip_choosing_utils import (
     calculate_filters, label_value_maker, calc_template_ranges,
-    integrate_real_ranges
+    integrate_real_ranges, UN
 )
 from core.range.models import Range
 from core.site.models import Site
@@ -279,7 +279,7 @@ def ajax_find_related(request):
     return render(request, 'range/ip_chooser.html', {
         'sites': Site.objects.all(),
         'vlans': Vlan.objects.all(),
-        'networks': Network.objects.all(),
+        'networks': Network.objects.filter(UN),
     })
 
 
@@ -291,5 +291,5 @@ def debug_show_ranges(request):
     """
     return render(request, 'range/debug_show_ranges.html', {
         'calc_template_ranges': calc_template_ranges,
-        'networks': Network.objects.all(),
+        'networks': Network.objects.filter(UN),
     })
