@@ -7,7 +7,7 @@
     console.log("Form loaded: I see rdtype=: {{record_type}} and pk=:{{record_pk}}");
     $(document).ready(function (){
         if ($('#id_ip_str') && !$('#id_ip_str').val()){
-            $("<input type='button' id='ffip' value='FFIP'/>").insertAfter('#id_ip_str').css('margin-left', '0.7em');
+            $("<input type='button' id='ffip' value='Automatially Assign'/>").insertAfter('#id_ip_str').css('margin-left', '0.7em');
 
             // Pull in find IP stuff
             $('#ffip').click(function () {
