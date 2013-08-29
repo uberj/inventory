@@ -6,16 +6,16 @@
 
     {% block action_bar %}
         {% if network.get_edit_url %}
-            <a class="btn btn-primary" href="{{ network.get_edit_url() }}">Edit</a>
+            <a class="btn" href="{{ network.get_edit_url() }}">Edit</a>
         {% endif %}
 
         {% block mid_action_bar %}
         {% endblock %}
 
         {% if network.get_delete_url %}
-            <a class="btn btn-danger" href="{{ network.get_delete_url() }}">Delete</a>
+            <a class="btn" href="{{ network.get_delete_url() }}">Delete</a>
         {% endif %}
-        <a href="{{ 'create-range' | url()}}?network={{ network.pk }}&start_str={{ network.network_str.split('/')[0] }}&end_str={{ network.network_str.split('/')[0] }}">
+        <a class="btn medium white" href="{{ 'create-range' | url()}}?network={{ network.pk }}&start_str={{ network.network_str.split('/')[0] }}&end_str={{ network.network_str.split('/')[0] }}">
             Create a range in this network
         </a>
     {% endblock %}
