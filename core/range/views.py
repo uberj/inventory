@@ -276,10 +276,13 @@ def find_related(request):
 
 
 def ajax_find_related(request):
+    networks = Network.objects.filter(UN).order_by(
+        'ip_type', 'network_str', 'prefixlen'
+    )
     return render(request, 'range/ip_chooser.html', {
-        'sites': Site.objects.all(),
-        'vlans': Vlan.objects.all(),
-        'networks': Network.objects.filter(UN),
+        'sites': Site.objects.all().order_by('name'),
+        'vlans': Vlan.objects.all().order_by('name'),
+        'networks': networks
     })
 
 
@@ -289,7 +292,10 @@ def debug_show_ranges(request):
     objects. These ranges and templates will show up in the FFIP interface.
     This is a good place to see all of these ranges in one place.
     """
+    networks = Network.objects.filter(UN).order_by(
+        'ip_type', 'network_str', 'prefixlen'
+    )
     return render(request, 'range/debug_show_ranges.html', {
         'calc_template_ranges': calc_template_ranges,
-        'networks': Network.objects.filter(UN),
+        'networks': networks
     })

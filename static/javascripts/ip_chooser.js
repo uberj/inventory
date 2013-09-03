@@ -29,8 +29,13 @@ function chosen_init(ctx){
   function insert_options(select_id, values_and_labels){
     var select_el = $(select_id);
     $.each(values_and_labels, function(key, o) {
+      if (o.disabled) {
+        option = $("<option disabled></option>");
+      } else {
+        option = $("<option></option>");
+      }
       select_el.append(
-        $("<option></option>").attr("value", o.value).attr('class', 'choice').text(o.label)
+        option.attr("value", o.value).attr('class', 'choice').text(o.label)
       );
     });
     $(select_id).trigger("chosen:updated");
@@ -87,15 +92,25 @@ function chosen_init(ctx){
             function (){
               // What to do when the user clicks on a range
               var that = this;
-              var start = $(this).find('.range-info').data('start');
-              var end = $(this).find('.range-info').data('end');
+              var start = $(that).find('.range-info').data('start');
+              var end = $(that).find('.range-info').data('end');
               var name_fragment = $(this).find('.range-info').data('name-fragment');
               console.log(start + ' - ' + end);
               gather_range_info(start, end, function (range_info){
                 console.log(range_info);
+
                 $('.range').each(function(i, el){
                   $(el).css('background-color', '#D8D8D8');
+                  $(el).css('border-width', '1px');
+                  $(el).css('font-weight', 'normal');
                 });
+
+                $(that).css('transition', 'border-width 0.5s linear 0s');
+                $(that).css('border-width', '3px');
+
+                $(that).css('transition', 'font-weight 0.5s linear 0s');
+                $(that).css('font-weight', 'bold');
+
                 if (typeof range_info.free_ip == 'undefined'){
                   $(that).css('transition', 'background-color 0.5s linear 0s');
                   $(that).css('background-color', 'red');
@@ -107,7 +122,7 @@ function chosen_init(ctx){
                     ' ' + range_info.percent_used + ' addresses are used.'
                   );
                   $(that).css('transition', 'background-color 0.2s linear 0s');
-                  $(that).css('background-color', 'green');
+                  $(that).css('background-color', '#00CC33');
                 }
                 ctx.found_ip_callback(range_info, name_fragment);
               });

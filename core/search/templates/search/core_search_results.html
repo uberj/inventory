@@ -138,7 +138,7 @@
             <td>{{ s.serial }}</td>
             <td>{{ s.asset_tag }}   </td>
             <td>{{ s.system_status }}   </td>
-            <td><a href='{{ s.get_edit_url() }}'>Edit</a></td>
+            <td><a class='btn btn-small' href='{{ s.get_edit_url() }}'>Edit</a></td>
         </tr>
         {% endfor -%}
         </tbody>
@@ -163,7 +163,7 @@
                 <td></td>
             {% endif %}
             <td>{{ r.name }}</td>
-            <td><a href='{{ r.get_absolute_url() }}'>View</a> <a href='{{ r.get_edit_url() }}'>Edit</a></td>
+            <td><a class='btn btn-small' href='{{ r.get_absolute_url() }}'>View</a> <a class='btn btn-small' href='{{ r.get_edit_url() }}'>Edit</a></td>
         </tr>
         {% endfor -%}
         </tbody>

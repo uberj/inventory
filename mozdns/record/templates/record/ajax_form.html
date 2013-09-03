@@ -7,7 +7,7 @@
     console.log("Form loaded: I see rdtype=: {{record_type}} and pk=:{{record_pk}}");
     $(document).ready(function (){
         if ($('#id_ip_str') && !$('#id_ip_str').val()){
-            $("<input type='button' id='ffip' value='Automatially Assign'/>").insertAfter('#id_ip_str').css('margin-left', '0.7em');
+            $("<input type='button' id='ffip' value='Automatically Assign'/>").insertAfter('#id_ip_str').css('margin-left', '0.7em');
 
             // Pull in find IP stuff
             $('#ffip').click(function () {
@@ -211,8 +211,8 @@
 
         <table class='tablesorter'>
             <tr>
-                <td>
-                    Record History: <a href='{{ object_.get_history_url() }}'> click </a>
+                <td style='text-align: center'>
+                    <a class='btn btn-small' href='{{ object_.get_history_url() }}'>Record History</a>
                 </td>
             </tr>
         </table>
@@ -232,7 +232,7 @@
                         {% endif %}
                 </td>
                 <td>
-                    <a href='{{ d.soa.get_debug_build_url() }}'>Debug</a>
+                    <a class='btn btn-small' href='{{ d.soa.get_debug_build_url() }}'>Debug</a>
                 </td>
             </tr>
             {% else %}

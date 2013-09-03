@@ -10,7 +10,11 @@
             {% if loop.first %}
                 <option class='choice' value=""></option>
             {% endif %}
-            <option class='choice' value="{{ site.pk }}">{{ site.full_name }}</option>
+            {% if site.network_set.exists() %}
+              <option class='choice' value="{{ site.pk }}">{{ site.full_name }}</option>
+            {% else %}
+              <option class='choice' value="{{ site.pk }}" disabled>{{ site.full_name }}</option>
+            {% endif %}
         {% endfor %}
     </select>
     <select id='choose-vlan' class='chosen-select' data-choice-type='vlan' data-placeholder="Choose a Vlan">
