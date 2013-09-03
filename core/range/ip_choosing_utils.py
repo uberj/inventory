@@ -1,4 +1,3 @@
-# First we need to raise the JSON pk's into ORM objects
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from core.site.models import Site

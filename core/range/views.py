@@ -196,9 +196,8 @@ def find_related(request):
     When a user selects a vlan, this can limit which networks are displayed
     which in turn can limit which sites are displayed
 
-
-    When a user selects a network, this will limit both networks and vlans to
-    at most one object.
+    When a user selects a network, this will limit both networks, vlans, and
+    sites to at most one object per each type.
 
     input::
         {
