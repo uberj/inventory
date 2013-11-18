@@ -1,9 +1,14 @@
 from django.db import models
 
 
-class DNSManager(models.Manager):
-    def get_queryset(self):
-        return super(DNSManager, self).get_queryset().filter(ttype='dns')
+class DNSIncrementalManager(models.Manager):
+    def get_query_set(self):
+        return super(DNSIncrementalManager, self).get_query_set().filter(ttype='dns-incremental')  # noqa
+
+
+class DNSClobberManager(models.Manager):
+    def get_query_set(self):
+        return super(DNSClobberManager, self).get_query_set().filter(ttype='dns-clobber')  # noqa
 
 
 class Task(models.Model):
@@ -11,11 +16,16 @@ class Task(models.Model):
     ttype = models.CharField(max_length=255, blank=False)
 
     objects = models.Manager()
-    dns = DNSManager()
+    dns_incremental = DNSIncrementalManager()
+    dns_clobber = DNSClobberManager()
 
     @classmethod
     def schedule_zone_rebuild(cls, soa):
-        Task(task=str(soa.pk), ttype='dns').save()
+        Task(task=str(soa.pk), ttype='dns-incremental').save()
+
+    @classmethod
+    def schedule_all_dns_rebuild(cls, soa):
+        Task(task=str(soa.pk), ttype='dns-clobber').save()
 
     def __repr__(self):
         return "<Task: {0}>".format(self)

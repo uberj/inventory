@@ -130,15 +130,31 @@ class MockBuildScriptTests(TestCase):
             a.ttl = 8
             a.save()
 
+        # We just updated a zone so a clobber build shouldn't be triggered
+        self.assertFalse(Task.dns_clobber.all())
+
+        # we should see one zone being rebuilt
+        self.assertEqual(1, Task.dns_incremental.all().count())
+
         self.assertTrue(SOA.objects.get(pk=root_domain.soa.pk).dirty)
         tmp_serial = SOA.objects.get(pk=root_domain.soa.pk).serial
 
         b.PUSH_TO_PROD = False  # Task isn't deleted
         b.build_dns()  # Serial get's incrimented
+
+        # Since push-to-prod is false, we should still see the tasks in the
+        # same state
+        self.assertFalse(Task.dns_clobber.all())
+        self.assertEqual(1, Task.dns_incremental.all().count())
+
         self.assertEqual(
             SOA.objects.get(pk=root_domain.soa.pk).serial, tmp_serial + 1
         )
+
+        # BUG!! Even though tasks are not being deleted, the dirty bit is
+        # being set to False.
         self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
+
         # added new record (1) and new serials (2 for both views), old serials
         # removed.
         self.assertEqual((3, 2), b.svn_lines_changed(b.PROD_DIR))
@@ -148,9 +164,15 @@ class MockBuildScriptTests(TestCase):
 
         b.PUSH_TO_PROD = True
         b.build_dns()
+
+        # Since push-to-prod is true all tasks should be back 0
+        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_incremental.all())
+
         self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
+
         # Serial is again incremented because PUSH_TO_PROD was False during the
-        # last build. When PUSH_TO_PROD is false, no scheduled tasts are
+        # last build.
         # deleted so we should still see this soa being rebuilt.
         self.assertEqual(
             SOA.objects.get(pk=root_domain.soa.pk).serial, tmp_serial + 1
@@ -163,6 +185,11 @@ class MockBuildScriptTests(TestCase):
         tmp_serial = SOA.objects.get(pk=root_domain.soa.pk).serial
         b.PUSH_TO_PROD = False
         b.build_dns()
+
+        # Nothing changed
+        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_incremental.all())
+
         self.assertEqual(SOA.objects.get(pk=root_domain.soa.pk).serial,
                          tmp_serial)
         self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
@@ -203,9 +230,18 @@ class MockBuildScriptTests(TestCase):
                        LOCK_FILE=self.lock_file, LOG_SYSLOG=False,
                        FIRST_RUN=True, PUSH_TO_PROD=True,
                        STOP_UPDATE_FILE=self.stop_update)
+        self.assertTrue(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_incremental.all())
         b.build_dns()
+
+        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_incremental.all())
+
         for ns in root_domain1.nameserver_set.all():
             ns.delete()
+
+        self.assertTrue(Task.dns_clobber.all())
+        self.assertTrue(Task.dns_incremental.all())
 
         b.build_dns()  # One zone removed should be okay
 
@@ -215,6 +251,7 @@ class MockBuildScriptTests(TestCase):
         for ns in root_domain3.nameserver_set.all():
             ns.delete()
 
+        b.PUSH_TO_PROD = False
         self.assertRaises(BuildError, b.build_dns)
 
     def test_two_file_svn_lines_changed(self):

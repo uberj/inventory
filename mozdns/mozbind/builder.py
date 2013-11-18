@@ -10,6 +10,7 @@ import os
 import re
 import time
 import datetime
+from itertools import chain
 
 from settings.dnsbuilds import (
     STAGE_DIR, PROD_DIR, LOCK_FILE, STOP_UPDATE_FILE, NAMED_CHECKZONE_OPTS,
@@ -312,12 +313,15 @@ class DNSBuilder(SVNBuilderMixin):
             the scheduled tasks. Not checking files into SVN is indicative of a
             troubleshoot build.
         """
-        ts = [t for t in Task.dns.all()]
-        ts_len = len(ts)
+        ts_incremental = Task.dns_incremental.all()
         self.log("{0} zone{1} requested to be rebuilt".format(
-            ts_len, 's' if ts_len != 1 else '')
+            len(ts_incremental), 's' if len(ts_incremental) != 1 else '')
         )
-        return ts
+
+        ts_clobber = Task.dns_clobber.all()
+        self.log("{0} requests for a clobber build".format(len(ts_clobber)))
+
+        return ts_incremental, ts_clobber
 
     def log(self, msg, log_level='LOG_INFO', **kwargs):
         # Eventually log this stuff into bs
@@ -870,9 +874,10 @@ class DNSBuilder(SVNBuilderMixin):
         if not self.lock():
             return
 
-        dns_tasks = self.get_scheduled()
+        dns_incremental_tasks, dns_clobber_tasks = self.get_scheduled()
+        something_to_do = dns_incremental_tasks or dns_clobber_tasks
 
-        if not dns_tasks and not self.FORCE_BUILD:
+        if not (something_to_do or self.FORCE_BUILD):
             self.log("Nothing to do!")
             self.goto_out()
             return
@@ -884,10 +889,20 @@ class DNSBuilder(SVNBuilderMixin):
 
             # zone files
             if self.BUILD_ZONES:
-                soa_pks_to_rebuild = set(int(t.task) for t in dns_tasks)
-                self.build_config_files(
+                if dns_clobber_tasks:
+                    soa_pks_to_rebuild = set(
+                        int(t.task) for t in chain(
+                            dns_incremental_tasks, dns_clobber_tasks
+                        )
+                    )
+                    self.build_config_files(
+                        self.build_zone_files(soa_pks_to_rebuild)
+                    )
+                else:
+                    soa_pks_to_rebuild = set(
+                        int(t.task) for t in dns_incremental_tasks
+                    )
                     self.build_zone_files(soa_pks_to_rebuild)
-                )
             else:
                 self.log("BUILD_ZONES is False. Not "
                          "building zone files.")
@@ -913,7 +928,10 @@ class DNSBuilder(SVNBuilderMixin):
                 # function
                 # Also, if the checking was not successful, don't delete the
                 # tasks
-                map(lambda t: t.delete(), dns_tasks)
+                map(
+                    lambda t: t.delete(),
+                    chain(dns_incremental_tasks, dns_clobber_tasks)
+                )
 
         # All errors are handled by caller (this function)
         except BuildError:
