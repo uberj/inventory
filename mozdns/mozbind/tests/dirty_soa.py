@@ -56,7 +56,7 @@ class DirtySOATests(TestCase):
         self.assertTrue(self.rsoa.bind_render_record() not in ('', None))
 
     def generic_dirty(self, Klass, create_data, update_data, local_soa,
-                      tdiff=1):
+                      tdiff=1, clobber=False):
         Task.dns_incremental.all().delete()  # Delete all tasks
         local_soa.dirty = False
         local_soa.save()
@@ -68,10 +68,14 @@ class DirtySOATests(TestCase):
         self.assertTrue(local_soa.dirty)
 
         self.assertEqual(tdiff, Task.dns_incremental.all().count())
-        self.assertFalse(Task.dns_clobber.all().count())
+        if clobber:
+            self.assertTrue(Task.dns_clobber.all().count())
+        else:
+            self.assertFalse(Task.dns_clobber.all().count())
 
         # Now try updating
         Task.dns_incremental.all().delete()  # Delete all tasks
+        Task.dns_clobber.all().delete()  # Delete all tasks
         local_soa.dirty = False
         local_soa.save()
         local_soa = SOA.objects.get(pk=local_soa.pk)
@@ -83,9 +87,14 @@ class DirtySOATests(TestCase):
         self.assertTrue(local_soa.dirty)
 
         self.assertEqual(tdiff, Task.dns_incremental.all().count())
+        if clobber:
+            self.assertTrue(Task.dns_clobber.all().count())
+        else:
+            self.assertFalse(Task.dns_clobber.all().count())
 
         # Now delete
         Task.dns_incremental.all().delete()  # Delete all tasks
+        Task.dns_clobber.all().delete()  # Delete all tasks
         local_soa.dirty = False
         local_soa.save()
         local_soa = SOA.objects.get(pk=local_soa.pk)
@@ -95,6 +104,10 @@ class DirtySOATests(TestCase):
         self.assertTrue(local_soa.dirty)
 
         self.assertEqual(tdiff, Task.dns_incremental.all().count())
+        if clobber:
+            self.assertTrue(Task.dns_clobber.all().count())
+        else:
+            self.assertFalse(Task.dns_clobber.all().count())
 
     def test_dirty_a(self):
         create_data = {
@@ -165,7 +178,10 @@ class DirtySOATests(TestCase):
         update_data = {
             'label': 'asdfx4',
         }
-        self.generic_dirty(Nameserver, create_data, update_data, self.soa)
+        # We expect nameserver changes to trigger a clobber rebuild
+        self.generic_dirty(
+            Nameserver, create_data, update_data, self.soa, clobber=True
+        )
 
     def test_dirty_soa(self):
         self.soa.dirty = False

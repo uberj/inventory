@@ -251,7 +251,7 @@ class MockBuildScriptTests(TestCase):
         for ns in root_domain3.nameserver_set.all():
             ns.delete()
 
-        b.PUSH_TO_PROD = False
+        b.PUSH_TO_PROD = True
         self.assertRaises(BuildError, b.build_dns)
 
     def test_two_file_svn_lines_changed(self):
