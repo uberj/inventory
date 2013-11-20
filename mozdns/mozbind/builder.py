@@ -675,10 +675,10 @@ class DNSBuilder(SVNBuilderMixin):
                                                file_meta['rel_fname'])
         return file_meta
 
-    def build_zone_files(self, soa_pks_to_rebuild):
+    def build_zone_files(self, soas, soa_pks_to_rebuild, clobber=True):
         zone_stmts = {}
 
-        for soa in SOA.objects.all():
+        for soa in soas:
             # If anything happens during this soa's build we need to mark
             # it as dirty so it can be rebuild
             try:
@@ -734,15 +734,23 @@ class DNSBuilder(SVNBuilderMixin):
                              .format(view.name, soa, build_time),
                              root_domain=root_domain, build_time=build_time)
                     if not view_data:
-                        self.log('< {0} > No data found in this view. '
-                                 'No zone file will be made or included in any'
-                                 ' config for this view.'.format(view.name),
-                                 root_domain=root_domain)
+                        if clobber:
+                            self.log(
+                                '< {0} > No data found in this view. No zone '
+                                'file will be made or included in any config '
+                                'for this view.'.format(view.name),
+                                root_domain=root_domain
+                            )
                         continue
-                    self.log('< {0} > Non-empty data set for this '
-                             'view. Its zone file will be included in the '
-                             'config.'.format(view.name),
-                             root_domain=root_domain)
+
+                    if clobber:
+                        self.log(
+                            '< {0} > Non-empty data set for this view. Its '
+                            'zone file will be included in the '
+                            'config.'.format(view.name),
+                            root_domain=root_domain
+                        )
+
                     file_meta = self.get_file_meta(view, root_domain, soa)
                     was_bad_prev, safe_serial = self.verify_previous_build(
                         file_meta, view, root_domain, soa
@@ -775,11 +783,12 @@ class DNSBuilder(SVNBuilderMixin):
 
                 for view, file_meta, view_data in views_to_build:
                     if (root_domain.name, view.name) in ZONES_WITH_NO_CONFIG:
-                        self.log(
-                            '!!! Not going to emit zone statements for '
-                            '{0}\n'.format(root_domain.name),
-                            root_domain=root_domain
-                        )
+                        if clobber:
+                            self.log(
+                                '!!! Not going to emit zone statements for '
+                                '{0}\n'.format(root_domain.name),
+                                root_domain=root_domain
+                            )
                     else:
                         view_zone_stmts = zone_stmts.setdefault(view.name, [])
 
@@ -895,14 +904,18 @@ class DNSBuilder(SVNBuilderMixin):
                             dns_incremental_tasks, dns_clobber_tasks
                         )
                     )
-                    self.build_config_files(
-                        self.build_zone_files(soa_pks_to_rebuild)
+                    stmts = self.build_zone_files(
+                        SOA.objects.all(), soa_pks_to_rebuild, clobber=True
                     )
+                    self.build_config_files(stmts)
                 else:
                     soa_pks_to_rebuild = set(
                         int(t.task) for t in dns_incremental_tasks
                     )
-                    self.build_zone_files(soa_pks_to_rebuild)
+                    self.build_zone_files(
+                        SOA.objects.filter(pk__in=soa_pks_to_rebuild),
+                        soa_pks_to_rebuild, clobber=False
+                    )
             else:
                 self.log("BUILD_ZONES is False. Not "
                          "building zone files.")
