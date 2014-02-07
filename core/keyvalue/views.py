@@ -7,6 +7,7 @@ from core.keyvalue.utils import get_aa, get_docstrings
 
 import simplejson as json
 
+from core.circuit.models import CircuitKeyValue
 from core.network.models import NetworkKeyValue
 from core.range.models import RangeKeyValue
 from core.site.models import SiteKeyValue
@@ -19,6 +20,7 @@ from core.hwadapter.models import HWAdapterKeyValue
 from systems.models import KeyValue as SystemKeyValue
 
 klasses = (
+    CircuitKeyValue,
     NetworkKeyValue,
     RangeKeyValue,
     SiteKeyValue,
