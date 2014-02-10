@@ -390,7 +390,7 @@ class System(DirtyFieldsMixin, CoreDisplayMixin, models.Model):
     server_model = models.ForeignKey('ServerModel', blank=True, null=True)
     allocation = models.ForeignKey('Allocation', blank=True, null=True)
     system_rack = models.ForeignKey('SystemRack', blank=True, null=True)
-    system_type = models.ForeignKey('SystemType', blank=True, null=True)
+    system_type = models.ForeignKey('SystemType', blank=False, null=True)
     system_status = models.ForeignKey('SystemStatus', blank=True, null=True)
 
     hostname = models.CharField(
@@ -563,15 +563,48 @@ class System(DirtyFieldsMixin, CoreDisplayMixin, models.Model):
         super(System, self).save(*args, **kwargs)
 
     def clean(self):
-        self.validate_warranty()
+        if not self.pk:
+            # New systems need to have their system_type set
+            self.validate_system_type()
+
+        if self.system_type and not self.is_vm():
+            self.validate_warranty()
+            self.validate_serial()
+
+    def is_vm(self):
+        return (
+            False if self.system_type.type_name.find('Virtual Server') == -1
+            else True
+        )
+
+    def validate_system_type(self):
+        if not self.system_type:
+            raise ValidationError(
+                "Server Type is a required field"
+            )
+
+    def validate_serial(self):
+        if not self.serial:
+            raise ValidationError(
+                "Serial numbers are reruied for non VM systems"
+            )
 
     def validate_warranty(self):
+        # If pk is None we are a new system. New systems are required to have
+        # their warranty data set
+        if self.pk is None and not bool(self.warranty_end):
+            raise ValidationError(
+                "Warranty Data is required"
+            )
+
         if bool(self.warranty_start) ^ bool(self.warranty_end):
             raise ValidationError(
                 "Warranty must have a start and end date"
             )
+
         if not self.warranty_start:
             return
+
         if self.warranty_start.timetuple() > self.warranty_end.timetuple():
             raise ValidationError(
                 "warranty start date should be before the end date"
@@ -612,8 +645,9 @@ class System(DirtyFieldsMixin, CoreDisplayMixin, models.Model):
         except Exception:
             pass
 
-        if not self.id:
+        if not self.pk:
             self.created_on = datetime.datetime.now()
+
         self.updated_on = datetime.datetime.now()
 
     def get_edit_url(self):
