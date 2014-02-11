@@ -387,11 +387,11 @@ class System(DirtyFieldsMixin, CoreDisplayMixin, models.Model):
     # Related Objects
     operating_system = models.ForeignKey(
         'OperatingSystem', blank=True, null=True)
-    server_model = models.ForeignKey('ServerModel', blank=True, null=True)
-    allocation = models.ForeignKey('Allocation', blank=True, null=True)
-    system_rack = models.ForeignKey('SystemRack', blank=True, null=True)
+    allocation = models.ForeignKey('Allocation', blank=False, null=True)
     system_type = models.ForeignKey('SystemType', blank=False, null=True)
     system_status = models.ForeignKey('SystemStatus', blank=True, null=True)
+    server_model = models.ForeignKey('ServerModel', blank=True, null=True)
+    system_rack = models.ForeignKey('SystemRack', blank=True, null=True)
 
     hostname = models.CharField(
         unique=True, max_length=255, validators=[validate_name]
@@ -570,6 +570,11 @@ class System(DirtyFieldsMixin, CoreDisplayMixin, models.Model):
         if self.system_type and not self.is_vm():
             self.validate_warranty()
             self.validate_serial()
+
+        if not self.system_status:
+            self.system_status, _ = SystemStatus.objects.get_or_create(
+                status='building'
+            )
 
     def is_vm(self):
         return (

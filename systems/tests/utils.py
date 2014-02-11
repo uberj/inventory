@@ -2,7 +2,7 @@ import random
 import string
 import datetime
 
-from systems.models import System, SystemType
+from systems.models import System, SystemType, Allocation
 
 
 def random_str(length=10):
@@ -28,6 +28,14 @@ def create_fake_host(**kwargs):
             type_name = random_str()
         system_type, _ = SystemType.objects.get_or_create(type_name=type_name)
 
+    if 'allocation' in kwargs:
+        allocation = kwargs.pop('allocation')
+    else:
+        allocation_name = random_str()
+        while Allocation.objects.filter(name=allocation_name).exists():
+            allocation_name = random_str()
+        allocation, _ = Allocation.objects.get_or_create(name=allocation_name)
+
     if 'serial' in kwargs:
         serial = kwargs.pop('serial')
     else:
@@ -36,6 +44,7 @@ def create_fake_host(**kwargs):
             type_name = random_str()
 
     return System.objects.create(
+        allocation=allocation,
         serial=serial,
         system_type=system_type,
         warranty_start=datetime.datetime.now(),
