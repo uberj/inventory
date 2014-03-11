@@ -15,6 +15,7 @@ class Site(models.Model, ObjectUrlMixin, CoreDisplayMixin):
     # file as this circular import is not required.
 
     id = models.AutoField(primary_key=True)
+
     full_name = models.CharField(
         max_length=255, null=True, blank=True
     )

@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from core.circuit.models import Circuit
-from core.circuit.forms import CircuitForm
+from core.link.models import Circuit, Link
+from core.link.forms import CircuitForm, LinkForm
 from core.views import CoreDeleteView, CoreListView
 from core.views import CoreCreateView, CoreUpdateView
 
@@ -20,17 +20,28 @@ class CircuitDeleteView(CircuitView, CoreDeleteView):
 
 
 class CircuitListView(CircuitView, CoreListView):
-    #template_name = 'circuit/circuit_list.html'
     pass
 
 
 class CircuitCreateView(CircuitView, CoreCreateView):
-    #template_name = 'core/core_form.html'
     pass
 
 
 class CircuitUpdateView(CircuitView, CoreUpdateView):
-    #template_name = 'circuit/circuit_edit.html'
+    pass
+
+
+class LinkView(object):
+    model = Link
+    queryset = Circuit.objects.all().order_by('circuit_id')
+    form_class = LinkForm
+
+
+class LinkCreateView(LinkView, CoreCreateView):
+    pass
+
+
+class LinkUpdateView(LinkView, CoreUpdateView):
     pass
 
 

@@ -1,6 +1,6 @@
 from django import forms
 
-from core.circuit.models import Circuit
+from core.circuit.models import Circuit, Link
 
 
 class CircuitForm(forms.ModelForm):
@@ -8,3 +8,8 @@ class CircuitForm(forms.ModelForm):
 
     class Meta:
         model = Circuit
+
+
+class LinkForm(forms.ModelForm):
+    class Meta:
+        model = Link
