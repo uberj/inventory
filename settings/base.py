@@ -50,6 +50,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'base',
     'base.base',
     'core',
+    'core.link',
     'core.circuit',
     'core.task',
     'core.site',
