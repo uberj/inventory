@@ -1,6 +1,6 @@
 SERVICE_TYPE = (
-    'Private Line',
-    'WAVE',
-    'ELINE',
-    'IP Transit',
+    ('pl', 'Private Line'),
+    ('wv', 'WAVE'),
+    ('el', 'ELINE'),
+    ('it', 'IP Transit'),
 )

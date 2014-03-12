@@ -1,0 +1,82 @@
+{% extends "core/core_base.html" %}
+
+{% block head %}
+    <script src="{{ MEDIA_URL }}javascripts/jquery.tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/link.css" type="text/css" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".tablesorter").tablesorter();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class='dns-title'><h3>Linking {{ link }}</h3></div>
+
+
+    {% block action_bar %}
+        {% if link.get_edit_url %}
+            <a class="btn btn-primary" href="{{ link.get_edit_url() }}">Edit</a>
+        {% endif %}
+
+        {% block mid_action_bar %}
+        {% endblock %}
+
+        {% if link.get_delete_url %}
+            <a class="btn btn-danger" href="{{ link.get_delete_url() }}">Delete</a>
+        {% endif %}
+    {% endblock %}
+
+        <div>
+            {% from 'core/core_macros.html' import display_details %}
+            <div class='top-attributes'>
+                {{ display_details(link.details(), obj=link) }}
+            </div>
+
+            <div class='top-attributes-left'>
+                {% from 'core/core_macros.html' import display_kv %}
+                {{ display_kv(attrs, store_name='Link Meta Data', obj=link, kv_type='link', caption='Link Attributes') }}
+            </div>
+        </div>
+
+        <div class='circuit-list'>
+            {% for c in link.circuit_set.all() %}
+                <div class='circuit-list-item'>
+                    <div class='circuit-list-item-title'>
+                        <span>Circuit {{ loop.index }}</span>
+                    </div>
+                    {{ display_details(c.details(), obj=c) }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style='display: inline-block;'>
+            <table class="tablesorter">
+                <thead>
+                    <tr>
+                        <th>A Site (<a href="{{ link.a_site.get_absolute_url() }}">{{ link.a_site }}</a>)</th>
+                        <th>Z Site (<a href="{{ link.z_site.get_absolute_url() }}">{{ link.z_site }}</a>)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for (a_n, z_n) in site_networks %}
+                    <tr>
+                        <td>
+                            {% if a_n %}
+                                <a href='{{ a_n.get_absolute_url() }}'>{{ a_n }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if z_n %}
+                                <a href='{{ z_n.get_absolute_url() }}'>{{ z_n }}</a>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+{% endblock %}

@@ -1,13 +1,6 @@
 from django import forms
 
-from core.circuit.models import Circuit, Link
-
-
-class CircuitForm(forms.ModelForm):
-    full_name = forms.CharField()
-
-    class Meta:
-        model = Circuit
+from core.link.models import Link
 
 
 class LinkForm(forms.ModelForm):
