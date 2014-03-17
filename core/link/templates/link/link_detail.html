@@ -2,7 +2,7 @@
 
 {% block head %}
     <script src="{{ MEDIA_URL }}javascripts/jquery.tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="{{ MEDIA_URL }}css/link.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/core.css" type="text/css" />
     <script type="text/javascript">
         $(document).ready(function () {
             $(".tablesorter").tablesorter();
@@ -39,11 +39,11 @@
             </div>
         </div>
 
-        <div class='circuit-list'>
+        <div class='core-list'>
             {% for c in link.circuit_set.all() %}
-                <div class='circuit-list-item'>
-                    <div class='circuit-list-item-title'>
-                        <span>Circuit {{ loop.index }}</span>
+                <div class='core-list-item'>
+                    <div class='core-list-item-title'>
+                        <span><a href='{{ c.get_absolute_url() }}'>Circuit {{ loop.index }}</a></span>
                     </div>
                     {{ display_details(c.details(), obj=c) }}
                 </div>

@@ -1,0 +1,181 @@
+{% macro draw_link_graph(graph, links) %}
+<style>
+.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 3px;
+}
+
+#licensing {
+  fill: green;
+}
+
+.link.root {
+  stroke: green;
+}
+
+.node.root {
+  stroke: green;
+}
+
+.ignore {
+  display: none;
+}
+.text.ignore {
+  display: none;
+}
+
+
+.link.resolved {
+  stroke-dasharray: 0,2 1;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+text {
+  font: 10px sans-serif;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+</style>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+$(document).ready(function () {
+// http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
+var links = $.parseJSON('{{ links }}');
+console.log(links);
+
+var nodes = {};
+
+// Compute the distinct nodes from the links.
+var n = links.length;
+links.forEach(function(link, i) {
+  link.source = nodes[link.source] || (nodes[link.source] = {
+    name: link.source,
+    type: link.type,
+    charge: link.charge,
+    distance: link.distance
+  });
+
+  link.target = nodes[link.target] || (nodes[link.target] = {
+    name: link.target,
+    type: link.type,
+    charge: link.charge,
+    distance: link.distance
+  });
+});
+
+links.forEach(function(d, i) {
+  d.x = d.y = height / n * i;
+});
+
+var width = 960,
+    height = 500;
+
+var force = d3.layout.force()
+    .gravity(0.0001)
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(function (d) { return d.distance; })
+    //.charge(-800)
+    .on("tick", tick)
+    force.start();
+
+
+var svg = d3.select("{{ graph }}").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Per-type markers, as they don't inherit styles.
+svg.append("defs").selectAll("marker")
+    .data(["source", "other", "ignore"])
+  .enter().append("marker")
+    .attr("id", function(d) { return d; })
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+  .append("path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+var path = svg.append("g").selectAll("path")
+    .data(force.links())
+  .enter().append("path")
+    .attr("class", function(d) { return "link " + d.type; });
+    //.attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+$(document).ready(function (){
+    $(".link").hover(function (l){
+        console.log(l);
+    })
+});
+
+var circle = svg.append("g").selectAll("circle")
+    .data(force.nodes())
+  .enter().append("circle")
+    .attr("class", function(d) { return "node " + d.type; })
+    .on("mousedown", function(d) { console.log("clicked :" + d.name); })
+    .attr("r", 10)
+    .call(force.drag);
+
+
+//console.log(force.nodes());
+
+var text = svg.append("g").selectAll("text")
+    .data(force.nodes())
+  .enter().append("text")
+    .attr("x", 20)
+    .attr("y", ".31em")
+    .attr("class", function(d) { return "text " + d.type; })
+    .text(function(d) { return d.name; });
+
+var cache = {};
+// Use elliptical arc path segments to doubly-encode directionality.
+function tick() {
+  path.attr("d", linkArc);
+  circle.attr("transform", transform);
+  text.attr("transform", transform);
+}
+
+var cache = {};
+
+function linkArc(d) {
+  var dx = d.target.x - d.source.x,
+      dy = d.target.y - d.source.y,
+      dr = Math.sqrt(dx * dx + dy * dy) * (d.lc/(d.lm + 1));
+  if (d.lc == 1) {
+    ctype = '0,1'
+    dr = Math.sqrt(dx * dx + dy * dy);
+  } else {
+    ctype = '1,0'
+    dr = dr - d.lc * 1 ;
+    console.log(dr);
+  }
+
+  return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 100 "+ ctype +" " + d.target.x + "," + d.target.y;
+}
+
+function transform(d) {
+  return "translate(" + d.x + "," + d.y + ")";
+}
+
+safety = 0;
+while(force.alpha() > 0.05) { // You'll want to try out different, "small" values for this
+    force.tick();
+    if(safety++ > 1000) {
+      break;// Avoids infinite looping in case this solution was a bad idea
+    }
+}
+});
+
+
+</script>
+{% endmacro %}

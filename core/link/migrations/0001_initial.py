@@ -8,60 +8,58 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Circuit'
-        db.create_table('circuit', (
+        # Adding model 'Link'
+        db.create_table('link', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('circuit_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('a_site', self.gf('django.db.models.fields.related.ForeignKey')(related_name='a_circuit_set', to=orm['site.Site'])),
-            ('z_site', self.gf('django.db.models.fields.related.ForeignKey')(related_name='z_circuit_set', to=orm['site.Site'])),
-            ('network', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['network.Network'], null=True, blank=True)),
+            ('network', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['network.Network'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('a_site', self.gf('django.db.models.fields.related.ForeignKey')(related_name='a_link_set', to=orm['site.Site'])),
+            ('z_site', self.gf('django.db.models.fields.related.ForeignKey')(related_name='z_link_set', to=orm['site.Site'])),
         ))
-        db.send_create_signal('circuit', ['Circuit'])
+        db.send_create_signal('link', ['Link'])
 
-        # Adding unique constraint on 'Circuit', fields ['circuit_id']
-        db.create_unique('circuit', ['circuit_id'])
+        # Adding unique constraint on 'Link', fields ['a_site', 'z_site', 'network']
+        db.create_unique('link', ['a_site_id', 'z_site_id', 'network_id'])
 
-        # Adding model 'CircuitKeyValue'
-        db.create_table('circuit_key_value', (
+        # Adding model 'LinkKeyValue'
+        db.create_table('link_key_value', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('value', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['circuit.Circuit'])),
+            ('obj', self.gf('django.db.models.fields.related.ForeignKey')(related_name='keyvalue_set', to=orm['link.Link'])),
         ))
-        db.send_create_signal('circuit', ['CircuitKeyValue'])
+        db.send_create_signal('link', ['LinkKeyValue'])
 
-        # Adding unique constraint on 'CircuitKeyValue', fields ['key', 'value', 'obj']
-        db.create_unique('circuit_key_value', ['key', 'value', 'obj_id'])
+        # Adding unique constraint on 'LinkKeyValue', fields ['key', 'value', 'obj']
+        db.create_unique('link_key_value', ['key', 'value', 'obj_id'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'CircuitKeyValue', fields ['key', 'value', 'obj']
-        db.delete_unique('circuit_key_value', ['key', 'value', 'obj_id'])
+        # Removing unique constraint on 'LinkKeyValue', fields ['key', 'value', 'obj']
+        db.delete_unique('link_key_value', ['key', 'value', 'obj_id'])
 
-        # Removing unique constraint on 'Circuit', fields ['circuit_id']
-        db.delete_unique('circuit', ['circuit_id'])
+        # Removing unique constraint on 'Link', fields ['a_site', 'z_site', 'network']
+        db.delete_unique('link', ['a_site_id', 'z_site_id', 'network_id'])
 
-        # Deleting model 'Circuit'
-        db.delete_table('circuit')
+        # Deleting model 'Link'
+        db.delete_table('link')
 
-        # Deleting model 'CircuitKeyValue'
-        db.delete_table('circuit_key_value')
+        # Deleting model 'LinkKeyValue'
+        db.delete_table('link_key_value')
 
 
     models = {
-        'circuit.circuit': {
-            'Meta': {'unique_together': "(('circuit_id',),)", 'object_name': 'Circuit', 'db_table': "'circuit'"},
-            'a_site': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'a_circuit_set'", 'to': "orm['site.Site']"}),
-            'circuit_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+        'link.link': {
+            'Meta': {'unique_together': "(('a_site', 'z_site', 'network'),)", 'object_name': 'Link', 'db_table': "'link'"},
+            'a_site': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'a_link_set'", 'to': "orm['site.Site']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'network': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['network.Network']", 'null': 'True', 'blank': 'True'}),
-            'z_site': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'z_circuit_set'", 'to': "orm['site.Site']"})
+            'network': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['network.Network']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
+            'z_site': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'z_link_set'", 'to': "orm['site.Site']"})
         },
-        'circuit.circuitkeyvalue': {
-            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'CircuitKeyValue', 'db_table': "'circuit_key_value'"},
+        'link.linkkeyvalue': {
+            'Meta': {'unique_together': "(('key', 'value', 'obj'),)", 'object_name': 'LinkKeyValue', 'db_table': "'link_key_value'"},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['circuit.Circuit']"}),
+            'obj': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'keyvalue_set'", 'to': "orm['link.Link']"}),
             'value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'network.network': {
@@ -92,4 +90,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['circuit']
+    complete_apps = ['link']

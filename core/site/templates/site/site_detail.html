@@ -2,6 +2,7 @@
 
 {% block head %}
     <script src="{{ MEDIA_URL }}javascripts/jquery.tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/core.css" type="text/css" />
     <script type="text/javascript">
         $(document).ready(function () {
             $(".tablesorter").tablesorter();
@@ -35,16 +36,16 @@
 
         <div>
             {% from 'core/core_macros.html' import display_details %}
-            <div style='float:left;'>
+            <div class='top-attributes'>
             {{ display_details(site.details(), obj=site) }}
             </div>
 
-            <div style='float:left; margin-left: 3em;'>
+            <div class='top-attributes-left'>
                 {% from 'core/core_macros.html' import display_kv %}
                 {{ display_kv(attrs, obj=site, kv_type='site') }}
             </div>
 
-            <div style='float:left; margin-left: 3em;'>
+            <div class='top-attributes-left'>
             {% if child_sites %}
                 <table class="tablesorter" >
                     <caption>Sub Sites</caption>
@@ -55,15 +56,21 @@
                         <tr>
                             <td>
                                 <a href='{{ child_site.get_absolute_url() }}'>{{ child_site.full_name }}</a>
-                        </td>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
             {% endif %}
             </div>
         </div>
+        <div>
+            <div id='link-graph'>
+            </div>
+            {% from 'link/link_graph.html' import draw_link_graph %}
+            {{ draw_link_graph("#link-graph", links) }}
+        </div>
 
-        <div style='float:left; display:table; width: 90%;'>
+        <div class='top-attributes-left' style='width: 90%'>
             {% from 'core/core_macros.html' import display_networks %}
             {{ display_networks(site.network_set.all().order_by('prefixlen'), first_header="Networks homed in "+site.full_name+".", extra_style="width: 100%; margin-left:3em;") }}
         </div>

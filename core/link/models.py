@@ -53,10 +53,10 @@ class Link(models.Model, ObjectUrlMixin, CoreDisplayMixin):
         Network, null=True, blank=True, on_delete=models.SET_NULL
     )
     a_site = models.ForeignKey(
-        Site, null=False, blank=False, related_name='a_circuit_set'
+        Site, null=False, blank=False, related_name='a_link_set'
     )
     z_site = models.ForeignKey(
-        Site, null=False, blank=False, related_name='z_circuit_set'
+        Site, null=False, blank=False, related_name='z_link_set'
     )
     search_fields = (
         'a_site__name',

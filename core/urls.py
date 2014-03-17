@@ -11,6 +11,7 @@ urlpatterns = patterns(
     url(r'^$', csrf_exempt(core_index), name='core-index'),
     url(r'^api/', include(v1_core_api.urls)),
     url(r'^link/', include('core.link.urls')),
+    url(r'^circuit/', include('core.circuit.urls')),
     url(r'^dhcp/', include('core.dhcp.urls')),
     url(r'^group/', include('core.group.urls')),
     url(r'^hwadapter/', include('core.hwadapter.urls')),

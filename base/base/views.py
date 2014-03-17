@@ -43,8 +43,9 @@ class BaseCreateView(CreateView):
         # redirect back to form if errors
         except (IntegrityError, ValidationError), e:
             messages.error(request, str(e))
-            request.method = 'GET'
-            return super(BaseCreateView, self).get(request, *args, **kwargs)
+            form_class = self.get_form_class()
+            form = form_class(request.POST)
+            return self.render_to_response(self.get_context_data(form=form))
 
         return obj
 

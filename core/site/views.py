@@ -4,9 +4,13 @@ from django.shortcuts import render
 from core.site.models import Site
 from core.site.forms import SiteForm
 from core.site.utils import get_vlans
+from core.link.models import Link
+from core.link.utils import build_link_graph
 
 from core.views import CoreDeleteView, CoreListView
 from core.views import CoreCreateView, CoreUpdateView
+
+import simplejson as json
 
 
 class SiteView(object):
@@ -46,6 +50,7 @@ def site_detail(request, site_pk):
     site = get_object_or_404(Site, pk=site_pk)
 
     return render(request, 'site/site_detail.html', {
+        'links': json.dumps(build_link_graph(Link.objects.all(), site=site)),
         'site': site,
         'vlans': get_vlans(site),
         'child_sites': site.site_set.all(),
