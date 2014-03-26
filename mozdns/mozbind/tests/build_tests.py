@@ -24,6 +24,7 @@ TEST_PREFIX = TEST_PREFIX.rstrip('/')
 
 class MockBuildScriptTests(TestCase):
     def setUp(self):
+        Task.objects.all().delete()
         for soa in SOA.objects.all():
             delete_zone_helper(soa.root_domain.name)
         Domain.objects.get_or_create(name="arpa")
@@ -130,8 +131,8 @@ class MockBuildScriptTests(TestCase):
             a.ttl = 8
             a.save()
 
-        # We just updated a zone so a clobber build shouldn't be triggered
-        self.assertFalse(Task.dns_clobber.all())
+        # We just updated a zone so a full build shouldn't be triggered
+        self.assertFalse(Task.dns_full.all())
 
         # we should see one zone being rebuilt
         self.assertEqual(1, Task.dns_incremental.all().count())
@@ -144,29 +145,27 @@ class MockBuildScriptTests(TestCase):
 
         # Since push-to-prod is false, we should still see the tasks in the
         # same state
-        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_full.all())
         self.assertEqual(1, Task.dns_incremental.all().count())
 
         self.assertEqual(
             SOA.objects.get(pk=root_domain.soa.pk).serial, tmp_serial + 1
         )
 
-        # BUG!! Even though tasks are not being deleted, the dirty bit is
-        # being set to False.
-        self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
+        # The dirty bit should still be true because we didn't check things in
+        self.assertTrue(SOA.objects.get(pk=root_domain.soa.pk).dirty)
 
         # added new record (1) and new serials (2 for both views), old serials
         # removed.
         self.assertEqual((3, 2), b.svn_lines_changed(b.PROD_DIR))
 
         tmp_serial = SOA.objects.get(pk=root_domain.soa.pk).serial
-        self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
 
         b.PUSH_TO_PROD = True
         b.build_dns()
 
         # Since push-to-prod is true all tasks should be back 0
-        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_full.all())
         self.assertFalse(Task.dns_incremental.all())
 
         self.assertFalse(SOA.objects.get(pk=root_domain.soa.pk).dirty)
@@ -187,7 +186,7 @@ class MockBuildScriptTests(TestCase):
         b.build_dns()
 
         # Nothing changed
-        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_full.all())
         self.assertFalse(Task.dns_incremental.all())
 
         self.assertEqual(SOA.objects.get(pk=root_domain.soa.pk).serial,
@@ -230,17 +229,17 @@ class MockBuildScriptTests(TestCase):
                        LOCK_FILE=self.lock_file, LOG_SYSLOG=False,
                        FIRST_RUN=True, PUSH_TO_PROD=True,
                        STOP_UPDATE_FILE=self.stop_update)
-        self.assertTrue(Task.dns_clobber.all())
+        self.assertTrue(Task.dns_full.all())
         self.assertFalse(Task.dns_incremental.all())
         b.build_dns()
 
-        self.assertFalse(Task.dns_clobber.all())
+        self.assertFalse(Task.dns_full.all())
         self.assertFalse(Task.dns_incremental.all())
 
         for ns in root_domain1.nameserver_set.all():
             ns.delete()
 
-        self.assertTrue(Task.dns_clobber.all())
+        self.assertTrue(Task.dns_full.all())
         self.assertTrue(Task.dns_incremental.all())
 
         b.build_dns()  # One zone removed should be okay
@@ -306,7 +305,7 @@ class MockBuildScriptTests(TestCase):
 
         b1.build_dns()  # This checked stuff in
 
-        # Check the repo out somewhere elst
+        # Check the repo out somewhere else
         command_str = "svn co file://{0} {1}".format(
             self.svn_repo, self.prod_dir2
         )
@@ -328,7 +327,7 @@ class MockBuildScriptTests(TestCase):
         b1.vcs_checkin()
 
         b1.PROD_DIR = self.prod_dir  # Fix our little cheat
-        b1.FORCE = True  # Force a build
+        b1.FORCE_BUILD = True  # Force a build
 
         # Add something to the end of the file to cause a collision
         a = AddressRecord.objects.create(
@@ -337,7 +336,7 @@ class MockBuildScriptTests(TestCase):
         )
         a.views.add(View.objects.get(name='public'))
 
-        # Alright, we should have conflicts here. See if we detect it by
+        # We should have conflicts here. See if we detect it by
         # counting how many tasks need to be serviced. If the number remains
         # the same that means we aborted the build due to a conflict
         pre_task_count = Task.objects.all().count()

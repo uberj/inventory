@@ -1,0 +1,16 @@
+How the DNS builds work
+-----------------------
+
+The first things the build system does is check for a "stop_update" file. The existsance
+of this file will builds to exit without rebuilding. Next `get_scheduled()` is called.
+This function collects two types of build requests from the `Task` queue.
+
+At this point if we haven't found tasks queued up or we are not being asked to force a
+build, we exit.
+
+We next attempt to clear the staing area and then build a fresh staging area. If we are
+being asked to build zone files (which by default we are) we call the `do_build_zones()`
+function and pass in the tasks we previously collected. Later, depending on if
+`do_build_zones()` was successful, we delete the tasks we collected from the task queue.
+
+
