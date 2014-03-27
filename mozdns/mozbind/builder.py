@@ -676,7 +676,19 @@ class DNSBuilder(SVNBuilderMixin):
         return file_meta
 
     def build_views(self, soa, root_domain, gen_config, force_rebuild):
-        views_to_build = []
+        """
+        For a given soa build a zone file for every view in the database.
+        This function returns a list contaning tuples, where each tuple
+        contains:
+            * An ORM view object
+            * A dictionary containing file information about where a zone
+                should exist on the filesystem
+            * A zone file with eveything but the SOA's serial filled out.
+
+        This function also introspects a zone's existing bind file (if it
+        exists) to ensure no manual changes to the serial have been made.
+        """
+        view_bundles = []
         self.log(
             "SOA was seen with dirty == {0}".format(force_rebuild),
             root_domain=root_domain
@@ -719,23 +731,22 @@ class DNSBuilder(SVNBuilderMixin):
 
             if was_bad_prev:
                 soa.serial = safe_serial
-                force_rebuild = True
 
-            views_to_build.append(
+            view_bundles.append(
                 (view, file_meta, view_data)
             )
 
-        view_str = ' | '.join([v.name for v, _, _ in views_to_build])
+        view_str = ' | '.join([v.name for v, _, _ in view_bundles])
         self.log(
             '----- Building < {0} > ------'.format(view_str),
             root_domain=root_domain
         )
 
-        return views_to_build
+        return view_bundles
 
-    def do_build(self, zone_stmts, soa, views_to_build, root_domain,
+    def do_build(self, zone_stmts, soa, view_contents, root_domain,
                  gen_config, force_rebuild, next_serial):
-        for view, file_meta, view_data in views_to_build:
+        for view, file_meta, view_data in view_contents:
             if ((root_domain.name, view.name) in ZONES_WITH_NO_CONFIG
                     and gen_config):
                     self.log(
@@ -761,7 +772,7 @@ class DNSBuilder(SVNBuilderMixin):
                     root_domain=root_domain)
                 prod_fname = self.build_zone(
                     view, file_meta,
-                    # Lazy string evaluation
+                    # Here we finally set the serial in the zone's context
                     view_data.format(serial=next_serial),
                     root_domain
                 )
@@ -782,6 +793,23 @@ class DNSBuilder(SVNBuilderMixin):
                     )
 
     def build_zone_files(self, soas, soa_pks_to_rebuild, gen_config=True):
+        """
+        For every soa in soas, build a views that are valid for its zone. If
+        gen_config is true, generate a config statement for a view and store it
+        in zone_stmts (returned by this function). When an soa's pk is in
+        `soa_pks_to_rebuild` calculate a new serial for the zone.
+
+        :param soas: The soa objects that will have config statments made
+            with gen_config is True
+        :param soa_pks_to_rebuild: The primary keys of soa objects that have
+            been flagged as needing to be rebuilt. These soas will have their
+            serial numbers recalculated.
+        :param gen_config: Defaults to True, this parameter decides whether
+            or not zone_statements will be be calculated for the soa objects
+            found in the `soas` parameter
+        :returns zone_stmts: A dictionary mapping zone names to config
+            statements
+        """
         zone_stmts = {}
 
         for soa in soas:
@@ -807,7 +835,7 @@ class DNSBuilder(SVNBuilderMixin):
                     root_domain, soa.serial)
                 )
 
-                views_to_build = self.build_views(
+                view_contents = self.build_views(
                     soa, root_domain, gen_config, force_rebuild
                 )
 
@@ -829,7 +857,7 @@ class DNSBuilder(SVNBuilderMixin):
                     )
 
                 self.do_build(
-                    zone_stmts, soa, views_to_build, root_domain,
+                    zone_stmts, soa, view_contents, root_domain,
                     gen_config, force_rebuild, next_serial
                 )
             except Exception:
@@ -888,29 +916,33 @@ class DNSBuilder(SVNBuilderMixin):
         type of build we are doing.
 
         The three types of builds are:
-            * force build -- we build everything and write a config file
-            * full build -- we rebuild only certain zones but still
-                calculate a config file.
-            * incremental build -- we only zone files, leaving the config how
-                it is.
+            * force build -- we rebuild all zones and write a complete
+                config file
+            * full build -- we rebuild only certain zones and still
+                write a complete config file
+            * incremental build -- we only rebuild certain zones and do *not*
+                write a new config file
         """
         write_statements = True
         if self.FORCE_BUILD:
             soa_pks_to_rebuild = set(
                 SOA.objects.all().values_list('pk', flat=True)
             )
+            soas = SOA.objects.all()
         elif dns_full_tasks:
             soa_pks_to_rebuild = set(int(t.task) for t in chain(
                 dns_incremental_tasks, dns_full_tasks
             ))
+            soas = SOA.objects.all()
         else:
             soa_pks_to_rebuild = set(
                 int(t.task) for t in dns_incremental_tasks
             )
+            soas = SOA.objects.filter(pk__in=soa_pks_to_rebuild)
             write_statements = False
 
         stmts = self.build_zone_files(
-            SOA.objects.filter(pk__in=soa_pks_to_rebuild),
+            soas,
             soa_pks_to_rebuild, gen_config=False
         )
 

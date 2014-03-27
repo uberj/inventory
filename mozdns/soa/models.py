@@ -196,7 +196,7 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
         if commit:
             self.save()
 
-    def schedule_clobber_rebuild(self, commit=True):
+    def schedule_full_rebuild(self, commit=True):
         Task.schedule_all_dns_rebuild(self)
         self.dirty = True
         if commit:
@@ -226,7 +226,7 @@ class SOA(models.Model, ObjectUrlMixin, DisplayMixin):
 
         if new:
             # Need to call this after save because new objects won't have a pk
-            self.schedule_clobber_rebuild(commit=False)
+            self.schedule_full_rebuild(commit=False)
 
     def __str__(self):
         return self.description

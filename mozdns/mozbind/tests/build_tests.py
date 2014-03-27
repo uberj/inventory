@@ -225,6 +225,7 @@ class MockBuildScriptTests(TestCase):
         root_domain1 = create_fake_zone('asdf87')
         root_domain2 = create_fake_zone('asdf88')
         root_domain3 = create_fake_zone('asdf89')
+        create_fake_zone('asdf90')
         b = DNSBuilder(STAGE_DIR=self.stage_dir, PROD_DIR=self.prod_dir,
                        LOCK_FILE=self.lock_file, LOG_SYSLOG=False,
                        FIRST_RUN=True, PUSH_TO_PROD=True,
