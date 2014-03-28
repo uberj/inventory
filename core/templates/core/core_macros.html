@@ -9,6 +9,7 @@
                     <th>Vlan</th>
                     {% endif %}
                     <th>Site</th>
+                    <th>DHCP Scope name</th>
             </tr>
             </thead>
             {% for network in networks %}
@@ -26,6 +27,7 @@
                 {% else %}
                     <td>None</td>
                 {% endif %}
+                <td>{{ network.calc_dhcp_scope_name() }}</td>
             {% endfor %}
             </tr>
         </table>
