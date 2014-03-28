@@ -1,0 +1,22 @@
+.core-list {
+}
+
+.core-list-item {
+    display: inline-block;
+}
+
+.top-attributes {
+    display: inline-block;
+}
+
+.top-attributes-left {
+    display: inline-block;
+    margin-left: 3em;
+}
+
+.core-list-item-title {
+}
+
+.core-choose-circuits {
+    width: 70px;
+}

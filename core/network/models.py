@@ -102,7 +102,10 @@ class Network(models.Model, ObjectUrlMixin, CoreDisplayMixin, KVUrlMixin):
         else:
             details.append(('Site', 'None'))
 
-        details.append(('DHCP Scope Name', self.calc_dhcp_scope_name()))
+        details.append((
+            'DHCP Scope Name',
+            self.calc_dhcp_scope_name() or 'No Valid Scope'
+        ))
 
         return details
 
@@ -135,7 +138,7 @@ class Network(models.Model, ObjectUrlMixin, CoreDisplayMixin, KVUrlMixin):
             if Truth.objects.filter(name=scope_name).exists():
                 return scope_name
 
-        return 'No Valid Scope'
+        return None
 
     def delete(self, *args, **kwargs):
         if self.range_set.all().exists():
