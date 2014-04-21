@@ -747,8 +747,7 @@ class DNSBuilder(SVNBuilderMixin):
     def do_build(self, zone_stmts, soa, view_contents, root_domain,
                  gen_config, force_rebuild, next_serial):
         for view, file_meta, view_data in view_contents:
-            if ((root_domain.name, view.name) in ZONES_WITH_NO_CONFIG
-                    and gen_config):
+            if (root_domain.name, view.name) in ZONES_WITH_NO_CONFIG:
                     self.log(
                         '!!! Not going to emit zone statements for '
                         '{0}\n'.format(root_domain.name),
