@@ -250,22 +250,41 @@ class DirectiveFilter(_Filter):
         self.directive, self.dattribute = directive
         self.dvalue = dvalue
 
+    def strict_equality_gaurd(self):
+        if self.eq != '=' and self.eq != '=:':
+            raise BadDirective(
+                "The {0} directive only supports the strict equality operator "
+                "(i.e. '=').".format(self.directive)
+            )
+
     def compile_Q(self):
+        # The way self.strict_equality_gaurd() is being called can be improved
+        # by moving all the build_* methods into DirectiveFilter class and
+        # using a @strict_equality_gaurd decorator. Right now its a bit
+        # redundant.
         if self.directive == 'view':
+            self.strict_equality_gaurd()
             return build_view_qsets(self.dvalue)
         elif self.directive == 'network':
+            self.strict_equality_gaurd()
             return build_network_qsets(self.dvalue)
         elif self.directive == 'vlan':
+            self.strict_equality_gaurd()
             return build_vlan_qsets(self.dvalue)
         elif self.directive == 'zone':
+            self.strict_equality_gaurd()
             return build_zone_qsets(self.dvalue)
         elif self.directive == 'range':
+            self.strict_equality_gaurd()
             return build_range_qsets(self.dvalue)
         elif self.directive == 'type':
+            self.strict_equality_gaurd()
             return build_rdtype_qsets(self.dvalue)
         elif self.directive == 'site':
+            self.strict_equality_gaurd()
             return build_site_qsets(self.dvalue)
         elif self.directive == 'ip':
+            self.strict_equality_gaurd()
             return build_ip_qsets(self.dvalue)
         # If we haven't already hit a hardcoded directive, try searching
         # searchables to see if we can introspect one of the tables using
