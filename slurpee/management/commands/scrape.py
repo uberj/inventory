@@ -4,7 +4,7 @@ import simplejson as json
 from django.core.management.base import BaseCommand, CommandError
 
 from settings.scrape import config
-from slurpee.puppet_slurp import slurp_puppet_facts
+from slurpee.puppet.puppet_slurp import slurp_puppet_facts
 
 from settings.scrape import ALERT_FILE
 
