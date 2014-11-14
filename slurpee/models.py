@@ -15,7 +15,7 @@ class ExternalData(models.Model):
 
     # If ExternalData.policy is default (its just extra data) we set
     # ExternalData.name to ExternalData.source_name
-    system = models.ForeignKey(System, null=False)
+    system = models.ForeignKey(System, null=True)
     name = models.CharField(max_length=255, null=False)
     data = models.CharField(max_length=1023, null=False)
     source = models.CharField(max_length=255, null=False)
