@@ -3,16 +3,13 @@ import requests
 import simplejson as json
 import time
 
-from slurpee.models import ExternalData
+from slurpee.puppet.models import ExternalPuppetData
 from systems.models import System
 from django.db import transaction
 
 from slurpee.constants import P_EXTRA, P_MANAGED
+from slurpee.exceptions import NoDataReturned
 from settings.scrape import RETRY as MAX_RETRY
-
-
-class NoDataReturned(Exception):
-    pass
 
 
 class ForemanFactSlurp(object):
@@ -35,7 +32,11 @@ class ForemanFactSlurp(object):
             # The user has specified an explicit policy to use:
             #   - Build a list containing all full policy names
             #   - See if this fact's policy is in the list of policies
-            if fact['policy'] not in [p[0] for p in ExternalData.POLICY_TYPE]:
+            if (
+                fact['policy'] not in [
+                    p[0] for p in ExternalPuppetData.POLICY_TYPE
+                ]
+            ):
                 raise Exception(
                     "Unkown policy type '{0}'".format(fact['policy'])
                 )
@@ -119,7 +120,7 @@ class ForemanFactSlurp(object):
                 continue
 
             try:
-                orm_data.append(ExternalData(
+                orm_data.append(ExternalPuppetData(
                     system=System.objects.get(hostname=hostname),
                     name=self.name,
                     source_name=self.fact_name,
@@ -136,7 +137,7 @@ class ForemanFactSlurp(object):
             raise NoDataReturned(
                 "No data returned from {0} {1}".format(self.source, self.url)
             )
-        ExternalData.objects.bulk_create(orm_data)
+        ExternalPuppetData.objects.bulk_create(orm_data)
 
         print "Created {0} new datum".format(len(orm_data))
         print "Done!"
@@ -164,7 +165,7 @@ def slurp_puppet_facts(source=None, source_url=None, auth=None, facts=None,
     )
 
     # Clear everything we saw last time
-    ExternalData.objects.filter(source=source).delete()
+    ExternalPuppetData.objects.filter(source=source).delete()
 
     with futures.ThreadPoolExecutor(max_workers=len(future_facts)) as executor:
         facts = dict(

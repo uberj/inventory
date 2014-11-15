@@ -53,17 +53,17 @@
     <div class='system-data'>
         {% set found_external = False %}
         {% for attr in attrs %}
-            {% if s.externaldata_set.filter(name=attr).exists() %}
+            {% if s.externalpuppetdata_set.filter(name=attr).exists() %}
                 {% set found_external = True %}
-                {% for ed in s.externaldata_set.filter(name=attr)  %}
-                    {% if s.external_data_conflict(attr)  %}
+                {% for ed in s.externalpuppetdata_set.filter(name=attr)  %}
+                    {% if s.externalpuppet_data_conflict(attr)  %}
                         {{ build_attr(ed, s, attr, s_value, True, format_display=format_display) }}
                     {% else %}
                         {{ build_attr(ed, s, attr, s_value, False, format_display=format_display) }}
                     {% endif %}
                 {% endfor %}
 
-                {% if loop.last and s.external_data_conflict(attr) %}
+                {% if loop.last and s.externalpuppet_data_conflict(attr) %}
                     {% if found_external %}
                         <div class='system-passive-native-data'>
                             <div class='content'>

@@ -8,10 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'ExternalData'
-        db.create_table('slurpee_externaldata', (
+        # Adding model 'ExternalPuppetData'
+        db.create_table('puppet_externalpuppetdata', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('system', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['systems.System'])),
+            ('system', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['systems.System'], null=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('data', self.gf('django.db.models.fields.CharField')(max_length=1023)),
             ('source', self.gf('django.db.models.fields.CharField')(max_length=255)),
@@ -20,24 +20,17 @@ class Migration(SchemaMigration):
             ('dtype', self.gf('django.db.models.fields.CharField')(default='rt', max_length=2)),
             ('policy', self.gf('django.db.models.fields.CharField')(default='ex', max_length=2)),
         ))
-        db.send_create_signal('slurpee', ['ExternalData'])
+        db.send_create_signal('puppet', ['ExternalPuppetData'])
 
 
     def backwards(self, orm):
-        # Deleting model 'ExternalData'
-        db.delete_table('slurpee_externaldata')
+        # Deleting model 'ExternalPuppetData'
+        db.delete_table('puppet_externalpuppetdata')
 
 
     models = {
-        'site.site': {
-            'Meta': {'unique_together': "(('full_name',),)", 'object_name': 'Site', 'db_table': "'site'"},
-            'full_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['site.Site']", 'null': 'True', 'blank': 'True'})
-        },
-        'slurpee.externaldata': {
-            'Meta': {'object_name': 'ExternalData'},
+        'puppet.externalpuppetdata': {
+            'Meta': {'object_name': 'ExternalPuppetData'},
             'atime': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'auto_now_add': 'True', 'blank': 'True'}),
             'data': ('django.db.models.fields.CharField', [], {'max_length': '1023'}),
             'dtype': ('django.db.models.fields.CharField', [], {'default': "'rt'", 'max_length': '2'}),
@@ -46,7 +39,14 @@ class Migration(SchemaMigration):
             'policy': ('django.db.models.fields.CharField', [], {'default': "'ex'", 'max_length': '2'}),
             'source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'source_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'system': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['systems.System']"})
+            'system': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['systems.System']", 'null': 'True'})
+        },
+        'site.site': {
+            'Meta': {'unique_together': "(('full_name',),)", 'object_name': 'Site', 'db_table': "'site'"},
+            'full_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['site.Site']", 'null': 'True', 'blank': 'True'})
         },
         'systems.allocation': {
             'Meta': {'ordering': "['name']", 'object_name': 'Allocation', 'db_table': "u'allocations'"},
@@ -128,4 +128,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['slurpee']
+    complete_apps = ['puppet']

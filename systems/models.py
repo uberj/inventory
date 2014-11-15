@@ -774,7 +774,7 @@ class System(Refresher, DirtyFieldsMixin, CoreDisplayMixin, models.Model):
         self.keyvalue_set.filter(key__startswith='nic.%i' % index).delete()
         return True
 
-    def external_data_conflict(self, attr):
+    def externalpuppet_data_conflict(self, attr):
         if not hasattr(self, attr):
             return False
 
@@ -782,7 +782,7 @@ class System(Refresher, DirtyFieldsMixin, CoreDisplayMixin, models.Model):
         if not val:
             return False
 
-        for ed in self.externaldata_set.filter(name=attr):
+        for ed in self.externalpuppetdata_set.filter(name=attr):
             if (attr == 'oob_ip' and
                     ed.data == val.strip().lstrip('ssh').strip()):
                 return False

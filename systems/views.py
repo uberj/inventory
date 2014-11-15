@@ -516,14 +516,14 @@ def sync_external_data_ajax(request):
         }), status=400)
 
     try:
-        ed = system.externaldata_set.get(source=source, name=attr)
-    except system.externaldata_set.model.DoesNotExist:
+        ed = system.externalpuppetdata_set.get(source=source, name=attr)
+    except system.externalpuppetdata_set.model.DoesNotExist:
         return HttpResponse(json.dumps({
             'error': "System {0} has no external attribute '{1}' for source "
             "'{2}'".format(system.hostname, attr, source)
         }), status=400)
 
-    conflict_seen = system.external_data_conflict(attr)
+    conflict_seen = system.externalpuppet_data_conflict(attr)
     cur_value = getattr(system, attr)
     if attr == 'oob_ip' and cur_value.strip().startswith('ssh'):
         new_value = 'ssh ' + ed.data

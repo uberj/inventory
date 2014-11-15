@@ -1,6 +1,6 @@
 from django.test import Client, TestCase
 
-from slurpee.models import ExternalData
+from slurpee.puppet.models import ExternalData as ExternalFactData
 from slurpee.constants import P_OVERLAY
 
 from systems.tests.utils import create_fake_host
@@ -15,7 +15,7 @@ class ExternalDataTests(TestCase):
         self.s = create_fake_host(
             hostname='fakehost.mozilla.com', serial=serial
         )
-        ExternalData.objects.create(
+        ExternalFactData.objects.create(
             system=self.s,
             name='serial',
             source_name='serial',

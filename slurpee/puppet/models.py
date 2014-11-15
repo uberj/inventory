@@ -7,7 +7,7 @@ from slurpee.constants import (
 )
 
 
-class ExternalData(models.Model):
+class ExternalPuppetData(models.Model):
     # ExternalData.name is what Inventory references the data as.
     # For example: puppet calls a serial 'serialnumber' but Inventory calls
     # it 'serial'. In that case ExternalData.name would be 'serial' and

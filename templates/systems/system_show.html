@@ -20,10 +20,10 @@
 
 <div id='meta-data' data-system-id='{{system.id}}'></div>
 
-{% if system.externaldata_set.exists() %}
+{% if system.externalpuppetdata_set.exists() %}
     <div class='external-sources'>
         <div id='sources-title'>Active External Data Sources</div>
-        {% for source in system.externaldata_set.all().values_list('source', flat=True).distinct() %}
+        {% for source in system.externalpuppetdata_set.all().values_list('source', flat=True).distinct() %}
             <div class='external-source {{ source }}'>
                 <a href='{{external_config[source]['host-url'].format(hostname=system.hostname) }}'>{{ source }}</a>
             </div>
@@ -142,7 +142,7 @@
 <div style="clear:both;"></div>
 
 {# Display P_EXTRA facts about this machine #}
-{% for ed in extra_externaldata %}
+{% for ed in extra_externalpuppetdata %}
     {% if ed.data != 'Not Specified' %}
         {% if ed.source == 'infra-puppet-facts' %}
             <dt class='infra-puppet-facts'>{{ ed.name }}:</dt>

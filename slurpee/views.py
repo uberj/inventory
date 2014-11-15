@@ -7,13 +7,13 @@ from slurpee.constants import P_OVERLAY
 
 
 def conflict_attrs(s):
-    return s.externaldata_set.filter(policy=P_OVERLAY)
+    return s.externalpuppetdata_set.filter(policy=P_OVERLAY)
 
 
 def get_conflicts(s):
     conflicts = []
     for ed in conflict_attrs(s):
-        if s.external_data_conflict(ed.name):
+        if s.externalpuppet_data_conflict(ed.name):
             conflicts.append(ed)
     return conflicts
 

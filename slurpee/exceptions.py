@@ -1,0 +1,2 @@
+class NoDataReturned(Exception):
+    pass
