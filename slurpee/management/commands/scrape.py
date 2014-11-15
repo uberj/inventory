@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from settings.scrape import config
 from slurpee.puppet.puppet_slurp import slurp_puppet_facts
+from slurpee.zxtm.zxtm_slurp import slurp_zxtm_facts
 
 from settings.scrape import ALERT_FILE
 
@@ -46,6 +47,15 @@ class Command(BaseCommand):
             if 'type' not in c:
                 raise CommandError(
                     "Invalid config. Couldn't find type of {0}".format(c)
+                )
+
+            if c['type'] == 'zxtm':
+                slurp_zxtm_facts(
+                    source_name,
+                    source_url=c['source-url'],
+                    auth=(c['user'], c['pass']),
+                    ssl_verify=c.get('ssl-verify', True),
+                    api_version=c['api-version']
                 )
 
             if c['type'] == 'puppet-dashboard':

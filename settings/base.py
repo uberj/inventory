@@ -36,6 +36,7 @@ INSTALLED_APPS = list(INSTALLED_APPS) + [
     'south',
     'slurpee',
     'slurpee.puppet',
+    'slurpee.zxtm',
     'systems',
     'oncall',
     'migrate_dns',
