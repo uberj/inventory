@@ -1,3 +1,21 @@
+{% macro build_zxtm_info(nodes) -%}
+    <div class='content'>
+        <div class='tooltip'>
+            {% for node in nodes %}
+            <div class='zxtm-piece-of-info'>
+                <div class='zxtm-node'>
+                    {% for snippet in node.snippets %}
+                    <div class='zxtm-node-snippet'>
+                        {{ snippet }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro -%}
+
 {% macro build_attr(ed, s, attr, s_value, conflict, format_display=None, is_extra=False) -%}
         <div class='system-external-data'>
             <div class='content'>
@@ -14,7 +32,7 @@
                         data-source='{{ ed.source }}'
                         data-system-pk='{{ s.pk }}'
                         class='btn btn-small sync-external-data-button'>
-                        Overwrite 
+                        Overwrite
                     </button>
                     {% else %}
                     This data aligns with current system data.

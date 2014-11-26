@@ -44,8 +44,9 @@ class PointerPath(object):
 
 
 class Pool(object):
-    def __init__(self, name, blob):
+    def __init__(self, name, zxtm, blob):
         self.name = name
+        self.zxtm = zxtm
         self.blob = blob
         self.vservers = []
 
@@ -70,12 +71,13 @@ class Pool(object):
         return self.blob.get_path('/info/properties/basic').json['nodes_table']
 
     def make_orm_object(self):
-        return ORMPool(name=self.name)
+        return ORMPool(name=self.name, zxtm=self.zxtm.name)
 
 
 class TIG(object):
-    def __init__(self, name, blob):
+    def __init__(self, name, zxmt, blob):
         self.name = name
+        self.zxmt = zxtm
         self.blob = blob
         self.vservers = []
 
@@ -98,7 +100,7 @@ class TIG(object):
         return self.blob.get_path('/info/properties/basic').json['ipaddresses']
 
     def make_orm_object(self):
-        return ORMTIG(name=self.name)
+        return ORMTIG(name=self.name, zxtm=self.zxtm.name)
 
 
 class Nodes(object):
@@ -116,7 +118,7 @@ class Nodes(object):
     def _process_node(self, node_instance, pool):
         node_id = node_instance['node_id']
         if node_id not in self._nodes:
-            new_node = Node(node_id=node_id)
+            new_node = Node(self.zstate, node_id=node_id)
             self._nodes[node_id] = new_node
         self._nodes[node_id].instances.append((pool, node_instance))
 
@@ -137,10 +139,9 @@ class Node(object):
     Node is a representation of an IP or hostname. 10.1.1.1:500 10.1.1.1:501
     would be the *same* node.
     """
-    def __init__(
-        self, node_id=None
-    ):
+    def __init__(self, zxtm, node_id=None):
         self.node_id = node_id
+        self.zxtm = zxtm
         self.instances = []
 
     def __str__(self):
@@ -157,6 +158,7 @@ class Node(object):
     def make_orm_objects(self):
         for pool, instance in self.instances:
             yield ORMNode(
+                zxtm=self.zxtm.name,
                 node_id=self.node_id,
                 name=instance['node'],
                 pool=pool.name
@@ -181,6 +183,9 @@ class ZXTM(object):
     def url(self):
         return self.blob.json['url']
 
+    def name(self):
+        return self.url
+
     @property
     def nodes(self):
         if not self._nodes:
@@ -199,6 +204,7 @@ class ZXTM(object):
                     )
                 self._tigs[tig_name] = TIG(
                     tig_name,
+                    self,
                     self.blob.get_path('/tigs/' + tig_name)
                 )
         return self._tigs
@@ -208,7 +214,7 @@ class ZXTM(object):
         if not self._pools:
             self._pools = {
                 'discard': Pool(
-                    'discard', None
+                    'discard', self, None
                 )
             }
             for pool_name in self.blob.get_path('/pools').json:
@@ -218,7 +224,7 @@ class ZXTM(object):
                         .format(pool_name)
                     )
                 self._pools[pool_name] = Pool(
-                    pool_name, self.blob.get_path('/pools/' + pool_name)
+                    pool_name, self, self.blob.get_path('/pools/' + pool_name)
                 )
         return self._pools
 
@@ -321,7 +327,9 @@ class VServer(object):
         ]
 
     def make_orm_object(self):
-        return ORMVServer(name=self.name, pool=self.pool_name)
+        return ORMVServer(
+            name=self.name, pool=self.pool_name, zxtm=self.zxtm.name
+        )
 
 
 class Blob(object):
@@ -395,6 +403,7 @@ class ZXTMState(object):
 
     @classmethod
     def clear_orm_state(cls):
+        ORMNode.objects.all().delete()
         ORMPool.objects.all().delete()
         ORMTIG.objects.all().delete()
         ORMVServer.objects.all().delete()

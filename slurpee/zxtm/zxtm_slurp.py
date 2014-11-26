@@ -45,15 +45,17 @@ class ZXTMConnector(object):
 def slurp_zxtm_facts(source_name, source_url=None, auth=None, ssl_verify=None,
                      api_version=None):
     # Clear everything we saw last time
+    import pdb;pdb.set_trace()
     zs = ZXTMState(
         filename='/home/juber/inventory/inventory/slurpee/zxtm/zxtm.json',
         version=api_version
     )
 
+    from slurpee.zxtm.models import Pool as ORMPool
+    before = ORMPool.objects.all().count()
     ZXTMState.clear_orm_state()  # Deletes everything in the db
+    after = ORMPool.objects.all().count()
     zs.save_orm_state()
-    from slurpee.zxtm.models import Node
-    import pdb;pdb.set_trace()
-    Node.objects.filter(node_id='10.20.77.22')
-    pass
-
+    print before
+    print after
+    print ORMPool.objects.all().count()
