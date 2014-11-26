@@ -596,7 +596,8 @@ def system_show(request, id):
         'adapters': adapters,
         'key_values': key_values,
         'is_release': is_release,
-        'extra_externaldata': system.externaldata_set.filter(policy=P_EXTRA),
+        'extra_externaldata': system.externalpuppetdata_set.filter(
+            policy=P_EXTRA),
         'external_config': external_config,
         'read_only': getattr(request, 'read_only', False),
     })

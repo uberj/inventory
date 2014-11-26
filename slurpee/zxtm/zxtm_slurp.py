@@ -45,7 +45,6 @@ class ZXTMConnector(object):
 def slurp_zxtm_facts(source_name, source_url=None, auth=None, ssl_verify=None,
                      api_version=None):
     # Clear everything we saw last time
-    import pdb;pdb.set_trace()
     zs = ZXTMState(
         filename='/home/juber/inventory/inventory/slurpee/zxtm/zxtm.json',
         version=api_version

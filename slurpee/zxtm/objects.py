@@ -5,7 +5,8 @@ from slurpee.zxtm.models import (
     TIG as ORMTIG,
     Pool as ORMPool,
     VServer as ORMVServer,
-    VServerListenOnTig
+    VServerListenOnTig,
+    ZXTM as ORMZXTM
 )
 
 import sys
@@ -75,9 +76,9 @@ class Pool(object):
 
 
 class TIG(object):
-    def __init__(self, name, zxmt, blob):
+    def __init__(self, name, zxtm, blob):
         self.name = name
-        self.zxmt = zxtm
+        self.zxtm = zxtm
         self.blob = blob
         self.vservers = []
 
@@ -108,9 +109,10 @@ class Nodes(object):
     This is meant to be an inverted index of the ZuesState object that maps
     hosts to tigs, pools, and virtual servers.
     """
-    def __init__(self, zstate):
+    def __init__(self, zxtm):
+        self.zxtm = zxtm
         self._nodes = {}
-        for pool in zstate.pools.values():
+        for pool in zxtm.pools.values():
             for node in pool.nodes_table:
                 node['node_id'] = node['node'].split(':')[0]
                 self._process_node(node, pool)
@@ -118,7 +120,7 @@ class Nodes(object):
     def _process_node(self, node_instance, pool):
         node_id = node_instance['node_id']
         if node_id not in self._nodes:
-            new_node = Node(self.zstate, node_id=node_id)
+            new_node = Node(self.zxtm, node_id=node_id)
             self._nodes[node_id] = new_node
         self._nodes[node_id].instances.append((pool, node_instance))
 
@@ -183,6 +185,7 @@ class ZXTM(object):
     def url(self):
         return self.blob.json['url']
 
+    @property
     def name(self):
         return self.url
 
@@ -240,6 +243,7 @@ class ZXTM(object):
                     )
                 self._vservers[vserver_name] = VServer(
                     vserver_name,
+                    self,
                     self.blob.get_path('/servers/' + vserver_name)
                 )
         return self._vservers
@@ -266,6 +270,7 @@ class ZXTM(object):
                     ORMVServers_TIG_relationships.append(
                         VServerListenOnTig(
                             vserver=vserver_name,
+                            zxtm=self.name,
                             tig=tig_name
                         )
                     )
@@ -288,7 +293,9 @@ class ZXTM(object):
             yield tig.make_orm_object()
 
     def save_orm_state(self):
-        ORMPool.objects.bulk_create(self.orm_pools())
+        for pool in self.orm_pools():
+            ORMPool.objects.bulk_create([pool])
+        ORMZXTM.objects.create(name=self.name)
         ORMTIG.objects.bulk_create(self.orm_tigs())
         orm_vservers, orm_vserver_relationships = (
             self.orm_vservers_and_relationships()
@@ -301,8 +308,9 @@ class ZXTM(object):
 
 
 class VServer(object):
-    def __init__(self, name, blob):
+    def __init__(self, name, zxtm, blob):
         self.name = name
+        self.zxtm = zxtm
         self.blob = blob
         self.tigs = []
 

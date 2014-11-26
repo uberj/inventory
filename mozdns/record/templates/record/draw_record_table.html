@@ -197,7 +197,7 @@
         <tr>
             <td>{{ obj.fqdn }}</td>
             <td><b>{{ obj.record_type() }}</b></td>
-            <td>{{ obj.ip_str }}</td>
+            <td><div class='possible-zxtm-info'>{{ obj.ip_str }}</div></td>
             <td><a class='btn btn-small' href="{{ obj.get_fancy_edit_url() }}">Edit</a></td>
         </tr>
         {% endfor %}
@@ -216,7 +216,7 @@
         <tr>
             <td>{{ obj.fqdn }}</td>
             <td><b>{{ obj.record_type() }}</b></td>
-            <td>{{ obj.ip_str }}</td>
+            <td><div class='possible-zxtm-info'>{{ obj.ip_str }}</div></td>
             <td><a class='btn btn-small' href="{{ obj.get_fancy_edit_url() }}">Edit</a></td>
         </tr>
         {% endfor %}
@@ -233,7 +233,7 @@
         <tbody>
         {% for ptr in objs %}
         <tr>
-            <td>{{ ptr.ip_str }}</td>
+            <td><div class='possible-zxtm-info'>{{ ptr.ip_str }}</div></td>
             <td><b>PTR</b></td>
             <td>{{ ptr.name }}</td>
             <td><a class='btn btn-small' href="{{ ptr.get_fancy_edit_url() }}">Edit</a></td>

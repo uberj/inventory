@@ -1,0 +1,36 @@
+.zxtm-info {
+  color: blue;
+}
+
+.zxtm-piece-of-info {
+    display: block;
+}
+
+.zxtm-node {
+    display: block;
+}
+
+/*
+ * Tool tip stuff
+ */
+
+.content {
+  position: relative;
+  display: inline;
+}
+
+.content .tooltip span {
+  margin-left: 40px;
+}
+
+.content .tooltip {
+  color: black;
+  background-color: #F8F8F8;
+  border: 1px solid #777;
+  border-radius: 2px;
+  padding: 9px;
+  position: absolute;
+  width: 400px;
+  z-Index: 99999;
+  /*display: none; */
+}

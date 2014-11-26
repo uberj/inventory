@@ -116,7 +116,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro display_obj_field(obj, field_name, value, draw_row=True, top_row=False, class='field-blank') %}
+{% macro display_obj_field(obj, field_name, value, draw_row=True, top_row=False, value_class='') %}
     {% if draw_row %}
         <tr>
     {% endif %}
@@ -127,7 +127,7 @@
             {{ field_name }}
         {% endif %}
     </td>
-    <td class='field-value' align='left'>
+    <td class='field-value {{ value_class }}' align='left'>
         {{ value }}
     </td>
     {% if draw_row %}
@@ -159,7 +159,7 @@
 {% macro display_sreg(sreg) -%}
     {{ display_obj_field(sreg, 'fqdn', sreg.fqdn, top_row=True) }}
     {{ display_obj_field(sreg, 'name', sreg.name) }}
-    {{ display_obj_field(sreg, 'inet4 addr' if sreg.ip_type == '4' else 'inet6 addr', sreg.ip_str) }}
+    {{ display_obj_field(sreg, 'inet4 addr' if sreg.ip_type == '4' else 'inet6 addr', sreg.ip_str, value_class='possible-zxtm-info') }}
     {{ display_views(sreg, 'views', sreg.views.all()) }}
     {{ display_obj_field(sreg.network, 'network', sreg.network or 'N/A') }}
     <div class='sreg-data' style='display: none;' data-network-dhcp-scope-name='{{ sreg.network and sreg.network.calc_dhcp_scope_name() }}'></div>
