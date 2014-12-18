@@ -37,7 +37,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 api-man:
-	wget https://raw.github.com/uberj/inv-tool/master/docs/invtool.man.rst -O api.man.rst
+	wget --no-check-certificate https://raw.github.com/uberj/inv-tool/master/docs/invtool.man.rst -O api.man.rst
 	sed -i "s/==/--/g" api.man.rst && sed -i "s/=$$/-/"  api.man.rst
 
 html: api-man
